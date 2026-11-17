@@ -24,13 +24,14 @@ function linksTab(sub) {
   if (sub === 'routes') {
     const mine = G.links.filter(l => l.n === P || G.ter[l.a].ctrl === P || G.ter[l.b].ctrl === P);
     return (mine.map(l => { const st = G.linkVisible(l); return `<div class="card small"><div class="row"><b>${ico(LT[l.type].ic)} ${LT[l.type].n}</b><span class="${st === 'cut' ? 'r' : st === 'build' ? 'y' : 'g'}">${st === 'cut' ? 'перерізано війною' : st === 'build' ? 'будується ' + (l.done - G.day) + ' дн.' : 'працює'}</span></div><div class="row"><span>${esc(regName(l.a))} — ${esc(regName(l.b))}</span><span>${Math.round(l.km)} км</span></div></div>`; }).join('') || '<div class="mut">Власних маршрутів ще немає.</div>')
-      + '<div class="mut small">Залізниці й автошляхи прискорюють перекидання військ і постачання, міждержавні маршрути здешевлюють торгівлю (труби — газ, залізниця — сировина й контейнери, авто — контейнери). Авіаміст — швидке перекидання військ і цінних вантажів.</div>';
+      + '<div class="mut small">Залізниці й автошляхи прискорюють перекидання військ і постачання, міждержавні маршрути здешевлюють торгівлю (труби — газ, залізниця — сировина й контейнери, авто — контейнери). Авіаміст — швидке перекидання військ і цінних вантажів. Морська лінія — дешевий морський коридор між вашими портами.</div>';
   }
   const d = linkDraft || { type: 'rail', a: sel && sel.type === 't' ? sel.id : -1 };
   linkDraft = d;
   let h = `<div class="sub">${Object.entries(LT).map(([k, v]) => `<button class="${d.type === k ? 'on' : ''}" onclick="linkDraft.type='${k}';renderTab(true)">${ico(v.ic)} ${v.n}</button>`).join('')}</div>`;
   h += `<div class="row"><span>Початок</span><b>${d.a >= 0 ? esc(regName(d.a)) : '— оберіть регіон на мапі'}</b></div>`;
   h += `<div class="btns"><button onclick="if(sel&&sel.type==='t'){linkDraft.a=sel.id;renderTab(true)}">📍 Взяти вибраний регіон</button>${d.a >= 0 ? `<button class="pri" onclick="orderMode='link';hint('Клікніть кінцевий регіон маршруту')">🎯 Обрати кінець на мапі</button>` : ''}</div>`;
+  if (d.type === 'sea') h += `<div class="card small">🚢 Морська лінія з'єднує два <b>морські порти</b> (будівля «Морський порт» на обох кінцях) — до 15 000 км. Здешевлює торгівлю сировиною й контейнерами між цими регіонами та дає +4% постачання арміям у портах. Рветься, якщо кінці у війні між собою.</div>`;
   h += `<div class="mut small">Ціна залежить від довжини й рельєфу: гори — майже вдвічі дорожче. Маршрут через кордон потребує згоди сусіда (відносини ≥ 40) і покращує відносини.</div>`;
   return h;
 }

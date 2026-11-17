@@ -28,7 +28,7 @@ function charDo(k) { const r = G.charDo(k, k === 'broker' ? window._brk : null);
 // вкладка
 TAB_FN.lead = function () {
   const L = G.leader; if (!L) return '<div class="mut">—</div>';
-  let h = `<div class="card"><div class="row"><b>${pxi('star')} ${esc(ldName())}</b><span class="mut">${esc(t_(L.role === 'president' ? 'глава держави' : L.role === 'ceo' ? 'генеральний директор' : G.D.charTypes[L.type].n))}</span></div><div class="small">${ldWhere()}</div>
+  let h = `<div class="card"><div class="ava-row">${leaderAva(80)}<div class="ava-btns"><button class="small" onclick="rerollLeaderAva()" data-tip="${t_('Інший вигляд аватарки')}">🎲</button><button class="small" onclick="toggleLeaderFem()" data-tip="${t_('Чоловік / жінка')}">⚥</button></div></div><div class="row"><b>${pxi('star')} ${esc(ldName())}</b><span class="mut">${esc(t_(L.role === 'president' ? 'глава держави' : L.role === 'ceo' ? 'генеральний директор' : G.D.charTypes[L.type].n))}</span></div><div class="small">${ldWhere()}</div>
     <div class="btns"><button onclick="ldHome()" ${L.mv ? 'disabled' : ''}>🏠 ${t_('Додому')}</button><button onclick="focusReg(${L.mv ? L.mv.to : L.at})">🎯 ${t_('Показати на мапі')}</button></div></div>`;
   h += `<div class="mut small">${t_('Щоб домовлятися з країною — союзи, торговельні угоди, військовий доступ, покращення відносин, офіси й лобізм — лідер має особисто прилетіти туди. Клацніть регіон країни → «Летіти сюди». Офіційний візит раз на пів року дає +6 до відносин. Довга відсутність удома знижує стабільність.')}</div>`;
   const vis = Object.entries(L.lastVisit).sort((a, b) => b[1] - a[1]).slice(0, 8);
@@ -47,7 +47,7 @@ TAB_FN.char = function () {
   return h;
 };
 function renderTopChar(sp) {
-  const L = G.leader; return `<button onclick="toggleLeft()">☰</button><div class="st"><b>${ico(G.D.charTypes[L.type].ic)} ${esc(L.name)}</b><span>${esc(t_(G.D.charTypes[L.type].n))}</span></div>
+  const L = G.leader; return `<button onclick="toggleLeft()">☰</button>${leaderAva(30)}<div class="st"><b>${ico(G.D.charTypes[L.type].ic)} ${esc(L.name)}</b><span>${esc(t_(G.D.charTypes[L.type].n))}</span></div>
   <div class="st"><b>${G.dateStr()}</b><span>${t_('день')} ${G.day}</span></div><div id="speed">${sp}</div>
   <div class="st" data-tip="${t_('Особисті кошти персонажа')}"><b>${money(L.money)}</b><span>${t_('кошти')}</span></div><div class="st"><b>${L.fame.toFixed(0)}</b><span>${t_('слава')}</span></div>
   <div class="st"><b>${L.mv ? '✈' : '📍'} ${esc(nat(L.mv ? G.ter[L.mv.to].ctrl : G.ter[L.at].ctrl).name)}</b><span>${t_('де ви')}</span></div>`;
@@ -62,7 +62,9 @@ function drawLeader(sh) {
   const [x, y] = toScreen(lon + sh, lat); if (x < -40 || x > innerWidth + 40) return;
   const p = PX_ICONS.star, bob = Math.sin(animT * 3) * 2; ctx.imageSmoothingEnabled = false;
   ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.beginPath(); ctx.ellipse(x, y + 12, 10, 3, 0, 0, 7); ctx.fill();
-  if (_pxImg.complete) ctx.drawImage(_pxImg, p[0] * 16, p[1] * 16, 16, 16, x - 12, y - 22 + bob, 24, 24);
+  const av = avatarImg(L.ava || L.name, { fem: L.fem });
+  if (av) { ctx.fillStyle = '#ffd34d'; ctx.fillRect(x - 15, y - 33 + bob, 30, 30); ctx.drawImage(av, x - 14, y - 32 + bob, 28, 28); if (_pxImg.complete) ctx.drawImage(_pxImg, p[0] * 16, p[1] * 16, 16, 16, x + 7, y - 38 + bob, 12, 12); }
+  else if (_pxImg.complete) ctx.drawImage(_pxImg, p[0] * 16, p[1] * 16, 16, 16, x - 12, y - 22 + bob, 24, 24);
   ctx.font = '600 11px Pixelify, system-ui'; ctx.textAlign = 'center'; const w = ctx.measureText(L.name).width + 10;
   ctx.fillStyle = 'rgba(10,16,24,0.85)'; ctx.fillRect(x - w / 2, y + 4, w, 15); ctx.fillStyle = '#ffd34d'; ctx.fillText(L.name, x, y + 15);
 }

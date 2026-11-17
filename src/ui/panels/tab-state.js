@@ -7,7 +7,9 @@ const TAB_FN = {};
 function renderTab(force) {
   if (!G) return; const el = $('#tabc');
   if (!force && el.contains(document.activeElement) && /INPUT|SELECT/.test(document.activeElement.tagName)) return;
-  const st = el.scrollTop; el.innerHTML = (TAB_FN[tab] || (() => ''))(); el.scrollTop = st;
+  const html = (TAB_FN[tab] || (() => ''))(); if (html === el._last && !force) return; // без змін — не перемальовуємо (без «смикання»)
+  if (el._tab !== tab) { el._tab = tab; el.classList.remove('anim'); void el.offsetWidth; el.classList.add('anim'); clearTimeout(el._at); el._at = setTimeout(() => el.classList.remove('anim'), 300); }
+  const st = el.scrollTop; el.innerHTML = html; el._last = html; el.scrollTop = st;
 }
 function subnav(t, list) { const cur = subtab[t] || list[0][0]; return `<div class="sub">${list.map(([k, v]) => `<button class="${cur === k ? 'on' : ''}" onclick="subtab['${t}']='${k}';renderTab(true)">${v}</button>`).join('')}</div>`; }
 const curSub = (t, def) => subtab[t] || def;
@@ -66,6 +68,11 @@ function parlTab(n) {
   <div class="row"><span data-tip="${t_('Частка голосів, на яку можна розраховувати: залежить від фракцій і стабільності')}">${t_('Підтримка рішень')}</span><b class="${sup > 0.55 ? 'g' : sup > 0.48 ? 'y' : 'r'}">${pct(sup, 0)}</b></div>
   <div class="row"><span>${t_('Наступні вибори')}</span><b>${G.dateStr(p.next)}</b></div>`;
   h += `<div class="card small">${p.regime === 'autocracy' ? t_('В автократії парламент не заважає: рішення ухвалюються без голосувань.') : t_('Великі зміни податків, мобілізації, оборонного й соціального бюджету та оголошення війни виносяться на голосування. Провалене рішення можна повторити через 30 днів. Підтримка росте зі стабільністю й економікою.')}</div>`;
+  if (p.regime !== 'autocracy' && n.id === G.player) {
+    h += `<div class="grp">${t_('Вплив на парламент')}</div>` + (p.decree > G.day ? `<div class="card small y">⚖ ${t_('Діють надзвичайні повноваження ще')} ${p.decree - G.day} ${t_('дн.')}</div>` : '');
+    for (const [k, A] of Object.entries(G.PARL_ACT)) { const e = G.parlCan(n.id, k), c = G.parlActCost(n.id, k);
+      h += `<div class="card small"><div class="row"><b>${ico(A.ic)} ${esc(t_(A.n))}</b><button ${e ? 'disabled' : ''} onclick="doParl('${k}')">${c ? money(c) : t_('Виконати')}</button></div><div class="mut">${esc(t_(A.d))}</div>${e ? `<div class="r">${esc(t_(e))}</div>` : ''}</div>`; }
+  }
   if (p.votes.length) h += `<div class="grp">${t_('Останні голосування')}</div>` + p.votes.map(v => `<div class="row small"><span>${v.ok ? '✅' : '❌'} ${esc(t_(v.what))}</span><span>${v.yes}/${v.need}</span></div>`).join('');
   return h;
 }
@@ -81,3 +88,4 @@ function projTab(n) {
   return h;
 }
 function doProj(k) { const r = G.act.startProject(k); hint(r.ok ? '🚀 ' + t_('Проєкт розпочато') : '⚠ ' + r.err, 3000); renderTab(true); }
+function doParl(k) { const r = G.act.parlAct(k); hint(r && r.ok ? '🏛 ' + t_('Виконано') : '⚠ ' + t_((r && r.err) || 'Помилка'), 3000); renderTab(true); renderTop(); }

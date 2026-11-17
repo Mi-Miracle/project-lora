@@ -53,8 +53,13 @@ function strikeTab(n) {
   const S = window._stk; let h = `<div class="mut small">${t_('Удари по тилу ворога: енергетика, оборонні заводи, склади й війська. ППО ворога збиває частину цілей.')}</div>`;
   if (!en.length) return h + `<div class="card">${t_('Ви не воюєте.')}</div>`;
   const WL = ['strike', 'missiles', 'ballistic', 'hyper', 'glide', 'bombing'];
+  // що стоїть за кожним засобом ураження і як його отримати
+  const how = w => { if (w === 'bombing') return (n.air && n.air.bmb >= 1) ? '' : t_('Потрібні бомбардувальники — «Армія → Авіація»'); const u = D.units[w]; if ((n.ars[w] || 0) >= 1) return '';
+    const rt = u.rt && !G.has(n, u.rt) ? `${t_('дослідження')} «${esc(D.techs[u.rt] ? techName(u.rt) : u.rt)}»` : ''; const pb = Object.keys(u.prod || {}).map(b => `«${esc(t_(D.buildings[b].n))}»`).join(' / ');
+    return (rt ? t_('Потрібне') + ' ' + rt + ', ' + t_('далі') + ' ' : t_('Потрібне виробництво') + ': ') + pb + (w === 'glide' ? ' + ' + t_('штурмовики') : ''); };
   h += `<div class="sub wsel">${WL.map(w => { const q = w === 'bombing' ? (n.air ? n.air.bmb : 0) : (n.ars[w] || 0); return `<button class="${S.w === w ? 'on' : ''}" ${q < 1 ? 'disabled' : ''} data-tip="${esc(w === 'bombing' ? D.airTypes.bmb.d : D.units[w].d)} · ${t_('дальність')} ${G.WP[w].r} ${t_('км')}" onclick="_stk.w='${w}';renderTab(true)">${pxi(w === 'bombing' ? 'bomber' : UNIT_PX[w])} ${esc(w === 'bombing' ? t_('Бомбардування') : unitName(w))} · ${fmtQ(q)}</button>`; }).join('')}</div>
   <div class="sub">${Object.entries(D.strikeGoals).map(([k, g]) => `<button class="${S.goal === k ? 'on' : ''}" title="${esc(g.d)}" onclick="_stk.goal='${k}';renderTab(true)">${ico(g.ic)} ${esc(LORA.lang === 'en' ? g.en : g.n)}</button>`).join('')}</div>
+  ${WL.filter(w => how(w)).length ? `<div class="card small"><b>${t_('Недоступні засоби')}</b>${WL.filter(w => how(w)).map(w => `<div class="row"><span>${pxi(w === 'bombing' ? 'bomber' : UNIT_PX[w])} ${esc(w === 'bombing' ? t_('Бомбардування') : unitName(w))}</span><span class="mut">${how(w)}</span></div>`).join('')}</div>` : ''}
   ${slider('stkCnt', t_('Кількість у залпі'), 5, 500, 5, S.cnt, v => v, '')}
   <label class="row" style="cursor:pointer"><span>🤖 ${t_('Автоматичні ударні кампанії (ШІ)')}</span><input type="checkbox" ${n.strikeAuto ? 'checked' : ''} onchange="nat(G.player).strikeAuto=this.checked"></label>`;
   const tgt = sel && sel.type === 't' ? sel.id : -1;
@@ -116,7 +121,7 @@ function navyMixBlock(n) {
 function gensTab(n) {
   const TR = D.genTraits, gs = G.gensOf(G.player).sort((a, b) => b.skill - a.skill);
   let h = `<div class="mut small">${t_('Генерали командують арміями: навичка (★) дає до +10% сили, риса — свою перевагу. Призначайте в панелі армії. У боях генерали ростуть і можуть загинути.')}</div>`;
-  gs.forEach(g => { const a = g.army != null ? G.armies.find(x => x.id === g.army) : null; h += `<div class="card"><div class="row"><b>🎖 ${esc(g.name)} <span class="y">${'★'.repeat(g.skill)}</span></b><span>${TR[g.trait].ic} ${esc(t_(TR[g.trait].n))}</span></div><div class="small mut">${esc(t_(TR[g.trait].d))}</div><div class="row small"><span>${a ? '⚔ ' + esc(a.name) + ' · ' + esc(regName(a.t)) : t_('у резерві')}</span>${a ? `<button onclick="selArmy(${a.id})">🔎</button>` : ''}</div></div>`; });
+  gs.forEach(g => { const a = g.army != null ? G.armies.find(x => x.id === g.army) : null; h += `<div class="card gen-row">${avatar('gen' + g.id + g.name, 40, { mil: 1, fem: false })}<div><div class="row"><b>🎖 ${esc(g.name)} <span class="y">${'★'.repeat(g.skill)}</span></b><span>${TR[g.trait].ic} ${esc(t_(TR[g.trait].n))}</span></div><div class="small mut">${esc(t_(TR[g.trait].d))}</div><div class="row small"><span>${a ? '⚔ ' + esc(a.name) + ' · ' + esc(regName(a.t)) : t_('у резерві')}</span>${a ? `<button onclick="selArmy(${a.id})">🔎</button>` : ''}</div></div></div>`; });
   return h;
 }
 

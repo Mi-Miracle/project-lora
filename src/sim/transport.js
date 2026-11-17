@@ -9,7 +9,7 @@ LORA.sim.register('transport', 56, function (G) {
   const TF = { plains: 1, steppe: 1, forest: 1.2, hills: 1.35, mountain: 1.9, desert: 1.15, arctic: 2.2 };
   G.linkQuote = function (type, a, b) {
     const L = LT[type]; const km = hav(T[a].c[0], T[a].c[1], T[b].c[0], T[b].c[1]);
-    const tf = type === 'air' ? 1 : (TF[T[a].t] + TF[T[b].t]) / 2;
+    const tf = type === 'air' || type === 'sea' ? 1 : (TF[T[a].t] + TF[T[b].t]) / 2;
     return { km, cost: +(type === 'air' ? 1.5 + km * L.costKm : km * L.costKm * tf).toFixed(2), days: Math.round(L.minDays + km * L.daysKm * tf) };
   };
   G.canLink = function (nid, type, a, b) {
@@ -19,7 +19,8 @@ LORA.sim.register('transport', 56, function (G) {
     const other = ca === nid ? cb : ca;
     if (other !== nid && (G.atWar(nid, other) || (G.rel[other][nid] < 40 && !G.allied(nid, other)))) return `${G.nm(other)} не погоджується (потрібні відносини ≥ 40)`;
     const q = G.linkQuote(type, a, b);
-    if (type !== 'air' && q.km > 2500) return 'Задовгий маршрут (понад 2500 км) — розбийте на ділянки';
+    if (type === 'sea') { if (!T[a].p.length || !T[b].p.length) return 'Морська лінія — лише між прибережними регіонами'; if (!(ter[a].bld.port > 0) || !(ter[b].bld.port > 0)) return 'Потрібні морські порти на обох кінцях (будівля «Морський порт»)'; if (q.km > 15000) return 'Задовга морська лінія'; }
+    else if (type !== 'air' && q.km > 2500) return 'Задовгий маршрут (понад 2500 км) — розбийте на ділянки';
     if (type === 'air' && q.km > 9000) return 'Задалеко для авіамосту';
     if (G.links.some(l => l.type === type && ((l.a === a && l.b === b) || (l.a === b && l.b === a)))) return 'Такий маршрут уже є';
     return '';
@@ -42,6 +43,7 @@ LORA.sim.register('transport', 56, function (G) {
       const ca = G.cellIdx[T[l.a].cc], cb = G.cellIdx[T[l.b].cc]; if (ca == null || cb == null || ca === cb) return;
       L.modes.forEach(m => { (G.extraCellAdj[m][ca] = G.extraCellAdj[m][ca] || []).push([cb, l.km * L.factor]); (G.extraCellAdj[m][cb] = G.extraCellAdj[m][cb] || []).push([ca, l.km * L.factor]); });
     });
+    G._seaEnd = {}; G.links.forEach(l => { if (l.type === 'sea' && l.done <= G.day && !l.cut) { G._seaEnd[l.a] = 1; G._seaEnd[l.b] = 1; } });
     G._routeSig = null; // змусити торгівлю перерахувати маршрути
   };
   G.linksDaily = function () {
@@ -53,6 +55,6 @@ LORA.sim.register('transport', 56, function (G) {
   };
   // постачання армій біля маршрутів
   const baseSup = G.supplyTarget;
-  G.supplyTarget = function (a) { const near = G.extraRegAdj[a.t].some(e => e[3] === 'rail' || e[3] === 'road' || e[3] === 'air'); return clamp(baseSup(a) + (near ? 0.06 : 0), 0, 1); };
+  G.supplyTarget = function (a) { const near = G.extraRegAdj[a.t].some(e => e[3] === 'rail' || e[3] === 'road' || e[3] === 'air'); const sea = G._seaEnd && G._seaEnd[a.t]; return clamp(baseSup(a) + (near ? 0.06 : 0) + (sea ? 0.04 : 0), 0, 1); };
   G.linkVisible = l => l.done > G.day ? 'build' : l.cut ? 'cut' : 'ok';
 });

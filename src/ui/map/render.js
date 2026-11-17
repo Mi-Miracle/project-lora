@@ -198,7 +198,7 @@ function drawLinks(lw) {
     const st = G.linkVisible(l); ctx.globalAlpha = st === 'build' ? 0.45 : 1;
     ctx.strokeStyle = st === 'cut' ? '#ff3b3b' : L.col; ctx.lineWidth = lw * (l.type === 'air' ? 1.5 : 3); ctx.setLineDash(L.dash.map(x => x * lw * 1.5));
     ctx.beginPath(); ctx.moveTo(a[0], -a[1]);
-    if (l.type === 'air') { const mx = (a[0] + bx) / 2, my = (a[1] + b[1]) / 2 + Math.hypot(bx - a[0], b[1] - a[1]) * 0.15; ctx.quadraticCurveTo(mx, -my, bx, -b[1]); } else ctx.lineTo(bx, -b[1]);
+    if (l.type === 'sea') { const mx = (a[0] + bx) / 2, my = (a[1] + b[1]) / 2 - Math.hypot(bx - a[0], b[1] - a[1]) * 0.08; ctx.quadraticCurveTo(mx, -my, bx, -b[1]); } else if (l.type === 'air') { const mx = (a[0] + bx) / 2, my = (a[1] + b[1]) / 2 + Math.hypot(bx - a[0], b[1] - a[1]) * 0.15; ctx.quadraticCurveTo(mx, -my, bx, -b[1]); } else ctx.lineTo(bx, -b[1]);
     ctx.stroke(); if (l.type === 'rail') { ctx.strokeStyle = '#fff'; ctx.lineWidth = lw; ctx.setLineDash([3 * lw, 7 * lw]); ctx.stroke(); }
     ctx.setLineDash([]); ctx.globalAlpha = 1;
   }

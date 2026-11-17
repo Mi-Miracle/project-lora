@@ -6,7 +6,7 @@ function renderRight(soft) {
   el.style.display = 'block'; const st = el.scrollTop;
   const h = sel.type === 'a' ? armyPanel() : sel.type === 'f' ? fleetPanel() : terrPanel(sel.id);
   if (!h) { sel = null; el.style.display = 'none'; return; }
-  el.innerHTML = `<div style="text-align:right;margin:-4px -4px 0 0"><button onclick="sel=null;renderRight()" title="Закрити">✕</button></div>` + h; el.scrollTop = st;
+  const html = `<div style="text-align:right;margin:-4px -4px 0 0"><button onclick="sel=null;renderRight()" title="Закрити">✕</button></div>` + h; if (soft && html === el._last) return; el.innerHTML = html; el._last = html; el.scrollTop = st;
 }
 function terrPanel(i) {
   const P = G.player, t = G.ter[i], R = D.regions[i], o = nat(t.owner), c = nat(t.ctrl); const isMe = t.owner === P; const rel = P >= 0 ? G.rel[P][t.owner] : 0;
@@ -93,13 +93,13 @@ function compBlock(a, mine) {
   const st = G.vetStars(a); h += `<div class="row small"><span>${t_('Досвід')}</span><span class="y">${st ? st + ' ' : ''}${Math.round((a.xp || 0) * 100)}%</span></div>`;
   const sn = G.seasonName ? G.seasonName(a.t) : ''; if (sn) h += `<div class="row small"><span>${t_('Сезон')}</span><span>${sn}${G.season(a.t).mud ? ' · ' + t_('техніка в наступі слабша') : ''}</span></div>`;
   const n = nat(a.n); if (mine && n._armSat != null && n._armSat < 0.9 && c.mbt + c.ifv > 0.15) h += `<div class="mut small r">⚠ ${t_('Бракує бронетехніки: танкові частини на')} ${Math.round(n._armSat * 100)}%</div>`;
-  if (a.retrain) h += `<div class="row"><span>${t_('Переформування')}</span><span class="y">→ ${esc(TP[a.retrain.to].n)} · ${a.retrain.until - G.day} ${t_('дн.')}</span></div>`;
-  else if (mine) h += `<div class="btns tplb">${Object.entries(TP).filter(([k]) => k !== 'mech').map(([k, v]) => `<button class="${k === cur ? 'on' : ''}" data-tip="${esc(tplTip(v))}. ${t_('Переформування 30 днів, сила −20% на цей час.')}" onclick="armyTpl('${k}')">${ico(v.ic)}</button>`).join('')}</div>`;
+  if (a.retrain) h += `<div class="row"><span>${t_('Переформування')}</span><span class="y">→ ${esc(a.retrain.c ? t_('власний склад') : TP[a.retrain.to].n)} · ${a.retrain.until - G.day} ${t_('дн.')}</span></div>`;
+  else if (mine) h += `<div class="btns"><button class="pri" onclick="openCompEditor(${a.id})">✏ ${t_('Змінити склад і техніку')}</button></div>`;
   return h + '</div>';
 }
 function genBlock(a, mine) {
   if (!G.generalOf) return ''; const g = G.generalOf(a), TR = D.genTraits;
-  let h = `<div class="grp">🎖 ${t_('Командувач')}</div>` + (g ? `<div class="small" data-tip="${esc(t_(TR[g.trait].d))}"><b>${esc(g.name)}</b> <span class="y">${'★'.repeat(g.skill)}</span> · ${ico(TR[g.trait].ic)} ${esc(t_(TR[g.trait].n))} — <span class="mut">${esc(t_(TR[g.trait].d))}</span></div>` : `<div class="small mut">${t_('немає')}</div>`);
+  let h = `<div class="grp">🎖 ${t_('Командувач')}</div>` + (g ? `<div class="small gen-row" data-tip="${esc(t_(TR[g.trait].d))}">${avatar('gen' + g.id + g.name, 40, { mil: 1, fem: false })}<div><b>${esc(g.name)}</b> <span class="y">${'★'.repeat(g.skill)}</span> · ${ico(TR[g.trait].ic)} ${esc(t_(TR[g.trait].n))} — <span class="mut">${esc(t_(TR[g.trait].d))}</span></div></div>` : `<div class="small mut">${t_('немає')}</div>`);
   if (mine) { const gens = G.gensOf(a.n).sort((x, y) => y.skill - x.skill);
     h += `<select class="gsel" onchange="genAssign(${a.id}, this.value)"><option value="">— ${t_('без командувача')} —</option>${gens.map(x => `<option value="${x.id}" ${g && g.id === x.id ? 'selected' : ''}>${esc(x.name)} ${'★'.repeat(x.skill)} · ${esc(t_(TR[x.trait].n))}${x.army != null && x.army !== a.id ? ' (' + t_('зайнятий') + ')' : ''}</option>`).join('')}</select>`; }
   return h;
@@ -124,3 +124,32 @@ function fleetPanel() {
 function fleetAct(k) { const f = G.fleets.find(x => x.id === sel.id); if (!f) return; if (k === 'home') { const p = G.nationPorts(f.n)[0]; if (p) G.orderFleet(f, p[0]); } if (k === 'auto') f.auto = !f.auto; renderRight(); }
 
 window._armyAct = armyAct; window._fleetAct = fleetAct;
+
+// ---- редактор складу армії
+let compDraft = null;
+function openCompEditor(aid) { const a = G.armies.find(x => x.id === aid); if (!a) return; compDraft = { aid, c: Object.assign({}, G.armyComp(a)) }; renderCompEditor(); }
+function compSet(k, v) { if (!compDraft) return; compDraft.c[k] = v / 100; renderCompEditor(k); }
+function compTpl(k) { if (!compDraft) return; compDraft.c = Object.assign({}, D.armyTemplates[k].c); renderCompEditor(); }
+function renderCompEditor(focusK) {
+  const d = compDraft, a = d && G.armies.find(x => x.id === d.aid); if (!a) { closeModal(); return; }
+  const TY = D.armyTypes, MD = D.models || {}, n = nat(a.n), L = G.COMP_LIM, q = G.compQuote(a, d.c), cur = G.armyComp(a);
+  const nc = q.c; let sum = 0; for (const k in d.c) sum += d.c[k] || 0;
+  let h = `<h2>🪖 ${esc(a.name)} — ${t_('склад і техніка')}</h2><div class="mut small">${t_('Тягніть повзунки: частки автоматично зводяться до 100%. Переформування займає час і гроші, армія тимчасово слабша (−20%).')} ${t_('Всього бійців')}: ${Math.round(a.k * 1000).toLocaleString()}</div>`;
+  h += `<div class="grp">${t_('Шаблони')}</div><div class="btns tplb">${Object.entries(D.armyTemplates).filter(([k]) => k !== 'mech').map(([k, v]) => `<button onclick="compTpl('${k}')" data-tip="${esc(tplTip(v))}">${ico(v.ic)} ${esc(t_(v.n))}</button>`).join('')}</div>`;
+  h += `<div class="compbar">${Object.keys(TY).filter(k => nc[k] > 0.004).map(k => `<i style="width:${nc[k] * 100}%;background:${TY[k].col}"></i>`).join('')}</div><table class="compedit">`;
+  for (const k of Object.keys(TY)) {
+    const t = TY[k], list = MD[k] || [], mi = n.mq ? Math.min(Math.floor(n.mq[k] || 0), list.length - 1) : 0, m = list[mi], best = G.bestModel ? G.bestModel(n, k) : mi, nb = list[best];
+    const men = Math.round(a.k * 1000 * nc[k]); const dl = nc[k] - (cur[k] || 0);
+    h += `<tr><td style="width:38%">${ico(t.ic)} <b>${esc(t_(t.n))}</b><div class="mut small">${esc(t_(t.d))}</div></td>
+      <td><input type="range" min="${L[k][0] * 100}" max="${L[k][1] * 100}" step="1" value="${Math.round((d.c[k] || 0) * 100)}" oninput="this.nextElementSibling.textContent=this.value+'%'" onchange="compSet('${k}',+this.value)"><b>${Math.round((d.c[k] || 0) * 100)}%</b>
+      <div class="small">→ ${Math.round(nc[k] * 100)}% · ${men.toLocaleString()} ${t_('ос.')} ${Math.abs(dl) > 0.005 ? `<span class="${dl > 0 ? 'g' : 'r'}">${dl > 0 ? '+' : ''}${Math.round(dl * 100)}%</span>` : ''}</div>
+      ${m ? `<div class="small mut">${ico(m.ic)} ${esc(t_(m.n))} · ⚔${(m.att || 1).toFixed(2)} 🛡${(m.def || 1).toFixed(2)}${best > mi && nb ? ` · <span class="y">${t_('переозброєння на')} ${esc(t_(nb.n))}</span>` : ''}</div>` : ''}</td></tr>`;
+  }
+  h += `</table>`;
+  const mine = a.n === G.player || (G.isHuman && G.isHuman(a.n));
+  h += `<div class="row"><span>${t_('Зміна складу')}</span><b>${Math.round(q.ch * 100)}%</b></div><div class="row"><span>${t_('Термін')}</span><b>${q.days} ${t_('дн.')}</b></div><div class="row"><span>${t_('Вартість')}</span><b>${money(q.cost)}</b></div>`;
+  h += `<div class="mut small">${t_('Техніку (моделі) держава оновлює сама в міру досліджень і виробництва — прискорити можна у вкладці «Армія → Техніка».')}</div>`;
+  h += `<div class="btns">${mine ? `<button class="pri" ${q.ch < 0.02 ? 'disabled' : ''} onclick="applyComp()">✔ ${t_('Переформувати')}</button>` : ''}<button onclick="tab='army';subtab.army='models';renderTabs();renderTab(true);$('#left').classList.remove('hide');closeModal()">⚙ ${t_('Техніка')}</button><button onclick="closeModal()">${t_('Закрити')}</button></div>`;
+  openModal(h);
+}
+function applyComp() { const d = compDraft; if (!d) return; const r = G.setArmyComp(d.aid, d.c); if (r && r.ok === false) { hint('⚠ ' + t_(r.err), 3000); return; } closeModal(); hint('🪖 ' + t_('Переформування почалось') + (r && r.days ? ' (' + r.days + ' ' + t_('дн.') + ')' : ''), 2500); renderRight(); }

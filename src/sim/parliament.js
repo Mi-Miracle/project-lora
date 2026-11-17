@@ -18,6 +18,7 @@ LORA.sim.register('parliament', 93, function (G) {
   // голосування за рішення гравця
   G.parlVote = function (n, key, what) {
     const p = n.parl; if (p.regime === 'autocracy') return { ok: true };
+    if (p.decree > G.day) { p.votes.unshift({ d: G.day, what: what + ' (указом)', yes: 0, need: 0, ok: true }); p.votes.length = Math.min(p.votes.length, 12); return { ok: true }; }
     if (p.lock[key] > G.day) return { ok: false, err: `${p.name} нещодавно провалила це рішення — повторне голосування через ${p.lock[key] - G.day} дн.` };
     const sup = G.parlSupport(n) * (p.regime === 'hybrid' ? 1.25 : 1); const yes = clamp(sup + (G.rnd() - 0.5) * 0.16, 0, 1); const votes = Math.round(yes * p.seats), need = Math.floor(p.seats / 2) + 1;
     const ok = votes >= need; p.votes.unshift({ d: G.day, what, yes: votes, need, ok }); p.votes.length = Math.min(p.votes.length, 12);
@@ -38,6 +39,40 @@ LORA.sim.register('parliament', 93, function (G) {
   };
   const baseWar = G.act.declareWar;
   G.act.declareWar = function (x) { const n = N[G.player]; if (n && n.parl && n.parl.regime !== 'autocracy' && !G.autoPlayer) { const r = G.parlVote(n, 'war' + x, `Оголошення війни: ${N[x].name}`); if (!r.ok) return r; } return baseWar(x); };
+  // ---- вплив на парламент (дії гравця)
+  G.PARL_ACT = {
+    lobby:    { n: 'Переговори з фракціями', ic: '🤝', d: 'Посади й бюджетні програми для депутатів-позафракційників: +3–6% до коаліції.', cd: 45 },
+    campaign: { n: 'Інформаційна кампанія', ic: '📣', d: 'Агітація за курс уряду: +2–4% до партії влади, +1 стабільність.', cd: 60 },
+    deal:     { n: 'Коаліційна угода', ic: '📜', d: 'Нова коаліція з поступками: +8–12% до коаліції, але −2 стабільність і збільшені соцвидатки на рік.', cd: 365 },
+    whip:     { n: 'Партійна дисципліна', ic: '📏', d: 'Тиск на своїх депутатів: заблоковані рішення можна знову ставити на голосування одразу.', cd: 90 },
+    decree:   { n: 'Надзвичайні повноваження', ic: '⚖', d: 'Рішення ухвалюються указами 90 днів без голосувань. Лише під час війни або в гібридному режимі. −4 стабільність, демократії невдоволені.', cd: 365 },
+    snap:     { n: 'Розпустити парламент', ic: '🗳', d: 'Дострокові вибори через 60 днів. Ризиковано: результат залежить від стабільності й економіки.', cd: 720 }
+  };
+  G.parlActCost = (nid, k) => { const g = Math.max(20, N[nid].agg ? N[nid].agg.gdp : 100); return +(k === 'lobby' ? g * 0.0004 : k === 'campaign' ? g * 0.0003 : k === 'deal' ? g * 0.0008 : k === 'snap' ? g * 0.0002 : 0).toFixed(2); };
+  G.parlCan = function (nid, k) {
+    const n = N[nid]; if (!n || !n.parl) return 'Немає парламенту'; const p = n.parl, A = G.PARL_ACT[k]; if (!A) return '?';
+    if (p.regime === 'autocracy') return 'В автократії парламент і так слухняний';
+    p.cd = p.cd || {}; if (p.cd[k] > G.day) return `Ще ${p.cd[k] - G.day} дн.`;
+    if (k === 'decree' && p.regime !== 'hybrid' && !G.enemiesOf(nid).length) return 'Лише під час війни або в гібридному режимі';
+    if (k === 'whip' && !Object.values(p.lock).some(d => d > G.day)) return 'Немає заблокованих рішень';
+    if (k === 'snap' && p.next - G.day < 120) return 'Вибори й так скоро';
+    if (k === 'snap' && nid === G.nIdx.UKR && G.enemiesOf(nid).length) return 'Воєнний стан: вибори неможливі';
+    const c = G.parlActCost(nid, k); if (c > n.cash + 0.01) return 'Бракує коштів (' + c + ' млрд)';
+    return '';
+  };
+  G.parlAct = function (nid, k) {
+    const e = G.parlCan(nid, k); if (e) return { ok: false, err: e };
+    const n = N[nid], p = n.parl, A = G.PARL_ACT[k]; n.cash -= G.parlActCost(nid, k); p.cd[k] = G.day + A.cd; const room = Math.max(0, 0.62 - p.gov - p.coal); let msg = '';
+    if (k === 'lobby') { const d = Math.min(room + 0.02, 0.03 + G.rnd() * 0.03); p.coal = clamp(p.coal + d, 0, 0.35); msg = `коаліція +${(d * 100).toFixed(1)}%`; if (G.rnd() < 0.12) { n.stab = Math.max(0, n.stab - 3); msg += '; журналісти розкопали «домовленості» — скандал, −3 стабільності'; } }
+    if (k === 'campaign') { const d = Math.min(room + 0.02, 0.02 + G.rnd() * 0.02); p.gov = clamp(p.gov + d, 0, 0.7); n.stab = Math.min(100, n.stab + 1); msg = `партія влади +${(d * 100).toFixed(1)}%`; }
+    if (k === 'deal') { const d = 0.08 + G.rnd() * 0.04; p.coal = clamp(p.coal + d, 0, 0.4); n.stab = Math.max(0, n.stab - 2); n.pol.soc = Math.min(0.35, (n.pol.soc || 0.15) + 0.02); if (p.law) p.law.soc = n.pol.soc; msg = `коаліція +${(d * 100).toFixed(0)}%, соцвидатки +2%`; }
+    if (k === 'whip') { p.lock = {}; msg = 'блокування голосувань знято'; }
+    if (k === 'decree') { p.decree = G.day + 90; n.stab = Math.max(0, n.stab - 4); N.forEach(m => { if (m.alive && m.id !== nid && m.parl && m.parl.regime === 'democracy' && G.rel[m.id]) { G.rel[m.id][nid] = Math.max(-100, G.rel[m.id][nid] - 2); G.rel[nid][m.id] = G.rel[m.id][nid]; } }); msg = 'рішення ухвалюються указами 90 днів'; }
+    if (k === 'snap') { p.next = G.day + 60; msg = 'дострокові вибори через 60 днів'; }
+    G.say(`🏛 ${p.name}: ${A.n} — ${msg}`, 'info', [nid]);
+    return { ok: true };
+  };
+  G.act.parlAct = k => G.player >= 0 ? G.parlAct(G.player, k) : { ok: false, err: 'Лише для глави держави' };
   // вибори
   function election(n) {
     const p = n.parl; p.next = G.day + p.cyc;

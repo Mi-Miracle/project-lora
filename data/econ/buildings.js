@@ -106,6 +106,7 @@ LORA.data.linkTypes = {
   rail: { n: 'Залізниця', ic: '🚆', costKm: 0.012, daysKm: 1.1, minDays: 120, col: '#222', dash: [6, 4], speed: 450, modes: [0, 2], factor: 0.45 },
   road: { n: 'Автомагістраль', ic: '🛣', costKm: 0.007, daysKm: 0.8, minDays: 90, col: '#6b6b6b', dash: [], speed: 300, modes: [2], factor: 0.6 },
   pipe: { n: 'Трубопровід', ic: '🛢', costKm: 0.006, daysKm: 0.7, minDays: 150, col: '#e67e22', dash: [2, 3], speed: 0, modes: [1], factor: 0.3 },
+  sea:  { n: 'Морська лінія (порт — порт)', ic: '🚢', costKm: 0.0004, daysKm: 0.02, minDays: 90, col: '#1f6fb5', dash: [8, 6], speed: 0, modes: [0, 2], factor: 0.25, port: 1 },
   air:  { n: 'Авіаміст', ic: '✈', costKm: 0.0006, daysKm: 0, minDays: 45, col: '#3a8dde', dash: [1, 6], speed: 900, modes: [2], factor: 2.0 }
 };
 // Пріоритети губернатора регіону / державного радника з розвитку

@@ -112,6 +112,20 @@ LORA.sim.register('units', 61, function (G) {
     const n = N[a.n]; const cost = a.k * (tpl === 'assault' ? 0.03 : 0.01); if (n.cash != null) n.cash -= cost;
     a.retrain = { to: tpl, until: G.day + 30 }; a.org = Math.min(a.org, 0.6); return { ok: true, days: 30, cost };
   };
+  // власний склад армії: c = { inf, spec, mbt, ifv, tube, mlrs, ad } у частках (нормалізується)
+  G.COMP_LIM = { inf: [0.15, 0.9], spec: [0, 0.2], mbt: [0, 0.45], ifv: [0, 0.4], tube: [0, 0.35], mlrs: [0, 0.2], ad: [0, 0.3] };
+  G.normComp = function (c) { const o = {}; let s = 0; for (const k of TK) { o[k] = clamp(+c[k] || 0, G.COMP_LIM[k][0], G.COMP_LIM[k][1]); s += o[k]; } for (const k of TK) o[k] = +(o[k] / (s || 1)).toFixed(3); return o; };
+  G.compChange = (a, c) => { const cur = comp(a); let d = 0; for (const k of TK) d += Math.abs((c[k] || 0) - (cur[k] || 0)); return d / 2; };
+  G.setArmyComp = function (a, c) {
+    if (typeof a === 'number') a = G.armies.find(x => x.id === a);
+    if (!a || !c) return { ok: false, err: 'Немає армії' }; if (a.retrain) return { ok: false, err: 'Армія вже переформовується' };
+    c = G.normComp(c); const ch = G.compChange(a, c); if (ch < 0.02) return { ok: false, err: 'Склад майже не змінився' };
+    const heavy = Math.max(0, (c.mbt + c.ifv + c.mlrs) - (comp(a).mbt + comp(a).ifv + comp(a).mlrs));
+    const n = N[a.n]; const cost = +(a.k * (0.004 + ch * 0.02 + heavy * 0.05)).toFixed(2); if (n.cash != null && n.cash < cost) return { ok: false, err: 'Бракує коштів: ' + cost };
+    if (n.cash != null) n.cash -= cost; const days = Math.round(10 + ch * 50);
+    a.retrain = { to: 'custom', c, until: G.day + days }; a.org = Math.min(a.org, 1 - ch * 0.8); return { ok: true, days, cost };
+  };
+  G.compQuote = function (a, c) { c = G.normComp(c); const ch = G.compChange(a, c); const cur = comp(a); const heavy = Math.max(0, (c.mbt + c.ifv + c.mlrs) - (cur.mbt + cur.ifv + cur.mlrs)); return { ch, days: Math.round(10 + ch * 50), cost: +(a.k * (0.004 + ch * 0.02 + heavy * 0.05)).toFixed(2), c }; };
   // ---- авіація
   const AT = G.D.airTypes = {
     ftr:  { n: 'Винищувачі', ic: '✈', px: 'jet', price: 0.08, d: 'Перевага в повітрі: посилює наступ, прикриває від ворожої авіації, перехоплює бомбардувальники' },
@@ -198,7 +212,7 @@ LORA.sim.register('units', 61, function (G) {
       if (a._k && a.k > a._k * 1.03) a.xp = (a.xp || 0) * a._k / a.k; a._k = a.k;
       if (hot.has(a.t)) a.xp = Math.min(1, (a.xp || 0) + 0.0035);
       if (a.retrain && G.day >= a.retrain.until) {
-        a.comp = Object.assign({}, TP[a.retrain.to].c); const nm = TP[a.retrain.to].n; a.retrain = null;
+        a.comp = Object.assign({}, a.retrain.c || TP[a.retrain.to].c); const nm = a.retrain.c ? 'власний склад' : TP[a.retrain.to].n; a.retrain = null;
         if (a.n === G.player || (G.isHuman && G.isHuman(a.n))) G.say(`🪖 «${a.name}» переформовано: ${nm}`, 'good', [a.n]);
       }
     }

@@ -113,7 +113,7 @@ tr:hover td{background:#ffffff06}
 .tag.war{background:#5c1a1f;border-color:#8f2a30}.tag.al{background:#173c5e;border-color:#25619a}.tag.nk{background:#4f410f;border-color:#86701c}
 
 /* ---------- модальні вікна ---------- */
-#modal{position:absolute;inset:0;background:radial-gradient(#0008,#000c);z-index:20;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+#modal{position:absolute;inset:0;background:radial-gradient(#0008,#000c);z-index:35;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
 #modal .box{background:linear-gradient(#131c27,#0e151e);border:1px solid var(--line2);border-top:3px solid var(--acc);border-radius:var(--r);padding:18px 20px;max-width:580px;width:calc(100% - 30px);max-height:90%;overflow-y:auto;box-shadow:0 0 0 4px #0009,0 20px 60px #000c}
 
 /* ---------- стартовий екран ---------- */
@@ -257,7 +257,7 @@ body.rp #outl{display:none}
 .pt-x{background:transparent;border-color:transparent;box-shadow:none;padding:2px 8px;color:var(--mut)}
 .pt-x:hover{color:#fff}
 #tabc{padding-top:8px}
-#tabc>*{animation:fadeUp .18s ease-out}
+#tabc.anim>*{animation:fadeUp .18s ease-out}
 @keyframes fadeUp{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
 #news{left:464px}
 body.lhide #news{left:82px}
@@ -358,3 +358,11 @@ button.big{padding:9px 22px;font-size:15px}
 .linkrow input{flex:1;font-size:11px;padding:4px;background:#0006;color:#cfe;border:1px solid #ffffff22;border-radius:4px}
 .lb-links{margin:8px 0;padding:8px;background:#ffffff08;border-radius:8px}
 .modeSel{grid-template-columns:repeat(4,1fr)!important}
+
+.help-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:65vh;overflow:auto}
+/* аватарки */
+img.ava{image-rendering:pixelated;border:2px solid #0b1118;outline:1px solid #ffd34d55;vertical-align:middle;background:#223}
+.ava-row{display:flex;align-items:flex-end;gap:8px;margin-bottom:6px}.ava-btns{display:flex;gap:4px}
+#top img.ava{margin:0 6px 0 2px}
+.gen-row{display:flex;gap:8px;align-items:center}.gen-row>div{flex:1;min-width:0}
+table.compedit td{vertical-align:top;padding:4px 3px}table.compedit input[type=range]{width:65%;vertical-align:middle}table.compedit b{margin-left:6px}

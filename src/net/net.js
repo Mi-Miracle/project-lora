@@ -40,7 +40,7 @@ const NET = (() => {
     $('#start').style.display = 'none'; closeModal(); startUI(); chatUI(true); return '';
   }
   // виконання команди гостя від імені його держави
-  const PROXY = ['act.*', 'decide', 'leaderGo', 'strike', 'setResearch', 'queueResearch', 'blocPropose', 'blocVote', 'blocApply', 'orderMove', 'startLink', 'cancelBuild', 'setStance', 'splitArmy', 'disband', 'orderFleet', 'setArmyTemplate', 'agentGo', 'agentTask', 'agentRecall'];
+  const PROXY = ['act.*', 'decide', 'leaderGo', 'strike', 'setResearch', 'queueResearch', 'blocPropose', 'blocVote', 'blocApply', 'orderMove', 'startLink', 'cancelBuild', 'setStance', 'splitArmy', 'disband', 'orderFleet', 'setArmyTemplate', 'setArmyComp', 'agentGo', 'agentTask', 'agentRecall'];
   function execCmd(pl, m) {
     if (pl.nid == null) return; const prev = G.player; G.player = pl.nid; let r;
     try {

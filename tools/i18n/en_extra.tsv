@@ -1530,3 +1530,120 @@ $0.5 млрд особистих коштів	$0.5 bn in personal funds
 Лекції й інтервʼю	Lectures and interviews
 Вимагати дострокових виборів	Demand snap elections
 популярність і слава; відносини з урядом	popularity and fame; relations with the government
+Залізниці й автошляхи прискорюють перекидання військ і постачання, міждержавні маршрути здешевлюють торгівлю (труби — газ, залізниця — сировина й контейнери, авто — контейнери). Авіаміст — швидке перекидання військ і цінних вантажів. Морська лінія — дешевий морський коридор між вашими портами.	Railways and highways speed up troop transfers and supply; cross-border routes make trade cheaper (pipes — gas, rail — raw materials and containers, roads — containers). Airlift — fast transfer of troops and valuable cargo. Sea line — a cheap maritime corridor between your ports.
+Оберіть армію на мапі: праворуч — склад військ (кнопка «Змінити склад» — повзунки піхоти, танків, артилерії, ППО…), командувач, досвід. Вкладка «Армія»: авіація, флот, моделі техніки, генерали, полонені й легіон, арсенал, удари (ракети, дрони, КАБ, бомбардування, кібератаки).	Select an army on the map: on the right — troop composition (the “Change composition” button — sliders for infantry, tanks, artillery, air defense…), commander, experience. The “Army” tab: air force, navy, equipment models, generals, POWs and legion, arsenal, strikes (missiles, drones, glide bombs, bombing, cyberattacks).
+Колесо — масштаб, ліва кнопка — вибір регіону чи армії, права — наказ армії рухатися (Shift+ПКМ — морем). Пробіл — пауза, 1–4 — швидкість. Туман війни: видно лише ваші й сусідні регіони, зону РЛС і те, що бачать ваші супутники.	Wheel — zoom, left click — select a region or army, right click — order an army to move (Shift+RMB — by sea). Space — pause, 1–4 — speed. Fog of war: you see only your own and neighboring regions, radar coverage and what your satellites see.
+Відносини, угоди, союзи, блоки (НАТО, ЄС…), санкції, мир. Багато дій можливі лише під час візиту вашого лідера (зірка на мапі) або з дипломатом-агентом у країні. Шпигуни — розвідка, диверсії, викрадення технологій.	Relations, treaties, alliances, blocs (NATO, EU…), sanctions, peace. Many actions are possible only during a visit by your leader (the star on the map) or with a diplomat agent in the country. Spies — reconnaissance, sabotage, technology theft.
+будівля «Морський порт» на обох кінцях) — до 15 000 км. Здешевлює торгівлю сировиною й контейнерами між цими регіонами та дає +4% постачання арміям у портах. Рветься, якщо кінці у війні між собою.	the “Seaport” building at both ends) — up to 15,000 km. Makes trade in raw materials and containers between these regions cheaper and gives +4% supply to armies in the ports. Breaks if the ends are at war with each other.
+Хост відкриває кімнату й роздає посилання; гравці обирають держави, глядачі дивляться без туману. Вивід на стрім: F9, Ctrl+Alt+1/2/3. Чат Twitch голосує за рішення.	The host opens a room and shares links; players pick nations, spectators watch without fog. Stream output: F9, Ctrl+Alt+1/2/3. Twitch chat votes on decisions.
+14 ресурсів, ринок і торгівля. Прокладайте залізниці, автомагістралі, трубопроводи й морські лінії між портами — дешевше й швидше постачання.	14 resources, market and trade. Build railways, highways, pipelines and sea lines between ports — cheaper and faster supply.
+79 типів будівель (енергетика, промисловість, оборонка, інтернет, космос). Дослідження відкривають будівлі, моделі техніки й нові можливості.	79 building types (energy, industry, defense, internet, space). Research unlocks buildings, equipment models and new options.
+Рішення ухвалюються указами 90 днів без голосувань. Лише під час війни або в гібридному режимі. −4 стабільність, демократії невдоволені.	Decisions are passed by decree for 90 days without votes. Only in wartime or in a hybrid regime. −4 stability, democracies are displeased.
+Податки, бюджет, мобілізація, закони через парламент (фракції, коаліції, впливи), національні проєкти, цілі (🏆 у верхній панелі).	Taxes, budget, mobilization, laws through parliament (factions, coalitions, influence), national projects, goals (🏆 in the top bar).
+Супутники (розвідка, звʼязок, навігація, раннє попередження), запуски, космічні програми, оренда розвідданих, інтернет і РЛС.	Satellites (reconnaissance, communications, navigation, early warning), launches, space programs, intelligence leasing, internet and radar.
+знімки ворожого тилу: ≥3 супутники відкривають туман війни над ворогами; з дослідженням «Супутникова розвідка» — наступ +3%	imagery of the enemy rear: ≥3 satellites lift the fog of war over enemies; with “Satellite reconnaissance” research — offense +3%
+Тягніть повзунки: частки автоматично зводяться до 100%. Переформування займає час і гроші, армія тимчасово слабша (−20%).	Drag the sliders: shares are normalized to 100% automatically. Reorganization takes time and money; the army is temporarily weaker (−20%).
+Техніку (моделі) держава оновлює сама в міру досліджень і виробництва — прискорити можна у вкладці «Армія → Техніка».	The state upgrades equipment (models) by itself as research and production allow — you can speed it up in “Army → Equipment”.
+Нова коаліція з поступками: +8–12% до коаліції, але −2 стабільність і збільшені соцвидатки на рік.	A new coalition with concessions: +8–12% to the coalition, but −2 stability and higher social spending for a year.
+Дострокові вибори через 60 днів. Ризиковано: результат залежить від стабільності й економіки.	Snap elections in 60 days. Risky: the result depends on stability and the economy.
+Комерційні запуски й супутники: дорого, але дохідно; потрібні дослідження країни-господаря	Commercial launches and satellites: expensive but profitable; requires the host country's research
+Тиск на своїх депутатів: заблоковані рішення можна знову ставити на голосування одразу.	Pressure on your own MPs: blocked decisions can be put to a vote again right away.
+Вхід через Twitch працює лише через локальний сервер: запустіть «Запустити LORA.bat»	Twitch login works only through the local server: run “Запустити LORA.bat”
+власна навігація (≥10): ракети й КАБ точніші на 10%, не залежите від чужого GPS	own navigation (≥10): missiles and glide bombs 10% more accurate, no dependence on foreign GPS
+Посади й бюджетні програми для депутатів-позафракційників: +3–6% до коаліції.	Posts and budget programs for independent MPs: +3–6% to the coalition.
+Кібератаки — лише проти ворогів або дуже ворожих держав (відносини < −30)	Cyberattacks — only against enemies or very hostile states (relations < −30)
+Потрібні власні старти (≥ 4 на рік): стартовий майданчик або космодром	Own launches required (≥ 4 per year): a launch pad or a spaceport
+Для обміну потрібні власні розвідсупутники (≥3); інакше — оренда	Exchange requires your own reconnaissance satellites (≥3); otherwise — lease
+інтернет і звʼязок армій (організованість відновлюється швидше)	internet and army communications (organization recovers faster)
+Агітація за курс уряду: +2–4% до партії влади, +1 стабільність.	Campaigning for the government's course: +2–4% to the ruling party, +1 stability.
+Потрібні морські порти на обох кінцях (будівля «Морський порт»)	Seaports are required at both ends (the “Seaport” building)
+журналісти розкопали «домовленості» — скандал, −3 стабільності	journalists dug up the “arrangements” — scandal, −3 stability
+розташування й склад військ відомі (наступ +6% на 45 днів)	troop positions and composition are known (offense +6% for 45 days)
+збивати ворожі супутники (міжнародне засудження)	shoot down enemy satellites (international condemnation)
+Морська лінія — лише між прибережними регіонами	A sea line — only between coastal regions
+Потрібні бомбардувальники — «Армія → Авіація»	Bombers required — “Army → Air force”
+Лише під час війни або в гібридному режимі	Only in wartime or in a hybrid regime
+%), популярність −3; тиск на владу росте	%), popularity −3; pressure on the government grows
+В автократії парламент і так слухняний	In an autocracy the parliament is obedient anyway
+глядачі й вивід на стрім — без туману)	spectators and stream output — without fog)
+рішення ухвалюються указами 90 днів	decisions are passed by decree for 90 days
+Ударні дрони-ведені (Loyal Wingman)	Loyal Wingman strike drones
+%). Ухвалювати рішення стане важче	%). Passing decisions will be harder
+Діють надзвичайні повноваження ще	Emergency powers remain in force for
+Відновлювана енергетика (змішана)	Renewable energy (mixed)
+Корабельна ППО (Aegis/«Полімент»)	Shipborne air defense (Aegis/Poliment)
+дострокові вибори через 60 днів	snap elections in 60 days
+Воєнний стан: вибори неможливі	Martial law: elections are impossible
+120 тис. FPV, стабільність +3	120k FPV, stability +3
+посилились (стабільність −3)	intensified (stability −3)
+20 тис. бійців біля столиці	20k troops near the capital
+блокування голосувань знято	vote blocks lifted
+Морська лінія (порт — порт)	Sea line (port — port)
+Армія вже переформовується	The army is already reorganizing
+Немає заблокованих рішень	No blocked decisions
+Будівництво й дослідження	Construction and research
+влада вистояла (шанс був	the government survived (the chance was
+Надзвичайні повноваження	Emergency powers
+Склад майже не змінився	The composition has barely changed
+Змінити склад і техніку	Change composition and equipment
+Переформування почалось	Reorganization started
+Переговори з фракціями	Talks with factions
+Лише для глави держави	Head of state only
+Інформаційна кампанія	Information campaign
+Задовга морська лінія	Sea line too long
+Економіка й логістика	Economy and logistics
+Розпустити парламент	Dissolve parliament
+Потрібне виробництво	Production required
+Партійна дисципліна	Party discipline
+>🏢 Купити офіс тут	>🏢 Buy an office here
+Морська лінія з	Sea line connects
+Вплив на парламент	Influence on parliament
+%, соцвидатки +2%	%, social spending +2%
+Недоступні засоби	Unavailable weapons
+Невідома держава	Unknown state
+Коаліційна угода	Coalition agreement
+Немає парламенту	No parliament
+переозброєння на	rearming with
+Орбіта Дайнемікс	Orbita Dynamics
+Мережа Атлантика	Atlantica Network
+склад і техніка	composition and equipment
+Рівʼєра Резортс	Riviera Resorts
+Стрім і онлайн	Stream and online
+власний склад	custom composition
+Всього бійців	Total troops
+Переформувати	Reorganize
+морські порти	seaports
+Балтік Файбер	Baltic Fiber
+інтернет +10%	internet +10%
+партія влади	ruling party
+Зміна складу	Composition change
+Хуася Космос	Huaxia Kosmos
+Зоряний Шлях	Star Path
+Сонячний Дім	Solar Home
+60 тис. FPV	60k FPV
+супутники ×	satellites ×
+Будівництво	Construction
+» завершено	» completed
+дослідження	research
+Дипломатія	Diplomacy
+штурмовики	attack aircraft
+Карпатнет	Karpatnet
+Мережі 6G	6G networks
+млн/міс.	M/mo.
+інтернет	internet
+коаліція	coalition
+Потрібне	Required
+Виконати	Execute
+Виконано	Done
+ракетою	by missile
+указом)	by decree)
+Шаблони	Templates
+Помилка	Error
+єктів	objects
+Збито	Shot down
+Мапа	Map
+далі	then
+Ще	Still
+ос.	pers.
+Інший вигляд аватарки	Different avatar look
+Чоловік / жінка	Male / female
