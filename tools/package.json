@@ -1,0 +1,2 @@
+{ "name": "project-lora-tools", "private": true, "description": "Скрипти для перебудови даних мапи Project LORA",
+  "dependencies": { "topojson-client": "^3.1.0", "d3-geo": "^3.1.1", "mapshaper": "^0.6.0", "i18n-iso-countries": "^7.11.0", "world-atlas": "^2.0.2" } }

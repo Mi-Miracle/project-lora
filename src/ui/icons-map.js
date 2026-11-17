@@ -1,0 +1,3 @@
+// ЗГЕНЕРОВАНО tools/art/icons.py: назва піксельної іконки → позиція в assets/ui/icons.png
+const PX_ICONS = {"state": [0, 0], "econ": [1, 0], "logi": [2, 0], "army": [3, 0], "dipl": [4, 0], "build": [5, 0], "tech": [6, 0], "world": [7, 0], "co": [0, 1], "infantry": [1, 1], "tank": [2, 1], "shells": [3, 1], "fpv": [4, 1], "strike": [5, 1], "missiles": [6, 1], "sam": [7, 1], "fleet": [0, 2], "energy": [1, 2], "factory": [2, 2], "target": [3, 2], "star": [4, 2], "shield": [5, 2], "flag": [6, 2], "jet": [7, 2], "attack": [0, 3], "bomber": [1, 3], "heli": [2, 3], "spy": [3, 3], "ballistic": [4, 3], "hyper": [5, 3], "glide": [6, 3], "ifv": [7, 3], "mlrs": [0, 4], "para": [1, 4]};
+const PX_COLS = 8;

@@ -1,0 +1,200 @@
+🚧 Stage 3: separate troop types — infantry, mechanized and armored units, artillery, air/missile defense, air force (fighters, bombers, transport), strike and recon drones, FPV, naval drones, missile forces, cyber troops, special forces, space systems. Each type has its own resource, factory and research needs. For now armies are generalized.
+Armies have strength, organization, supply, quality and a mode: 🛡 defense (positional fighting) or ➤ assault. Terrain and fortifications give a defense bonus. A region changes hands when the offensive reaches 100%. Losing the capital and half the economy means capitulation.
+New office: click a region on the map in any country (not at war with your HQ country and without sanctions) → “Buy office”. The price depends on the region's and country's economy. An office lets you build assets and lobby in that country. The HQ can be moved to any country where you have an office.
+Railways and highways speed up troop transfers and supply; cross-border routes make trade cheaper (pipes — gas, rail — raw materials and containers, road — containers). Airlift — fast transfer of troops and valuable cargo.
+Every month the advisor picks the most profitable projects: closes shortages, grows exports, and in wartime — defense industry, fortifications and depots. A region's governor can be switched off or given its own priority in the region panel.
+GDP of every region, 14 resources in 5 groups with real production (West Siberian oil, Kryvyi Rih ore, Taiwan chips…). The market runs automatically; you manage the budget, stockpiles, sanctions and contracts.
+The game watches itself: once a month a “director” checks whether the front is frozen, whether there are routs or excessive losses, how the world economy grows and whether the world is too peaceful or too warlike — and g
+Influence grows from lobbying and from your assets' share in the country's economy, and slowly fades. ≥ 30 — tax breaks, ≥ 50 — protection from nationalization, ≥ 70 — you can take over the government.
+Nation colors over terrain. Hatching with a red outline — region under foreign control. White line — your borders. ◆ — strategic straits (red — closed to you).
+space-based power, railguns, nanofactories, general AI, Moon/asteroid mining. For now science affects the overall technology level (tab “State → Policy”).
+You will become the government of this state: you will run its economy, army and diplomacy. 30% of the company's free cash goes to state reserves. Stability will drop temporarily.
+Assault — high intensity of fighting and losses, pushing forward. Defense — positional fighting with low losses. Auto — the army defends the front itself and attacks when it has the advantage.
+-
+The price depends on length and terrain: mountains cost almost twice as much. A cross-border route needs the neighbor's consent (relations ≥ 40) and improves relations.
+What comes next (construction, transport, troop types and drones, research, companies, traveling character, streaming) — see docs/ROADMAP.md.
+Consequences: relations worsen worldwide, possible sanctions, trade with the enemy stops, straits controlled by the enemy close to you.
+fusion power, quantum computing and cryptography, autonomous armies, orbital logistics, vertical farms, bioengineering
+Real-time global strategy: regional economies, resources, logistics, diplomacy and war on a realistic world map.
+shows them as an OBS overlay. Later chat voting, viewer commands etc. will plug in here — see docs/STREAM.md.
+Every state has an agent with a character close to its real-world politics. A separate “world director” runs events and crises.
+A strait's controller closes it to enemies and countries under its sanctions — trade takes longer and costlier routes.
+The HQ will be in the capital of the country chosen below. Goal — grow, gain influence and take over a state.
+Routes run over land and sea through real straits and canals; wars, blockades and sanctions cut them.
+No new buildings yet. The country's existing production is already included in the regional economy.
+No common border: you will need a naval landing or military access through third countries.
+🚀 Attacks on ships in Bab-el-Mandeb: the Suez route is closed, ships sail around Africa
+Contracts take priority over the market. Requires an open route and no sanctions/war.
+Controls: click an army → right-click a region (over land) or Shift+right-click (by sea, needs a fleet).
+No assets yet. Pick a region in a country where you have an office and build an asset in the right panel.
+⚠ Critical stability! Raise social spending, cut taxes or end the war.
+Right-click the sea to move. A fleet at a node blocks enemy trade and protects your routes.
+AI command, drone swarms, hypersonics, laser air defense, small modular reactors, 2-nm chips
+LMB — select · RMB — order · Shift+RMB — by sea · wheel — zoom · space — pause
+Attrition tactics: required-advantage multiplier for an aggressor with a manpower edge
+LMB — select; RMB — order; Shift+RMB — landing; space — pause; 1–4 — speed.
+offers peace on condition that you cede all the regions it controls.
+⚠ Shortage of microelectronics/metal/machinery slows arms production.
+friendly. Dashed — sea lanes. Bar next to an army — supply; ➤ — offensive.
+Stockpiles cover shortages during blockades and crises. Refilling costs the budget.
+Special economic zone (+growth, −30% taxes, construction −20%)
+in countries (click a region on the map → “Buy office”), build sector
+remember which offensives succeeded and become bolder or more cautious.
+cities. Wheel — zoom: the closer, the more cities and region names.
+Training 45+ days. Pick your region on the map to change the location.
+Tax breaks speed up regional growth, surcharges fill the budget.
+☢ Nuclear power. Full-scale war with it is an extreme risk.
+🦠 Pandemic: supply chains disrupted, the world economy falls
+offers peace and is ready to give you all the regions you control.
+offers a white peace: all occupied regions return to their owners.
+🤖 Automatic market (private companies buy and sell on their own)
+No land route (neutral countries without access, or sea)
+The AI runs the budget, mobilization and diplomacy (handy on stream)
+desert. Mountains and forest give a defense bonus and slow offensives.
+No safe sea route (blockade or no ports)
+The game broadcasts events (news, wars, date, state status) to the channel
+lightly tweaks parameters within safe limits. Nation agents rem
+International aid to victims of aggression (share of donor GDP per year)
+Above 35% slows growth; above 45% lowers stability
+Troop speed, supply, transport cost, growth
+Technology tree from today to the theoretical future
+Contract added — it takes effect when routes are recalculated
+Now you run the state, and the company stays yours.
+Route too long (over 2500 km) — split it into sections
+Pick a country on the map to open diplomatic actions.
+Combat losses per day (share of army × enemy advantage)
+📉 Global financial crisis: growth slows down
+🛢 OPEC+ cuts oil output by 7% for half a year
+Extra caution of risk-averse agents
+Default: credit markets closed, interest rate raised.
+Ports, hubs, depots — income from trade flows
+Neutral territory: military access required
+-
+Refusing will badly damage relations with the ally.
+Trade volume with you. Lines — trade routes
+At least one end must be on your territory
+The world against you: tough AI, debts, disasters
+⚠ Fuel shortage worsens army supply.
+Arms for governments: income from state contracts
+Core business (not tied to regions)
+Speed of establishing control over a region
+World-2026: the Russian-Ukrainian war goes on
+Intensity of positional fighting (without assault)
+AI more aggressive and stronger, more frequent crises
+💻 Cyberattack on logistics and power grids
+rejects the proposal. Their war assessment
+🏚 Construction stopped (region lost)
+Speed of building fortifications on the front
+Recruitment is only possible on your own territory
+Only on your own controlled territory
+Maximum control progress per day, %
+Base daily growth of war weariness
+victim of aggression needs more aid
+🤖 Governor (automatic construction)
+The company will fund a political campaign
+Over 1% of the population — a hit to the economy.
+When influence ≥ 70 and the government is weak — you can
+More money, more peaceful AI, fewer crises
+Not enough transport fleet: capacity
+⚠ The save is incompatible with this version
+and calls on you to fulfil your allied obli
+📡 Stream integration (stub)
+regions (oblasts, states, provinces)
+the region produces more than it consumes
+Base defense bonus on your own land
+a list of available buildings will appear.
+Agents have no combat experience yet.
+Loss multiplier for the assaulting side
+the world's companies increase output
+The country is at war with your HQ country
+enters the war to defend an ally
+has capitulated. The state is dissolved.
+Local channel (BroadcastChannel)
+Requires metal and microelectronics.
+Public investment (% of GDP per year)
+No changes for now — everything is within targets.
+for every state + a world director
+k. Raise the mobilization level.
+Click the end region of the route
+Advantage the AI needs to attack
+Allies may enter the war
+Mobilization level (% of population)
+shortage. Lines — global flows.
+Fortification strength (defense multiplier)
+🌀 Storm: shipping through «
+Regional taxes (relative to national)
+Cancelled, 50% of funds returned
+Base economic growth rate
+Ores, metals, critical minerals
+Peaceful world (no active wars)
+nationalizes the assets of company «
+Overall AI propensity for war
+Maximum level reached
+ceases to exist as a state
+Failed to load terrain
+You control their regions
+Organization loss in combat
+evades its allied obli
+Strategic straits and canals
+Main source of stability
+Army quality, productivity
+Critical minerals deposit
+front breakthrough too fast
+Mobilization limit: available
+Bilateral alliance dissolved
+🛡 An ally asks for help
+No own routes yet.
+Commodity prices (vs base)
+Goods, chemicals, pharmaceuticals
+Munitions and vehicle plant
+An office in this country is required
+🛡 defense (positional fighting)
+a region (over land) or
+Pre-tax profit / year
+Spending structure (% of GDP)
+Infrastructure and logistics
+States' GDP growth rate.
+Oil, gas, electricity
+Russian-Ukrainian war
+» effectively controls the government
+📦 International aid: $
+📂 Load saved game
+in a state and run it.
+You also run a state
+Consumer goods factory
+Autonomous Republic of Crimea
+The region has no deposits
+» encircled and capitulated
+📡 Stream integration
+📍 Take selected region
+🎯 Pick the end on the map
+imports. Dots — convoys.
+Grain, food, fertilizers
+Supply depots and warehouses
+🔬 Technological breakthrough
+🏢 Company founded «
+»: construction lost
+You already have an office in this country
+Mobilizing a new army
+The rest — new weapons.
+🔬 Research — stage 3
+Internal stability.
+starting infrastructure
+-
+Small modular reactor
+Solar/wind farm
+the front has been static for over a year
+No ports for a shipyard
+% of GDP, spending cut
+Too far for an airlift
+📜 Capitulation terms
+Routes under construction
+🏢 You have an office in this country
+-
+pick a region on the map
+Spending (with interest)
+Manpower limit
+GDP per capita in the region.
+Steel mill
+The government is too stable
+Stability required

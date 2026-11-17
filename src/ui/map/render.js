@@ -1,0 +1,246 @@
+// МАПА: малювання. Базовий шар (рельєф + регіони + кордони) кешується й перемальовується лише при змінах;
+// поверх щокадру малюються торгові потоки, війська, флоти, міста, підписи.
+const RCOL = {}; RES.forEach(r => RCOL[r] = RI[r].col);
+const resColor = (r, a) => `rgba(${RCOL[r].join(',')},${a})`;
+function lerpC(a, b, t) { return `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(',')})`; }
+function scale3(x) { x = Math.max(-1, Math.min(1, x)); return x < 0 ? lerpC([150, 155, 160], [205, 55, 55], -x) : lerpC([150, 155, 160], [60, 190, 110], x); }
+function heat(x) { x = Math.max(0, Math.min(1, x)); return x < 0.5 ? lerpC([40, 70, 120], [70, 170, 160], x * 2) : lerpC([70, 170, 160], [240, 220, 90], (x - 0.5) * 2); }
+const TERRAIN_COL = { plains: '#9bc46a', steppe: '#d8c77a', forest: '#3f8a4a', hills: '#a58a5a', mountain: '#8a7a6e', desert: '#e3c58a', arctic: '#e8f0f6' };
+function terrColor(i) {
+  const t = G.ter[i], n = G.N[t.ctrl], P = G.pv();
+  switch (mode) {
+    case 'pol': return n.color;
+    case 'rel': if (t.ctrl === P) return '#3d8bd9'; if (G.atWar(P, t.ctrl)) return '#8a1c1c'; if (G.allied(P, t.ctrl)) return '#2f6fb0'; return scale3(G.rel[P][t.ctrl] / 80);
+    case 'gdp': return heat(Math.log10(Math.max(1, t.gdp / Math.max(0.01, t.pop) * 1000)) / 5 - 0.5);
+    case 'growth': return scale3((n.growth - 0.015) / 0.04);
+    case 'stab': return scale3((n.stab - 50) / 40);
+    case 'mil': return heat(Math.log10(G.nationPower(t.ctrl) + 1) / 3.6);
+    case 'terrain': return TERRAIN_COL[D.regions[i].t] || '#888';
+    case 'res': { const v = t.prod[modeRes]; const need = t.need0[modeRes]; const bal = (v - need) / Math.max(1e-9, Math.max(v, need)); return scale3(bal); }
+    case 'trade': { if (t.ctrl === P) return '#3d8bd9'; let v = 0; G.flows.forEach(f => { if ((f.from === P && f.to === t.ctrl) || (f.to === P && f.from === t.ctrl)) v += f.val; }); return v > 0 ? heat(Math.log10(v + 1) / 2.6) : '#2b3440'; }
+    case 'supply': if (G.atWar(P, t.ctrl)) return '#7a2323'; if (t.ctrl === P) return '#2e6aa6'; if (G.friendlyTo(P, t.ctrl)) return '#2e5a6e'; return '#3a4250';
+  }
+  return n.color;
+}
+const stripePats = {};
+function stripePattern(c2d, color) { const k = color; if (stripePats[k]) return stripePats[k]; const c = document.createElement('canvas'); c.width = c.height = 8; const x = c.getContext('2d'); x.strokeStyle = color; x.lineWidth = 2.5; x.beginPath(); x.moveTo(-2, 10); x.lineTo(10, -2); x.moveTo(6, 10); x.lineTo(10, 6); x.stroke(); return stripePats[k] = c2d.createPattern(c, 'repeat'); }
+
+// ---------- базовий шар ----------
+function drawBase() {
+  const W = baseCv.width, H = baseCv.height, c = bctx;
+  c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#7fa9c9'; c.fillRect(0, 0, W, H);
+  const { out: shifts, lonL, lonR } = visibleShifts(); const lw = 1 / view.s;
+  const alpha = mode === 'pol' ? LORA.config.map.politicalAlpha : mode === 'terrain' ? 0.0 : 0.7;
+  for (const sh of shifts) {
+    if (GEO.reliefOk) { const img = GEO.relief; c.setTransform(view.s * DPR * 360 / img.width, 0, 0, view.s * DPR * 180 / img.height, (view.ox + (sh - 180) * view.s) * DPR, (view.oy - 90 * view.s) * DPR); c.drawImage(img, 0, 0); }
+    c.setTransform(view.s * DPR, 0, 0, view.s * DPR, (view.ox + sh * view.s) * DPR, view.oy * DPR);
+    if (!GEO.reliefOk) { c.fillStyle = '#d9d2bd'; for (let i = 0; i < GEO.paths.length; i++) c.fill(GEO.paths[i]); }
+    c.globalAlpha = alpha;
+    for (let i = 0; i < GEO.paths.length; i++) {
+      const bb = GEO.bbox[i]; if (bb[2] + sh < lonL - 2 || bb[0] + sh > lonR + 2) continue;
+      c.fillStyle = terrColor(i); c.fill(GEO.paths[i]);
+    }
+    c.globalAlpha = 1;
+    // окуповані регіони — штрихування кольором власника
+    for (let i = 0; i < GEO.paths.length; i++) { const t = G.ter[i]; if (t.ctrl === t.owner) continue; c.globalAlpha = 0.6; c.fillStyle = stripePattern(c, mode === 'pol' ? G.N[t.owner].color : '#000'); c.fill(GEO.paths[i]); c.globalAlpha = 1; }
+    const fv = window.fogVis ? fogVis() : null; if (fv) { c.fillStyle = 'rgba(12,18,28,0.42)'; for (let i = 0; i < GEO.paths.length; i++) { if (fv[i]) continue; const bb = GEO.bbox[i]; if (bb[2] + sh < lonL - 2 || bb[0] + sh > lonR + 2) continue; c.fill(GEO.paths[i]); } }
+    if (view.s > 2.4) { c.strokeStyle = 'rgba(255,255,255,0.28)'; c.lineWidth = lw * 0.7; c.stroke(GEO.inner); }
+    c.strokeStyle = 'rgba(40,70,100,0.55)'; c.lineWidth = lw * 0.8; c.stroke(GEO.coast);
+    c.strokeStyle = 'rgba(20,20,30,0.85)'; c.lineWidth = lw * 1.6; c.stroke(GEO.borders);
+    // кордони держав, змінені війною (лінія фронту): контур регіонів під чужим контролем
+    c.strokeStyle = '#ff3b3b'; c.lineWidth = lw * 1.4;
+    for (let i = 0; i < GEO.paths.length; i++) { const t = G.ter[i]; if (t.ctrl !== t.owner) c.stroke(GEO.paths[i]); }
+  }
+  mapDirty = false; lastViewKey = viewKey();
+  computeLabels();
+}
+const viewKey = () => view.s.toFixed(4) + ':' + view.ox.toFixed(1) + ':' + view.oy.toFixed(1) + ':' + mode + ':' + modeRes + ':' + cv.width + ':' + cv.height;
+
+// ---------- підписи держав ----------
+let labelPts = [];
+function computeLabels() {
+  labelPts = [];
+  G.N.forEach(n => {
+    if (!n.alive || n.home < 0) return; const hc = D.regions[n.home].c; let sx = 0, sy = 0, sw = 0;
+    G.ter.forEach((t, i) => { if (t.ctrl !== n.id) return; const c = D.regions[i].c; let x = c[0]; if (x - hc[0] > 180) x -= 360; else if (hc[0] - x > 180) x += 360; if (Math.abs(x - hc[0]) > 70) return; const w = Math.sqrt(t.area); sx += x * w; sy += c[1] * w; sw += w; });
+    if (!sw) return; const area = n.agg ? n.agg.area : 1e5;
+    labelPts.push({ id: n.id, lon: sx / sw, lat: sy / sw, area });
+  });
+}
+
+// ---------- кадр ----------
+let animT = 0;
+function draw() {
+  if (!G) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#0b1622'; ctx.fillRect(0, 0, cv.width, cv.height); return; }
+  if (mapDirty || viewKey() !== lastViewKey) drawBase();
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(baseCv, 0, 0);
+  const { out: shifts } = visibleShifts(); const lw = 1 / view.s;
+  for (const sh of shifts) {
+    ctx.setTransform(view.s * DPR, 0, 0, view.s * DPR, (view.ox + sh * view.s) * DPR, view.oy * DPR);
+    // морські шляхи
+    if (mode === 'supply' || mode === 'trade') { ctx.strokeStyle = 'rgba(20,60,100,0.5)'; ctx.lineWidth = lw * 1.2; ctx.setLineDash([4 * lw, 4 * lw]); ctx.beginPath(); D.sea.edges.forEach(([a, b]) => { const A = D.sea.nodes[a], B = D.sea.nodes[b]; let bx = B.lon; if (bx - A.lon > 180) bx -= 360; else if (A.lon - bx > 180) bx += 360; ctx.moveTo(A.lon, -A.lat); ctx.lineTo(bx, -B.lat); }); ctx.stroke(); ctx.setLineDash([]); }
+    // гравець, вибір, наведення, наступи
+    ctx.lineWidth = lw * 2; ctx.strokeStyle = '#ffffff';
+    G.ter.forEach((t, i) => { if (t.ctrl === G.player && D.regions[i].nb.some(j => G.ter[j].ctrl !== G.player)) ctx.stroke(GEO.paths[i]); });
+    if (sel && sel.type === 't') { ctx.strokeStyle = '#ffd34d'; ctx.lineWidth = lw * 2.6; ctx.stroke(GEO.paths[sel.id]); }
+    if (hoverT >= 0) { ctx.strokeStyle = 'rgba(255,255,255,0.75)'; ctx.lineWidth = lw * 1.5; ctx.stroke(GEO.paths[hoverT]); }
+    G.ter.forEach((t, i) => { if (t.occ && t.occ.p > 0) { ctx.strokeStyle = '#ff5d5d'; ctx.lineWidth = lw * (1.4 + Math.sin(animT * 4) * 0.6); ctx.stroke(GEO.paths[i]); } });
+    drawLinks(lw);
+    drawFlows();
+    G.chokeIdx.forEach(ci => { const s = D.sea.nodes[ci]; const blk = G._blkP && G._blkP[ci]; const r = 3.4 / Math.sqrt(view.s); ctx.save(); ctx.translate(s.lon, -s.lat); ctx.rotate(Math.PI / 4); ctx.fillStyle = blk ? '#ff5d5d' : '#ffd34d'; ctx.strokeStyle = '#000'; ctx.lineWidth = lw; ctx.fillRect(-r / 2, -r / 2, r, r); ctx.strokeRect(-r / 2, -r / 2, r, r); ctx.restore(); });
+  }
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  unitHit = [];
+  for (const sh of shifts) { drawCities(sh); drawLabels(sh); drawBuildings(sh); drawCompanyLayer(sh); drawUnits(sh); drawStrikes(sh); drawLeader(sh); if (window.drawAgents) drawAgents(sh); }
+}
+
+function drawFlows() {
+  const P = G.pv(); let list;
+  if (mode === 'trade') list = G.flows.filter(f => f.from === P || f.to === P || f.val > 40);
+  else if (mode === 'res') list = G.flows.filter(f => f.r === modeRes && f.val > 1);
+  else list = G.flows.filter(f => (f.from === P || f.to === P) && f.val > 0.5);
+  if (list.length > 450) list = list.sort((a, b) => b.val - a.val).slice(0, 450);
+  const lw = 1 / view.s; ctx.lineCap = 'round';
+  list.forEach(f => {
+    if (!f.line) f.line = G.routeLine(f.path);
+    const mine = f.from === P || f.to === P;
+    ctx.strokeStyle = mine ? (f.from === P ? 'rgba(40,200,120,0.6)' : 'rgba(60,150,255,0.6)') : resColor(f.r, 0.4); ctx.lineWidth = Math.max(0.6, Math.min(5, Math.log10(f.val + 1) * 1.6)) * lw;
+    ctx.beginPath(); f.line.forEach((p, k) => k ? ctx.lineTo(p[0], -p[1]) : ctx.moveTo(p[0], -p[1])); ctx.stroke();
+    if (!f.len) { f.cum = [0]; for (let k = 1; k < f.line.length; k++) f.cum.push(f.cum[k - 1] + Math.hypot(f.line[k][0] - f.line[k - 1][0], f.line[k][1] - f.line[k - 1][1])); f.len = f.cum[f.cum.length - 1] || 1; f.off = Math.random(); }
+    const cnt = Math.min(6, 1 + Math.floor(f.len / 25)); ctx.fillStyle = resColor(f.r, 1);
+    for (let c = 0; c < cnt; c++) { const d = ((animT * 6 + f.off * f.len + c * f.len / cnt) % f.len); let k = 1; while (k < f.cum.length - 1 && f.cum[k] < d) k++; const a = f.line[k - 1], b = f.line[k] || a, seg = (f.cum[k] - f.cum[k - 1]) || 1, u = (d - f.cum[k - 1]) / seg; ctx.beginPath(); ctx.arc(a[0] + (b[0] - a[0]) * u, -(a[1] + (b[1] - a[1]) * u), 2.6 * lw, 0, 6.283); ctx.fill(); }
+  });
+}
+function cityMin() { const s = view.s; return s < 3 ? 1e9 : s < 5 ? 5000 : s < 8 ? 2000 : s < 14 ? 800 : s < 25 ? 300 : 0; }
+function drawCities(sh) {
+  const min = cityMin(); ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  for (const c of GEO.cities) {
+    if (c.pop < min && !(c.cap && view.s >= 5)) continue;
+    const [x, y] = toScreen(c.lon + sh, c.lat); if (x < -20 || x > innerWidth + 20 || y < 40 || y > innerHeight) continue;
+    const r = c.cap ? 3.4 : 2.2 + Math.min(2, c.pop / 6000);
+    ctx.fillStyle = c.cap ? '#fff' : '#f4f1e6'; ctx.strokeStyle = '#111'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill(); ctx.stroke();
+    if (c.cap) { ctx.fillStyle = '#c0392b'; ctx.beginPath(); ctx.arc(x, y, 1.4, 0, 6.283); ctx.fill(); }
+    if (view.s >= 7 || (c.cap && view.s >= 5)) { ctx.font = `${c.cap ? 600 : 500} ${c.pop > 3000 ? 12 : 11}px system-ui,sans-serif`; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.fillStyle = '#1c2530'; ctx.strokeText(c.n, x + r + 3, y); ctx.fillText(c.n, x + r + 3, y); }
+  }
+}
+function drawLabels(sh) {
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  if (view.s < 18) labelPts.forEach(L => {
+    const px = Math.sqrt(L.area) / 111 * view.s; if (px < 40 && L.id !== G.player) return;
+    const [x, y] = toScreen(L.lon + sh, L.lat); if (x < -100 || x > innerWidth + 100 || y < 0 || y > innerHeight) return;
+    const fs = Math.max(11, Math.min(22, px / 9)); const n = G.N[L.id];
+    ctx.font = `700 ${fs}px system-ui,sans-serif`; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.fillStyle = '#1b2633';
+    const txt = view.s > 3 ? n.name.toUpperCase() : n.name; ctx.strokeText(txt, x, y); ctx.fillText(txt, x, y);
+  });
+  if (view.s >= 9) { ctx.font = 'italic 500 11px system-ui,sans-serif'; D.regions.forEach((r, i) => { if (!r.n) return; const px = Math.sqrt(r.ar) / 111 * view.s; if (px < 70) return; const [x, y] = toScreen(r.c[0] + sh, r.c[1]); if (x < 0 || x > innerWidth || y < 50 || y > innerHeight) return; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.fillStyle = '#3a3226'; ctx.strokeText(r.n, x, y + 14); ctx.fillText(r.n, x, y + 14); }); }
+  G.ter.forEach((t, i) => { if (!t.occ) return; const c = D.regions[i].c; const [x, y] = toScreen(c[0] + sh, c[1]); if (x < -50 || x > innerWidth + 50) return; ctx.fillStyle = '#000b'; ctx.fillRect(x - 22, y + 24, 44, 6); ctx.fillStyle = G.N[t.occ.by].color; ctx.fillRect(x - 22, y + 24, 44 * t.occ.p / 100, 6); ctx.strokeStyle = '#ff5d5d'; ctx.lineWidth = 1; ctx.strokeRect(x - 22, y + 24, 44, 6); });
+}
+function unitPos(a) {
+  const c = D.regions[a.t].c;
+  if (a.mv && !a.mv.sea && a.mv.path) { const nx = a.mv.path[a.mv.step]; if (nx != null) { const c2 = D.regions[nx].c; let x2 = c2[0]; if (x2 - c[0] > 180) x2 -= 360; else if (c[0] - x2 > 180) x2 += 360; const f = Math.max(0, Math.min(0.9, (a.mv.tot - a.mv.left + (speedIdx ? tAcc : 0)) / Math.max(1, a.mv.tot))); return { lon: c[0] + (x2 - c[0]) * f, lat: c[1] + (c2[1] - c[1]) * f, to: [x2, c2[1]] }; } } // плавний рух між днями
+  if (a.mv && a.mv.sea) { const nodes = a.mv.nodes; const prog = 1 - a.mv.left / a.mv.days; const k = Math.min(nodes.length - 1, Math.max(0, Math.floor(prog * nodes.length))); const s = D.sea.nodes[nodes[k]]; return { lon: s.lon, lat: s.lat, sea: true }; }
+  return { lon: c[0], lat: c[1] };
+}
+var unitHit = [];
+function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function groupByNation(list) { const m = {}; list.forEach(a => { if (!m[a.n]) m[a.n] = { n: a.n, k: 0, cnt: 0, first: a }; m[a.n].k += a.k; m[a.n].cnt++; }); return Object.values(m).map(g => g.cnt === 1 ? { n: g.n, k: g.k, arm: g.first } : g); }
+function drawUnits(sh) {
+  const P = G.pv(), zoomed = view.s >= 7, bset = new Set(G.battles || []);
+  const fv = window.fogVis ? fogVis() : null;
+  const showA = a => (!fv || a.n === P || fv[a.t] || G.allied(P, a.n)) && (zoomed || a.n === P || G.atWar(P, a.n) || bset.has(a.t) || (G.allied(P, a.n) && G.enemiesOf(P).length) || (sel && sel.type === 't' && G.ter[sel.id].ctrl === a.n));
+  const byT = {}; G.armies.forEach(a => { if (!showA(a)) return; const k = a.mv && a.mv.sea ? 's' + a.id : a.t; (byT[k] = byT[k] || []).push(a); });
+  Object.values(byT).forEach(list => {
+    const show = groupByNation(list.filter(a => a.n !== P)); list.filter(a => a.n === P).sort((a, b) => a.k - b.k).forEach(a => show.unshift({ n: a.n, k: a.k, arm: a }));
+    show.forEach((u, idx) => {
+      const a = u.arm || u.first; const p = unitPos(a);
+      let [x, y] = toScreen(p.lon + sh, p.lat); y += 4 + idx * 17 - (show.length - 1) * 8;
+      if (x < -40 || x > innerWidth + 40 || y < -20 || y > innerHeight + 20) return;
+      const n = G.N[u.n], war = G.atWar(P, u.n);
+      const txt = (u.k >= 1000 ? (u.k / 1000).toFixed(1) + 'М' : u.k.toFixed(0)) + (u.cnt > 1 ? '×' + u.cnt : '');
+      ctx.font = '600 11px system-ui'; const w = ctx.measureText(txt).width + 18;
+      if (u.arm && a.mv && p.to) { const [x2, y2] = toScreen(p.to[0] + sh, p.to[1]); ctx.strokeStyle = war ? '#ff3b3b' : u.n === P ? '#ffd34d' : '#ffffffaa'; ctx.fillStyle = ctx.strokeStyle; ctx.lineWidth = 2.2; ctx.setLineDash([5, 4]); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]); const ang = Math.atan2(y2 - y, x2 - x); ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - 9 * Math.cos(ang - 0.4), y2 - 9 * Math.sin(ang - 0.4)); ctx.lineTo(x2 - 9 * Math.cos(ang + 0.4), y2 - 9 * Math.sin(ang + 0.4)); ctx.fill(); }
+      const isSel = sel && sel.type === 'a' && u.arm && sel.id === u.arm.id;
+      ctx.fillStyle = n.color; ctx.strokeStyle = isSel ? '#ffd34d' : war ? '#ff3b3b' : u.n === P ? '#fff' : '#000'; ctx.lineWidth = isSel ? 3 : 1.5;
+      roundRect(x - w / 2, y - 8, w, 16, 4); ctx.fill(); ctx.stroke();
+      if (u.arm) { ctx.fillStyle = '#000a'; ctx.fillRect(x - w / 2 + 3, y - 5, 3, 10); ctx.fillStyle = a.sup > 0.6 ? '#4cd28a' : a.sup > 0.35 ? '#ffc04d' : '#ff5d5d'; ctx.fillRect(x - w / 2 + 3, y + 5 - 10 * a.sup, 3, 10 * a.sup); }
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 2.5; ctx.strokeStyle = '#000c'; ctx.strokeText(txt, x + 4, y + 0.5); ctx.fillText(txt, x + 4, y + 0.5);
+      if (a.stance === 'attack') { ctx.fillText('➤', x + w / 2 + 7, y); }
+      if (a.train > 0) { ctx.fillText('⏳', x + w / 2 + 7, y); }
+      if (u.arm && a.xp >= 0.25 && view.s >= 4) { ctx.fillStyle = '#ffd34d'; ctx.font = '600 9px system-ui'; ctx.fillText(G.vetStars(a), x + 4, y - 11); ctx.font = '600 11px system-ui'; ctx.fillStyle = '#fff'; }
+      if (p.sea) ctx.fillText('⚓', x - w / 2 - 7, y);
+      else if (u.arm && G.tplOf && view.s >= 3) drawNato(x - w / 2 - 9, y, G.tplOf(a), n.color);
+      unitHit.push({ x, y, w, h: 16, type: u.arm ? 'a' : 'g', id: u.arm ? u.arm.id : null, t: a.t });
+    });
+  });
+  (G.battles || []).forEach(ti => { const c = D.regions[ti].c; const [x, y] = toScreen(c[0] + sh, c[1]); ctx.font = (G.battleHot && G.battleHot[ti] ? '20px' : '14px') + ' system-ui'; ctx.globalAlpha = 0.6 + 0.4 * Math.sin(animT * 6); ctx.textAlign = 'center'; ctx.fillText('⚔', x + 34, y - 2); ctx.globalAlpha = 1; });
+  const byN = {};
+  const fvS = window.fogSea ? fogSea() : null;
+  G.fleets.forEach(f => { if (fvS && f.n !== P && !G.allied(P, f.n) && !fvS.has(f.node)) return; if (zoomed || f.n === P || G.atWar(P, f.n) || (sel && sel.type === 'f' && sel.id === f.id)) (byN[f.node] = byN[f.node] || []).push(f); });
+  Object.entries(byN).forEach(([node, list]) => {
+    const s = D.sea.nodes[+node];
+    list.forEach((f, idx) => {
+      let lon = s.lon, lat = s.lat;
+      if (f.mv && f.mv.nodes[f.mv.step] != null && f.mv.tot) { const t2 = D.sea.nodes[f.mv.nodes[f.mv.step]]; let x2 = t2.lon; if (x2 - lon > 180) x2 -= 360; else if (lon - x2 > 180) x2 += 360; const u = 1 - Math.max(0, f.mv.left) / f.mv.tot; lon += (x2 - lon) * u; lat += (t2.lat - lat) * u; }
+      let [x, y] = toScreen(lon + sh, lat); y += idx * 15; if (x < -30 || x > innerWidth + 30) return;
+      const war = G.atWar(P, f.n); ctx.font = '600 10px system-ui'; const txt = '⛴' + f.s.toFixed(0); const w = ctx.measureText(txt).width + 8;
+      const isSel = sel && sel.type === 'f' && sel.id === f.id;
+      ctx.fillStyle = G.N[f.n].color; ctx.strokeStyle = isSel ? '#ffd34d' : war ? '#ff3b3b' : f.n === P ? '#fff' : '#000'; ctx.lineWidth = isSel ? 3 : 1.2;
+      roundRect(x - w / 2, y - 7, w, 14, 7); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(txt, x, y + 0.5);
+      unitHit.push({ x, y, w, h: 14, type: 'f', id: f.id });
+    });
+  });
+}
+
+function drawLinks(lw) {
+  if (!G.links || !G.links.length) return;
+  for (const l of G.links) {
+    const L = D.linkTypes[l.type]; const a = D.regions[l.a].c, b = D.regions[l.b].c; let bx = b[0]; if (bx - a[0] > 180) bx -= 360; else if (a[0] - bx > 180) bx += 360;
+    const st = G.linkVisible(l); ctx.globalAlpha = st === 'build' ? 0.45 : 1;
+    ctx.strokeStyle = st === 'cut' ? '#ff3b3b' : L.col; ctx.lineWidth = lw * (l.type === 'air' ? 1.5 : 3); ctx.setLineDash(L.dash.map(x => x * lw * 1.5));
+    ctx.beginPath(); ctx.moveTo(a[0], -a[1]);
+    if (l.type === 'air') { const mx = (a[0] + bx) / 2, my = (a[1] + b[1]) / 2 + Math.hypot(bx - a[0], b[1] - a[1]) * 0.15; ctx.quadraticCurveTo(mx, -my, bx, -b[1]); } else ctx.lineTo(bx, -b[1]);
+    ctx.stroke(); if (l.type === 'rail') { ctx.strokeStyle = '#fff'; ctx.lineWidth = lw; ctx.setLineDash([3 * lw, 7 * lw]); ctx.stroke(); }
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
+  }
+}
+function drawBuildings(sh) {
+  if (typeof streamOn !== "undefined" && streamOn) return; // чиста мапа на стрімі
+  if (view.s < 9) return;
+  const fv = window.fogVis ? fogVis() : null;
+  G.ter.forEach((t, i) => { const ks = Object.keys(t.bld); const cons = G.constructions.filter(c => c.t === i && c.n === G.player); if (!ks.length && !cons.length) return;
+    if (fv && !fv[i]) return; if (view.s < 16 && t.owner !== G.player) return;
+    const c = D.regions[i].c; let [x, y] = toScreen(c[0] + sh, c[1]); if (x < 0 || x > innerWidth || y < 50 || y > innerHeight) return;
+    const list = ks.sort((a, b) => t.bld[b] - t.bld[a]).slice(0, view.s < 16 ? 4 : 7).map(k => D.buildings[k].ic); if (cons.length) list.push('🏗');
+    drawEmoRow(list, x, y - 25, 'rgba(255,255,255,0.85)'); });
+}
+// ряд піксельних іконок на «пігулці»
+const _emoImg = new Image(); _emoImg.src = 'assets/ui/emoji.png';
+function drawEmo(e, x, y, sz) { const p = typeof PX_EMO !== 'undefined' && PX_EMO[e]; if (p && _emoImg.complete) { ctx.imageSmoothingEnabled = false; ctx.drawImage(_emoImg, p[0] * 16, p[1] * 16, 16, 16, x - sz / 2, y - sz / 2, sz, sz); return true; } ctx.font = (sz - 2) + 'px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(e, x, y); return false; }
+function drawEmoRow(list, x, y, bg) { const sz = 16, w = list.length * (sz + 1) + 6; ctx.fillStyle = bg; roundRect(x - w / 2, y - 10, w, 20, 9); ctx.fill(); ctx.fillStyle = '#000'; list.forEach((e, k) => drawEmo(e, x - w / 2 + 3 + sz / 2 + k * (sz + 1), y, sz)); }
+
+// удари ракет і дронів: дуга від найближчої території нападника + спалах
+function drawStrikes(sh) {
+  const L = (G.strikes || []).filter(x => G.day - x.d <= 2); if (!L.length) return;
+  L.forEach(x => {
+    if (!x._src) { const c = D.regions[x.i].c; let best = null, bd = 1e9; G.ter.forEach((t, j) => { if (t.ctrl !== x.from) return; const d = Math.hypot(D.regions[j].c[0] - c[0], D.regions[j].c[1] - c[1]); if (d < bd) { bd = d; best = j; } }); x._src = best != null ? D.regions[best].c : c; }
+    const a = toScreen(x._src[0] + sh, x._src[1]), b = toScreen(D.regions[x.i].c[0] + sh, D.regions[x.i].c[1]);
+    const ph = ((animT * 0.6 + x.i * 0.13) % 1), mx = (a[0] + b[0]) / 2, my = Math.min(a[1], b[1]) - Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.35;
+    ctx.strokeStyle = x.w === 'missiles' ? 'rgba(255,120,60,0.55)' : 'rgba(255,210,90,0.45)'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.quadraticCurveTo(mx, my, b[0], b[1]); ctx.stroke(); ctx.setLineDash([]);
+    const u = ph, px = (1 - u) * (1 - u) * a[0] + 2 * (1 - u) * u * mx + u * u * b[0], py = (1 - u) * (1 - u) * a[1] + 2 * (1 - u) * u * my + u * u * b[1];
+    ctx.fillStyle = '#fff'; ctx.fillRect(px - 2, py - 2, 4, 4);
+    const r = 6 + 10 * ((animT * 1.5 + x.i) % 1); ctx.strokeStyle = `rgba(255,${x.hits ? 90 : 200},60,${1 - ((animT * 1.5 + x.i) % 1)})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(b[0], b[1], r, 0, 7); ctx.stroke();
+  });
+}
+
+// натовський умовний знак складу армії: піхота ✕, техніка — овал, артилерія — крапка, ППО — дуга
+function drawNato(x, y, tpl, col) {
+  ctx.save(); ctx.fillStyle = '#0b1320e6'; ctx.strokeStyle = col || '#fff'; ctx.lineWidth = 1.3; ctx.fillRect(x - 7, y - 5, 14, 10); ctx.strokeRect(x - 7, y - 5, 14, 10); ctx.strokeStyle = '#fff'; ctx.fillStyle = '#fff'; ctx.beginPath();
+  if (tpl === 'inf' || tpl === 'std' || tpl === 'assault') { ctx.moveTo(x - 7, y - 5); ctx.lineTo(x + 7, y + 5); ctx.moveTo(x + 7, y - 5); ctx.lineTo(x - 7, y + 5); }
+  if (tpl === 'tank' || tpl === 'mech' || tpl === 'std') { ctx.moveTo(x + 4.5, y); ctx.ellipse(x, y, 4.5, 2.6, 0, 0, Math.PI * 2); }
+  ctx.stroke();
+  if (tpl === 'assault') { ctx.beginPath(); ctx.arc(x, y - 1, 3, Math.PI, 0); ctx.stroke(); }
+  if (tpl === 'art') { ctx.beginPath(); ctx.arc(x, y, 2.2, 0, Math.PI * 2); ctx.fill(); }
+  if (tpl === 'shield') { ctx.beginPath(); ctx.arc(x, y + 5, 5, Math.PI, 0); ctx.stroke(); }
+  ctx.restore();
+}

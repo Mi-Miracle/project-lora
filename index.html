@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Project LORA — глобальна стратегія</title>
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+<canvas id="map"></canvas>
+<div id="top"></div>
+<div id="tabs"></div>
+<div id="left"><div id="ptitle"></div><div id="tabc"></div></div>
+<div id="vign"></div>
+<div id="right"></div>
+<div id="news"></div>
+<div id="legend"></div>
+<div id="hint"></div>
+<div id="tip"></div>
+<div id="modal"><div class="box" id="mbox"></div></div>
+<div id="start"><div class="box" id="sbox"><h1>Project LORA</h1><p>Завантаження світу…</p></div></div>
+
+<!-- ЯДРО -->
+<script src="src/core/lora.js"></script>
+<script src="src/core/i18n.js"></script>
+<script src="src/core/config.js"></script>
+<script src="src/core/util.js"></script>
+<script src="src/core/bus.js"></script>
+<!-- ДАНІ -->
+<script src="data/balance.js"></script>
+<script src="data/difficulty.js"></script>
+<script src="data/econ/resources.js"></script>
+<script src="data/econ/countries.js"></script>
+<script src="data/econ/production.js"></script>
+<script src="data/econ/buildings.js"></script>
+<script src="data/econ/start-buildings.js"></script>
+<script src="data/econ/finance.js"></script>
+<script src="data/companies.js"></script>
+<script src="data/tech.js"></script>
+<script src="data/military/units.js"></script>
+<script src="data/military/models.js"></script>
+<script src="data/ui/themes.js"></script>
+<script src="data/politics/alliances.js"></script>
+<script src="data/politics/relations.js"></script>
+<script src="data/politics/sanctions.js"></script>
+<script src="data/politics/territories.js"></script>
+<script src="data/ai/profiles.js"></script>
+<script src="data/scenarios/world2026.js"></script>
+<script src="data/geo/sea.js"></script>
+<script src="data/geo/cells.js"></script>
+<script src="data/geo/regions.js"></script>
+<script src="data/geo/cities.js"></script>
+<script src="data/geo/shapes.js"></script>
+<script src="data/geo/lines.js"></script>
+<script src="data/i18n/en.js"></script>
+<script src="data/i18n/names-en.js"></script>
+<script src="src/core/i18n-data.js"></script>
+<!-- СИМУЛЯЦІЯ -->
+<script src="src/sim/world.js"></script>
+<script src="src/sim/helpers.js"></script>
+<script src="src/sim/economy.js"></script>
+<script src="src/sim/trade.js"></script>
+<script src="src/sim/military.js"></script>
+<script src="src/sim/buildings.js"></script>
+<script src="src/sim/transport.js"></script>
+<script src="src/sim/companies.js"></script>
+<script src="src/sim/research.js"></script>
+<script src="src/sim/arsenal.js"></script>
+<script src="src/sim/units.js"></script>
+<script src="src/sim/generals.js"></script>
+<script src="src/sim/alerts.js"></script>
+<script src="src/sim/diplomacy.js"></script>
+<script src="src/ai/nation-agent.js"></script>
+<script src="src/ai/world-director.js"></script>
+<script src="src/ai/balance-director.js"></script>
+<script src="src/sim/actions.js"></script>
+<script src="src/sim/leader.js"></script>
+<script src="src/sim/agents.js"></script>
+<script src="src/sim/intel.js"></script>
+<script src="src/sim/projects.js"></script>
+<script src="src/sim/goals.js"></script>
+<script src="src/sim/parliament.js"></script>
+<script src="src/sim/pressure.js"></script>
+<script src="src/sim/blocs.js"></script>
+<script src="src/sim/decisions.js"></script>
+<script src="src/sim/game.js"></script>
+<!-- СТРІМ -->
+<script src="src/stream/bridge.js"></script>
+<script src="src/stream/twitch.js"></script>
+<script src="lib/peerjs.min.js"></script>
+<script src="src/net/net.js"></script>
+<!-- ІНТЕРФЕЙС -->
+<script src="src/ui/format.js"></script>
+<script src="src/ui/icons-map.js"></script>
+<script src="src/ui/emoji-map.js"></script>
+<script src="src/ui/theme.js"></script>
+<script src="src/ui/sound.js"></script>
+<script src="src/ui/map/geometry.js"></script>
+<script src="src/ui/map/camera.js"></script>
+<script src="src/ui/map/render.js"></script>
+<script src="src/ui/map/input.js"></script>
+<script src="src/ui/panels/top.js"></script>
+<script src="src/ui/panels/tab-state.js"></script>
+<script src="src/ui/panels/tab-trade.js"></script>
+<script src="src/ui/panels/tab-logistics.js"></script>
+<script src="src/ui/panels/tab-army.js"></script>
+<script src="src/ui/panels/tab-diplomacy.js"></script>
+<script src="src/ui/panels/tab-world.js"></script>
+<script src="src/ui/panels/tab-build.js"></script>
+<script src="src/ui/panels/tab-company.js"></script>
+<script src="src/ui/panels/tab-research.js"></script>
+<script src="src/ui/panels/tab-intel.js"></script>
+<script src="src/ui/panels/tab-leader.js"></script>
+<script src="src/ui/panels/agents.js"></script>
+<script src="src/ui/panels/right.js"></script>
+<script src="src/ui/panels/news.js"></script>
+<script src="src/ui/panels/modal.js"></script>
+<script src="src/ui/screens/start.js"></script>
+<script src="src/ui/screens/newscast.js"></script>
+<script src="src/ui/screens/lobby.js"></script>
+<script src="src/ui/screens/broadcast.js"></script>
+<script src="src/ui/panels/toast.js"></script>
+<script src="src/ui/panels/advisors.js"></script>
+<script src="src/ui/panels/tips.js"></script>
+<script src="src/ui/panels/outliner.js"></script>
+<script src="src/ui/main.js"></script>
+</body>
+</html>
