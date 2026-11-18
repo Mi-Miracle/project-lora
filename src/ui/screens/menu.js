@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['Closed-loop world market: you sell only to those who buy', 'Ministers by sector with AI autopilot', 'Hire bodyguards from private military companies', 'Stock exchange 2.0: IPOs, takeovers, bubbles', 'Neural Ukrainian voices offline (Piper)']
-  : ['Замкнений світовий ринок: продаєте лише тим, хто купує', 'Міністри по галузях з автокеруванням ШІ', 'Охорона з приватних військових компаній', 'Біржа 2.0: емісії, поглинання, бульбашки', 'Живі українські голоси офлайн (Piper)'];
+  ? ['Future tech: 45 new technologies, 33 buildings, space programmes to Venus, asteroids and Jupiter', 'Demolish unneeded buildings', 'President also has skills, wealth, party and a personal team', 'Company directors and personal advisers with AI autopilot', 'Monthly news about you first, yearly summary, endless funny ticker']
+  : ['Технології майбутнього: +45 досліджень, +33 будівлі, місії до Венери, астероїдів і Юпітера', 'Знесення непотрібних будівель', 'Президент теж має навички, статки, партію й особисту команду', 'Директори компанії й особисті помічники з автокеруванням ШІ', 'Новини спершу про вас, підсумки року, нескінченна стрічка кумедних новин'];
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }
@@ -78,7 +78,7 @@ function settingsScreen() {
   const rng = (k, n) => `<div class="sl"><div class="lab"><span>${t_(n)}</span><b>${Math.round((S[k] || 0) * 100)}%</b></div><input type="range" min="0" max="1" step="0.05" value="${S[k]}" oninput="AUD.set('${k}',+this.value);this.previousElementSibling.lastElementChild.textContent=Math.round(this.value*100)+'%'"></div>`;
   let body = '';
   if (setTab === 'sound') body = chk('music', 'Музика') + rng('mvol', 'Гучність музики') + `<div class="row"><span>${t_('Стиль музики')}</span><select onchange="AUD.set('style',this.value)"><option value="auto">${t_('Авто: за ситуацією, плейлист змінюється')}</option>${Object.entries(AUD.STY).map(([k, v]) => `<option value="${k}" ${S.style === k ? 'selected' : ''}>${t_(v.n)}</option>`).join('')}</select></div>`
-    + chk('sfx', 'Звукові ефекти') + rng('vol', 'Гучність ефектів') + chk('toasts', 'Спливаючі сповіщення') + chk('advisors', 'Радники з порадами') + chk('newscast', 'Щомісячний випуск новин');
+    + chk('sfx', 'Звукові ефекти') + rng('vol', 'Гучність ефектів') + chk('toasts', 'Спливаючі сповіщення') + chk('advisors', 'Радники з порадами') + chk('newscast', 'Щомісячний випуск новин') + chk('yearcast', 'Підсумки року (щорічний випуск)', true);
   else if (setTab === 'voice') body = chk('tts', 'Озвучка увімкнена') + `<div id="voiceBox">${voiceSettings()}</div>`;
   else if (setTab === 'game') body = `<label class="row"><span>🌫 ${t_('Туман війни')}</span><input type="checkbox" ${LORA.config.fog !== false ? 'checked' : ''} onchange="LORA.config.fog=this.checked;try{localStorage.setItem('lora_fog',this.checked?'1':'0')}catch(e){};if(window.mapDirty!==undefined)mapDirty=true"></label>
     <label class="row"><span>${t_('Заставка при запуску')}</span><input type="checkbox" ${localStorage.getItem('lora_intro') === 'off' ? '' : 'checked'} onchange="localStorage.setItem('lora_intro',this.checked?'on':'off')"></label>
@@ -113,7 +113,7 @@ document.addEventListener('keydown', e => {
   pauseMenu(); e.stopImmediatePropagation();
 }, true);
 // при запуску показуємо головне меню замість одразу налаштувань гри
-setTimeout(() => { if (!G && !/[?&](room|join|watch)=/.test(location.search) && (typeof netMode === 'undefined' || netMode === 'solo')) mainMenu(); }, 0);
+setTimeout(() => { if (!G && !/[?&](room|join|watch)=/.test(location.search) && (typeof netMode === 'undefined' || netMode === 'solo')) mainMenu(); const b = document.getElementById('boot'); if (b) b.remove(); }, 0);
 // будь-який старт гри ховає головне меню
 ['startGame', 'loadGame', 'hostOpen'].forEach(f => { const b = window[f]; if (typeof b === 'function') window[f] = function () { const r = b.apply(this, arguments); if ((f === 'startGame') || (f === 'loadGame' && r) || (f === 'hostOpen' && G)) mmHide(); return r; }; });
 // будь-який вхід у гру (одиночна, хост, гравець, глядач, завантаження) ховає фон меню

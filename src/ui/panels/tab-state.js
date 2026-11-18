@@ -5,7 +5,7 @@ function roleTabs(r) { const all = TABS.concat([['world', '📊 Світ']]); re
 const CO_RAIL = [['co', '🏢 Компанія'], ['coprod', '🏭 Виробництво'], ['cotrade', '📦 Ресурси'], ['cotend', '📑 Тендери'], ['cord', '🔬 R&D'], ['cobuild', '🏗 Будівництво'], ['codipl', '🤝 Дипломатія'], ['cofin', '🏦 Фінанси']];
 function curTabs() {
   if (G && G.mpRole && ROLE_TABS[G.mpRole]) return roleTabs(G.mpRole);
-  const isChar = G && G.leader && G.leader.role === 'char'; const ld = G && G.leader && !isChar ? [['lead', '⭐ Лідер']] : []; const ch = isChar ? [['char', '🧑 Персонаж'], ['career', '🧳 Кар\'єра'], ['skills', '🎓 Навчання'], ['party', '🎗 Партія'], ['life', '💎 Статки']] : [];
+  const isChar = G && G.leader && G.leader.role === 'char'; const ld = G && G.leader && !isChar ? [['lead', '⭐ Лідер']].concat(G.leader.money != null ? [['skills', '🎓 Навчання'], ['life', '💎 Статки'], ['party', '🎗 Партія']] : []) : []; const ch = isChar ? [['char', '🧑 Персонаж'], ['career', '🧳 Кар\'єра'], ['skills', '🎓 Навчання'], ['party', '🎗 Партія'], ['life', '💎 Статки']] : [];
   const co = G && G.pc >= 0 ? CO_RAIL : [];
   if (G && G.player < 0) return ch.concat(co, [['world', '📊 Світ']], ld);
   return TABS.concat(co, ld);

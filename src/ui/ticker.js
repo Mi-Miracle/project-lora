@@ -12,7 +12,7 @@
     clearTimeout(timer); if (!run) return; const w = el.querySelector('.tk-w'), sp = w.firstElementChild;
     if (!on() || !G || document.body.classList.contains('stream')) { el.style.display = 'none'; timer = setTimeout(next, 4000); return; }
     el.style.display = ''; document.body.classList.add('tk-on');
-    sp.textContent = LORA.funNext(LORA.lang); const W = w.clientWidth || 600, sw = sp.offsetWidth || 400;
+    let pl; if (G && Math.random() < 0.3) { const L2 = G.N.filter(n => n.alive && n.agg && n.agg.gdp > 40); const c = L2[Math.floor(Math.random() * L2.length)]; if (c) pl = LORA.lang === 'en' ? t_(c.name) : c.name; } sp.textContent = LORA.FUN ? LORA.FUN.next(LORA.lang, pl) : LORA.funNext(LORA.lang); const W = w.clientWidth || 600, sw = sp.offsetWidth || 400;
     if (anim) anim.cancel(); anim = sp.animate([{ transform: `translateX(${W}px)` }, { transform: `translateX(${-sw - 20}px)` }], { duration: (W + sw + 20) / SPEED * 1000, easing: 'linear', fill: 'forwards' });
     anim.onfinish = () => { timer = setTimeout(next, PAUSE); };
   }

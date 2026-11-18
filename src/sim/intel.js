@@ -50,7 +50,14 @@ LORA.sim.register('intel', 93.5, function (G) {
   G.SPACE_PROG = {
     station: { n: 'Орбітальна станція', ic: '🛰', cost: 30, days: 1460, req: 'heavy_lift', d: 'наука +, престиж (стабільність +4, відносини зі світом +5)' },
     moon:    { n: 'Місячна місія', ic: '🌕', cost: 45, days: 1825, req: 'heavy_lift', d: 'історичний престиж: стабільність +8, відносини +8, технології' },
-    mars:    { n: 'Пілотований політ на Марс', ic: '🔴', cost: 120, days: 3650, req: 'orbital_log', d: 'епохальне досягнення людства' }
+    mars:    { n: 'Пілотований політ на Марс', ic: '🔴', cost: 120, days: 3650, req: 'orbital_log', d: 'епохальне досягнення людства' },
+    telescope: { n: 'Космічний телескоп нового покоління', ic: '🔭', cost: 8, days: 900, req: 'space_station', prest: 4, stab: 3, tb: 0.01, d: 'наука +1%, престиж' },
+    tourism:   { n: 'Космічний туризм', ic: '🧑‍🚀', cost: 6, days: 600, req: 'space_tour', prest: 3, stab: 2, inc: 0.05, d: 'прибуток ~$0.05 млрд/міс від туристів' },
+    venus:     { n: 'Зонд до Венери', ic: '🟡', cost: 18, days: 1460, req: 'ion_drive', prest: 6, stab: 4, tb: 0.015, d: 'наука, престиж' },
+    asteroid:  { n: 'Місія до астероїда (повернення зразків)', ic: '☄', cost: 25, days: 1460, req: 'asteroid_probe', prest: 8, stab: 4, tb: 0.02, inc: 0.08, d: 'рідкісні метали, ліцензії: ~$0.08 млрд/міс' },
+    lunar_base:{ n: 'Постійна база на Місяці', ic: '🌕', cost: 60, days: 2190, req: 'moon_base', prest: 15, stab: 8, tb: 0.03, inc: 0.2, d: 'видобуток і туризм: ~$0.2 млрд/міс, великий престиж' },
+    jupiter:   { n: 'Місія до супутників Юпітера', ic: '🪐', cost: 90, days: 3650, req: 'deep_space', prest: 25, stab: 8, tb: 0.04, d: 'пошук життя на Європі — епохальна подія' },
+    habitat:   { n: 'Перше космічне місто', ic: '🌌', cost: 150, days: 4380, req: 'space_hab', prest: 35, stab: 10, tb: 0.05, inc: 0.4, d: 'людство живе в космосі: ~$0.4 млрд/міс' }
   };
   G.startProgram = function (nid, k) {
     const n = N[nid], P = G.SPACE_PROG[k]; if (!P) return { ok: false, err: 'Невідома програма' };
@@ -99,7 +106,7 @@ LORA.sim.register('intel', 93.5, function (G) {
       const mk = G.satMake(n.id); if (mk && G.launchCap(n.id) > sp.used) { n.sats.comms += mk * 0.3; n.sats.recon += mk * 0.15; sp.used += mk * 0.1; }
       for (const k in n.sats) n.sats[k] = Math.max(0, n.sats[k] * (1 - 1 / 96)); // ресурс ~8 років
       if (sp.q.length) sp.q = sp.q.filter(q => { if (G.day < q.done) return true; const ok = G.rnd() < q.succ; if (ok) { n.sats[q.type] += q.cnt; sp.launched = (sp.launched || 0) + q.cnt; } if (n.id === G.player || G.isHuman(n.id)) G.say(ok ? `🚀 Успішний запуск: ${ST[q.type].ic} ${ST[q.type].n.toLowerCase()} супутники ×${q.cnt}${q.prov !== n.id ? ' (ракетою ' + N[q.prov].name + ')' : ''}` : `💥 Аварія ракети: втрачено ${q.cnt} супутників`, ok ? 'good' : 'bad', [n.id]); return false; });
-      if (sp.prog) for (const k in sp.prog) { const p = sp.prog[k], P = G.SPACE_PROG[k]; if (p.ok) continue; const m = P.cost / (P.days / 30); const pay = Math.min(m, Math.max(0, n.cash * 0.5)); n.cash -= pay; p.paid += pay; if (G.day >= p.done) { if (p.paid >= P.cost * 0.95) { p.ok = true; sp.prest += k === 'mars' ? 25 : k === 'moon' ? 12 : 6; n.stab = Math.min(100, n.stab + (k === 'station' ? 4 : 8)); N.forEach(z => { if (z.id !== n.id && z.alive) G.rel[z.id][n.id] = clamp(G.rel[z.id][n.id] + (k === 'station' ? 5 : 8), -100, 100); }); n.techB = (n.techB || 0) + 0.02; G.say(`${P.ic} ${n.name}: ${P.n} — успіх! Історичне досягнення`, 'good', [n.id]); } else { p.done = G.day + 90; } } }
+      if (sp.prog) for (const k in sp.prog) { const p = sp.prog[k], P = G.SPACE_PROG[k]; if (!P) continue; if (p.ok) { if (P.inc) n.cash += P.inc * Math.min(1.5, 0.5 + (n.tech || 1) * 0.5); continue; } const m = P.cost / (P.days / 30); const pay = Math.min(m, Math.max(0, n.cash * 0.5)); n.cash -= pay; p.paid += pay; if (G.day >= p.done) { if (p.paid >= P.cost * 0.95) { p.ok = true; sp.prest += P.prest != null ? P.prest : k === 'mars' ? 25 : k === 'moon' ? 12 : 6; n.stab = Math.min(100, n.stab + (P.stab != null ? P.stab : k === 'station' ? 4 : 8)); if (P.tb) n.techB = (n.techB || 0) + P.tb; N.forEach(z => { if (z.id !== n.id && z.alive) G.rel[z.id][n.id] = clamp(G.rel[z.id][n.id] + (k === 'station' ? 5 : 8), -100, 100); }); n.techB = (n.techB || 0) + 0.02; G.say(`${P.ic} ${n.name}: ${P.n} — успіх! Історичне досягнення`, 'good', [n.id]); } else { p.done = G.day + 90; } } }
       // оренда розвідданих
       for (const k in n.intel) { const d = n.intel[k]; if (d.until <= G.day) { if (n.id === G.player) G.say(`🛰 Угода про розвіддані з ${N[k].name} завершилась — поновіть у вкладці «Розвідка»`, 'bad', [n.id]); delete n.intel[k]; continue; } if (d.fee) { n.cash -= d.fee; N[k].cash += d.fee; } }
       // ШІ: космічні амбіції

@@ -2,7 +2,7 @@
 // інвестиції (облігації, фонди, крипта, венчур, золото, прямі інвестиції в регіони) з впливом на світову економіку, партія.
 LORA.sim.register('life', 99.67, function (G) {
   const { N, ter, T } = G; const clamp = (v, a, b) => Math.max(a, Math.min(b, v)); const pick = a => a[Math.floor(G.rnd() * a.length)];
-  const isChar = L => L && L.role === 'char';
+  const isChar = L => L && (L.role === 'char' || ((L.role === 'president' || L.role === 'ceo') && L.money != null)); // особисте життя є і в президента/CEO
   const nidOf = () => G.leaderNation();
   const add = (o, nid, v) => { o[nid] = clamp((o[nid] || 0) + v * (v > 0 ? 1 - (o[nid] || 0) / 120 : 1), 0, 100); };
 
@@ -72,7 +72,7 @@ LORA.sim.register('life', 99.67, function (G) {
     tv:       { n: 'Ефір на ТБ (ток-шоу)', ic: '📺', days: 1, need: { fame: 10 }, d: 'популярність; ризик провалу', run: (L, nid) => { const ok = G.rnd() < 0.7 + G.skill(L, 'orat') * 0.05; add(L.popu, nid, ok ? 3 : -2); return ok ? 'вдалий ефір' : 'невдалий виступ, популярність −2'; } },
     charity:  { n: 'Благодійний аукціон', ic: '🎗', days: 5, need: { money: 0.002 }, d: 'віддаєте 1% статків: популярність і слава', run: (L, nid) => { const g = Math.max(0.0005, G.lifeWealth(L) * 0.01); L.money -= g; add(L.popu, nid, 3 + g * 300); L.fame += 1; return `пожертвувано ${'$' + (g * 1000).toFixed(2)} млн`; } }
   };
-  G.gigCan = function (k) { const L = G.leader, A = G.GIGS[k]; if (!isChar(L) || !A) return 'Лише для персонажа'; if (L.mv) return 'Персонаж у дорозі'; if (L.busy > G.day) return `Зайнятий ще ${L.busy - G.day} дн.`;
+  G.gigCan = function (k) { const L = G.leader, A = G.GIGS[k]; if (!L || L.role !== 'char' || !A) return 'Лише для персонажа'; if (L.mv) return 'Персонаж у дорозі'; if (L.busy > G.day) return `Зайнятий ще ${L.busy - G.day} дн.`;
     const nid = nidOf(); if (A.need.fame && L.fame < A.need.fame) return `Потрібна слава ≥ ${A.need.fame}`; if (A.need.cont && (L.cont[nid] || 0) < A.need.cont) return `Потрібні звʼязки ≥ ${A.need.cont}`; if (A.need.money && L.money < A.need.money) return 'Бракує грошей';
     if ((L.gigT || {})[k] > G.day) return `Можна знову через ${L.gigT[k] - G.day} дн.`; return ''; };
   G.gigDo = function (k) { const e = G.gigCan(k); if (e) return { ok: false, err: e }; const L = G.leader, A = G.GIGS[k], nid = nidOf(); L.busy = G.day + A.days; L.gigT = L.gigT || {}; L.gigT[k] = G.day + A.days + 14; const msg = A.run(L, nid); G.say(`${A.ic} ${L.name}: ${A.n.toLowerCase()} — ${msg}`, 'info', [nid]); return { ok: true, msg }; };
@@ -273,7 +273,7 @@ LORA.sim.register('life', 99.67, function (G) {
       (L.own || []).forEach(o => { const A = G.LUX[o.k], n = N[o.nid]; L.money -= o.p0 * (A.upk || 0) / 12; if (A.rent) L.money += o.v * A.rent / 12 * (n && G.enemiesOf(n.id).length ? 0.5 : 1);
         if (A.apr) o.v *= 1 + ((n ? n.growth || 0 : 0) * A.apr + (A.c === 'art' ? 0.004 : 0) + (G.rnd() - 0.5) * 0.01) / 12 * 12 / 12; else o.v *= 0.995;
         if (A.pop) add(L.popu, o.nid, A.pop); if (A.cont) add(L.cont, o.nid, A.cont); if ((A.pop || 0) < 0) showoff += -A.pop; });
-      if (showoff && where >= 0 && (N[where].pc || 0) < 15000 && G.rnd() < showoff * (1 - G.lifeSec(L) * 0.1)) { add(L.popu, where, -3 + G.skill(L, 'media') * 0.4); if (G.leader === L) G.say(`📰 Скандал: ЗМІ пишуть про розкішне життя ${L.name} — популярність падає`, 'bad', [where]); }
+      if (showoff && where >= 0 && (N[where].pc || 0) < 15000 && G.rnd() < showoff * (1 - G.lifeSec(L) * 0.1) * (L.lawShield > G.day ? 0.4 : 1)) { add(L.popu, where, -3 + G.skill(L, 'media') * 0.4); if (G.leader === L) G.say(`📰 Скандал: ЗМІ пишуть про розкішне життя ${L.name} — популярність падає`, 'bad', [where]); }
       // інвестиції
       const I = L.pf; if (I) { const eco = 1 + G.skill(L, 'eco') * 0.08;
         Object.entries(I.b).forEach(([k, v]) => { const nid = +k, n = N[nid]; if (!n || !v) return; L.money += v * G.bondYield(nid) * eco / 12; n.cash -= v * G.bondYield(nid) / 12;

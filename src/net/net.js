@@ -67,7 +67,7 @@ const NET = (() => {
   const PROXY = ['act.*', 'decide', 'leaderGo', 'leaderGo', 'strike', 'setResearch', 'queueResearch', 'blocPropose', 'blocVote', 'blocApply', 'orderMove', 'startLink', 'cancelBuild', 'setStance', 'splitArmy', 'disband', 'orderFleet', 'setArmyTemplate', 'setArmyComp', 'agentGo', 'agentTask', 'agentRecall'];
   const PERM = {
     general: /^(orderMove|setStance|splitArmy|disband|setArmyTemplate|setArmyComp|uiArmy|uiFleet|orderFleet|strike|act\.(strike|armySet|assignGeneral|modernize|navPrio))$/,
-    min_econ: /^(setResearch|queueResearch|startLink|cancelBuild|act\.(setPolicy|resAlloc|resGrant|resAuto|build|link|contract|cancelContract|explore|demine|rebuild|setTariff|setEmbargo|startProject|stockTrade))$/,
+    min_econ: /^(setResearch|queueResearch|startLink|cancelBuild|act\.(setPolicy|resAlloc|resGrant|resAuto|build|demolish|cancelBuild2|link|contract|cancelContract|explore|demine|rebuild|setTariff|setEmbargo|startProject|stockTrade))$/,
     min_def: /^(setArmyComp|setArmyTemplate|strike|act\.(setPolicy|strike|recruit|buildFleet|buyAir|modernize|navPrio|cyber|nukeTest))$/,
     min_for: /^(blocPropose|blocVote|blocApply|act\.(improve|treaty|sanction|alliance|access|aid|peace|answerPending|confSign|setTariff|setEmbargo|intelDeal))$/,
     diplomat: /^(agentGo|agentRecall|act\.(hireAgent|improve|intelDeal))$/,

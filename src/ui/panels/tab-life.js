@@ -2,7 +2,7 @@
 function lifeRes(r) { hint(r && r.ok ? '✅ ' + t_(r.msg || 'Готово') : '⚠ ' + t_((r && r.err) || 'Помилка'), 3500); AUD.sfx(r && r.ok ? 'good' : 'bad'); renderTab(true); renderTop(); }
 const lifeBusy = L => L.busy > G.day ? `<div class="card small y">⏳ ${t_('Персонаж зайнятий ще')} ${L.busy - G.day} ${t_('дн.')}</div>` : '';
 TAB_FN.skills = function () {
-  const L = G.leader; if (!L || L.role !== 'char') return '';
+  const L = G.leader; if (!L || (L.role !== 'char' && L.money == null)) return '';
   let h = lifeBusy(L) + `<div class="mut small">${t_('Навички — «дослідження» персонажа: відкривають професії й посилюють дії. Курс займає час і коштує грошей; досвід роботи теж підвищує навичку.')}</div><div class="grp">🎓 ${t_('Навички')}</div>`;
   h += Object.entries(G.SKILLS).map(([k, S]) => { const lv = G.skill(L, k), e = G.lifeStudyCan(k), pr = G.lifeStudyPrice(k);
     return `<div class="card small"><div class="row"><b>${S.ic} ${esc(t_(S.n))}</b><span>${'★'.repeat(lv)}${'☆'.repeat(5 - lv)}</span></div><div class="mut">${esc(t_(S.d))}</div>
@@ -12,7 +12,8 @@ TAB_FN.skills = function () {
   return h;
 };
 TAB_FN.party = function () {
-  const L = G.leader; if (!L || L.role !== 'char') return ''; const P = G.partyOf(L);
+  const L = G.leader; if (!L || (L.role !== 'char' && L.money == null)) return ''; const P = G.partyOf(L);
+  if (!P && L.role !== 'char') return `<div class="card small">${t_('Як глава держави ви можете очолити власну партію: рейтинг, осередки, фракція й законопроєкти.')}</div><div class="btns"><button class="pri" onclick="lifeRes(G.act.presParty())">🎗 ${t_('Очолити партію')}</button></div>`;
   if (!P) { const e = G.careerCan('party'); return `<div class="card small">${t_('У вас ще немає партії. Заснуйте її, коли популярність у країні сягне 15: партія — шлях до парламенту, коаліції й власних законів.')}</div><div class="btns"><button class="pri" ${e ? `disabled data-tip="${esc(t_(e))}"` : ''} onclick="carDo('party')">🎗 ${t_('Заснувати партію')} · ${money(G.CAREER.party.cost)}</button></div>${e ? `<div class="small y">${esc(t_(e))}</div>` : ''}`; }
   const n = nat(P.nid), parl = n.parl, I = G.IDEOS[P.ideo] || G.IDEOS.center; const brS = Object.values(P.br).reduce((s, v) => s + v, 0);
   let h = lifeBusy(L) + `<div class="kpi"><div><b>${P.r.toFixed(1)}%</b><span>${t_('рейтинг')}</span></div><div><b>${P.seats}${parl ? '/' + parl.seats : ''}</b><span>${t_('місць')}</span></div><div><b>${money(P.cash)}</b><span>${t_('каса')}</span></div><div><b>${P.mem.toFixed(0)} ${t_('тис.')}</b><span>${t_('членів')}</span></div></div>`;
@@ -31,7 +32,7 @@ TAB_FN.party = function () {
 let luxCat = 'home', invAmt = 0.01;
 function lspark(a) { if (a.length < 2) return ''; const w = 90, h = 18, mx = Math.max(...a), mn = Math.min(...a), d = Math.max(1e-9, mx - mn); return `<svg width="${w}" height="${h}" style="vertical-align:middle"><polyline fill="none" stroke="#4fb3ff" stroke-width="1.5" points="${a.map((v, i) => (i / (a.length - 1) * w).toFixed(1) + ',' + (h - 1 - (v - mn) / d * (h - 2)).toFixed(1)).join(' ')}"/></svg>`; }
 TAB_FN.life = function () {
-  const L = G.leader; if (!L || L.role !== 'char') return ''; G.lifeInit(); const V = G.invValue(L), nid = G.leaderNation();
+  const L = G.leader; if (!L || (L.role !== 'char' && L.money == null)) return ''; G.lifeInit(); const V = G.invValue(L), nid = G.leaderNation();
   let h = `<div class="kpi"><div><b>${money(G.lifeWealth(L))}</b><span>${t_('статки')}</span></div><div><b>${money(L.money)}</b><span>${t_('готівка')}</span></div><div><b>${money(V.tot)}</b><span>${t_('інвестиції')}</span></div><div><b>${(L.own || []).length}</b><span>${t_('майно')}</span></div></div>`;
   h += subnav('life', [['lux', '💎 ' + t_('Розкіш')], ['own', '🗝 ' + t_('Моє майно')], ['inv', '📈 ' + t_('Інвестиції')], ['sec', '🛡 ' + t_('Охорона')]]); const sub = curSub('life', 'lux');
   if (sub === 'sec') return h + secBlock('L', L.home);

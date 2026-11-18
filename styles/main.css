@@ -477,3 +477,5 @@ body.stream #funTk { display: none !important; }
 /* автори */
 .cr { text-align: center; } .cr .card { text-align: left; } .cr a { color: #4fb3ff; }
 .cr-logo { font: 700 44px Pixelify, system-ui; color: #ffd34d; text-shadow: 0 0 22px #ffb02088; margin-top: 4px; }
+.mincard.stf { border-left-color: #ffd34d; }
+.mincard.nohire { opacity: .8; border-style: dashed; }

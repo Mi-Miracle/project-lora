@@ -26,7 +26,8 @@ LORA.sim.register('humor', 99.73, function (G) {
     (x, y) => `${x} → ${y}: подарунок — памʼятник дружбі. Отримувачі досі думають, куди його поставити`
   ];
   G.humorWeekly = function () {
-    if (off() || G.rnd() > 0.5) return; const L = big(); if (L.length < 2) return; const a = pick(L); let b = pick(L); if (b === a) b = L[(L.indexOf(a) + 1) % L.length];
+    if (off() || G.rnd() > 0.9) return; const L = big(); if (L.length < 2) return; const a = pick(L); let b = pick(L); if (b === a) b = L[(L.indexOf(a) + 1) % L.length];
+    const F = LORA.FUN; if (F && G.rnd() < 0.6) { const lg = LORA.lang === 'en' ? 'en' : 'uk'; const nm = lg === 'en' && typeof t_ === 'function' ? t_(a.name) : a.name; G.say('😄 ' + F.gen(lg, nm, G.rnd), 'info', []); return; }
     G.say('😄 ' + pick(NEWS)(a.name, b.name), 'info', []);
   };
   // жартівливі ситуації-рішення для гравця
