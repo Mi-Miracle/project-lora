@@ -14,7 +14,7 @@ function afterStep() {
 }
 function frame(now) {
   const dt = Math.min(0.25, (now - lastFrame) / 1000); lastFrame = now; animT += dt;
-  if (G && !G.gameOver && speedIdx && (!modalOpen || NET.S.role === 'host') && !NET.isGuest()) {
+  if (G && !G.gameOver && speedIdx && !_paused && (!modalOpen || NET.S.role === 'host') && !NET.isGuest()) {
     tAcc += dt * LORA.config.speeds[speedIdx]; let steps = 0;
     while (tAcc >= 1 && steps < 5) { G.step(); tAcc -= 1; steps++; afterStep(); }
     if (steps >= 5) tAcc = 0;

@@ -10,9 +10,9 @@ function avatarURL(seed, opts) {
   const R = avaRng(key), pick = a => a[Math.floor(R() * a.length)];
   const c = document.createElement('canvas'); c.width = c.height = 20; const x = c.getContext('2d');
   const px = (i, j, col, w = 1, h = 1) => { x.fillStyle = col; x.fillRect(i, j, w, h); };
-  const SK = [['#f1c9a5', '#d9a77f'], ['#e0ac84', '#c08a62'], ['#c68a5e', '#a06a42'], ['#9a6440', '#7a4a2c'], ['#6f4529', '#55331d'], ['#f6d7bd', '#dcb293']];
+  const SK = [['#f1c9a5', '#d9a77f'], ['#e0ac84', '#c08a62'], ['#c68a5e', '#a06a42'], ['#9a6440', '#7a4a2c'], ['#6f4529', '#55331d'], ['#f6d7bd', '#dcb293'], ['#f3d2b3', '#d8ae8c'], ['#b07850', '#8a5a36'], ['#5a3820', '#422814']];
   const [sk, skd] = pick(SK); const age = R(); const fem = opts.fem != null ? opts.fem : R() < 0.3;
-  const HAIR = age > 0.7 ? ['#c9c9c9', '#e8e8e8', '#9a9a9a'] : ['#2a1d14', '#4a3020', '#7a5230', '#1a1a1a', '#b88a4a', '#d8b878', '#6a3a1a'];
+  const HAIR = age > 0.7 ? ['#c9c9c9', '#e8e8e8', '#9a9a9a'] : ['#2a1d14', '#4a3020', '#7a5230', '#1a1a1a', '#b88a4a', '#d8b878', '#6a3a1a', '#a33', '#e0c890', '#3a2a5a'];
   const hair = pick(HAIR); const bg = opts.bg || pick(['#2b4a6f', '#3a5a3a', '#5a3a4a', '#4a4a6a', '#6a5a3a', '#2f5f6f', '#5f3f2f']);
   // тло з легким градієнтом
   px(0, 0, bg, 20, 20); x.fillStyle = 'rgba(255,255,255,.08)'; x.fillRect(0, 0, 20, 7); x.fillStyle = 'rgba(0,0,0,.18)'; x.fillRect(0, 15, 20, 5);
@@ -29,7 +29,7 @@ function avatarURL(seed, opts) {
   px(cx - hw, 7, skd, 1, 3); px(cx + hw - 1, 7, skd, 1, 3); // тінь щік
   px(cx - hw - 1, 8, sk, 1, 2); px(cx + hw, 8, sk, 1, 2); px(cx - hw - 1, 9, skd, 1, 1); px(cx + hw, 9, skd, 1, 1); // вуха
   // волосся
-  const style = fem ? pick(['long', 'bob', 'bun']) : age > 0.82 ? pick(['bald', 'side']) : pick(['short', 'short', 'part', 'crew', 'side', 'wavy']);
+  const style = fem ? pick(['long', 'bob', 'bun', 'pony', 'curly', 'long']) : age > 0.82 ? pick(['bald', 'side']) : pick(['short', 'short', 'part', 'crew', 'side', 'wavy', 'mohawk', 'curly', 'longm']);
   if (style !== 'bald') {
     if (style !== 'side') { px(cx - hw, top - 1, hair, hw * 2, 2); px(cx - hw + 1, top - 2, hair, hw * 2 - 2, 1); }
     if (style === 'part') { px(cx - 2, top - 1, sk, 1, 1); px(cx - hw, top + 1, hair, 3, 1); }
@@ -39,6 +39,10 @@ function avatarURL(seed, opts) {
     if (style === 'side') { px(cx - hw, 5, hair, 1, 4); px(cx + hw - 1, 5, hair, 1, 4); px(cx - hw - 1, 6, hair, 1, 2); px(cx + hw, 6, hair, 1, 2); }
     if (style === 'long') { px(cx - hw - 1, top, hair, 2, 12); px(cx + hw - 1, top, hair, 2, 12); px(cx - hw + 1, top + 1, hair, 3, 1); }
     if (style === 'bob') { px(cx - hw - 1, top, hair, 2, 8); px(cx + hw - 1, top, hair, 2, 8); px(cx - hw + 1, top + 1, hair, hw * 2 - 2, 1); }
+    if (style === 'pony') { px(cx + hw - 1, top + 1, hair, 2, 3); px(cx + hw, top + 4, hair, 2, 6); px(cx - hw, top + 1, hair, 2, 2); }
+    if (style === 'curly') { for (let i = cx - hw - 1; i <= cx + hw; i += 2) { px(i, top - 2, hair, 1, 1); px(i + 1, top - 1, hair, 1, 1); } px(cx - hw - 1, top, hair, 2, 6); px(cx + hw - 1, top, hair, 2, 6); }
+    if (style === 'mohawk') { px(cx - hw, top - 1, sk, hw * 2, 2); px(cx - 1, top - 3, hair, 2, 4); }
+    if (style === 'longm') { px(cx - hw - 1, top, hair, 2, 9); px(cx + hw - 1, top, hair, 2, 9); }
     if (style === 'bun') { px(cx - 2, top - 4, hair, 4, 3); px(cx - hw, top + 1, hair, 2, 2); px(cx + hw - 2, top + 1, hair, 2, 2); }
   } else { px(cx - hw, 6, hair, 1, 3); px(cx + hw - 1, 6, hair, 1, 3); }
   // головний убір
@@ -55,6 +59,19 @@ function avatarURL(seed, opts) {
   if (age > 0.6) { px(cx - 4, 9, skd, 1, 1); px(cx + 3, 9, skd, 1, 1); }
   if (R() < 0.22 && !opts.spy) { const g = '#1c1c1c'; px(cx - 4, 7, g, 4, 1); px(cx, 7, g, 4, 1); px(cx - 4, 8, g, 1, 1); px(cx - 1, 8, g, 1, 1); px(cx, 8, g, 1, 1); px(cx + 3, 8, g, 1, 1); px(cx - 4, 9, g, 4, 1); px(cx, 9, g, 4, 1); px(cx - 2, 8, eye); px(cx + 1, 8, eye); }
   if (opts.spy) { px(cx - 4, 8, '#111', 3, 1); px(cx + 1, 8, '#111', 3, 1); px(cx - 1, 8, '#111', 2, 1); }
+  // одяг-варіації, аксесуари, міміка
+  if (!opts.mil && !opts.spy) { const cl = R();
+    if (cl < 0.12) { px(3, 16, '#eee', 14, 4); px(2, 17, '#eee', 16, 3); for (let i = 4; i < 17; i += 2) px(i, 17, '#c22'); px(8, 15, '#c22', 4, 1); } // вишиванка
+    else if (cl < 0.22) { px(3, 16, pick(['#3a6a3a', '#6a2a6a', '#2a4a7a', '#7a4a1a']), 14, 4); px(5, 15, '#222', 10, 1); } // худі
+  }
+  const acc = R();
+  if (acc < 0.08 && !opts.mil && !opts.spy) { const hc = pick(['#c33', '#246', '#ffd34d', '#2a2a2a']); px(cx - hw - 1, top - 2, hc, hw * 2 + 2, 3); px(cx - hw - 2, top, hc, hw * 2 + 6, 1); } // кепка
+  else if (acc < 0.13 && fem && !opts.mil) { const hc = pick(['#4a6a8a', '#7a3a4a', '#3a5a3a']); px(cx - hw - 1, top - 2, hc, hw * 2 + 2, 3); px(cx - hw - 1, top, hc, 2, 12); px(cx + hw - 1, top, hc, 2, 12); px(cx - hw, 14, hc, hw * 2, 2); } // хустка
+  else if (acc < 0.2) { px(cx - hw - 1, 6, '#333', 1, 4); px(cx + hw, 6, '#333', 1, 4); px(cx - hw, top - 2, '#333', hw * 2, 1); px(cx + hw, 10, '#333', 1, 1); px(cx + hw - 1, 11, '#c33', 2, 1); } // гарнітура
+  if (fem && R() < 0.35) { const ec = pick(['#ffd34d', '#ddd', '#4fb3ff']); px(cx - hw - 1, 10, ec); px(cx + hw, 10, ec); } // сережки
+  if (R() < 0.1) { px(cx - 3, 10, skd); px(cx - 2, 11, skd); px(cx + 2, 10, skd); px(cx + 3, 11, skd); } // веснянки
+  if (R() < 0.05) { px(cx + 2, 7, '#a55', 1, 3); } // шрам
+  if (R() < 0.3) { px(cx - 2, 12, sk, 4, 1); px(cx - 2, 11, fem ? '#b5525a' : '#8a4a3a', 1, 1); px(cx + 1, 11, fem ? '#b5525a' : '#8a4a3a', 1, 1); px(cx - 1, 12, fem ? '#b5525a' : '#8a4a3a', 2, 1); } // усмішка
   // рамка
   x.fillStyle = 'rgba(0,0,0,.35)'; x.fillRect(0, 0, 20, 1); x.fillRect(0, 19, 20, 1); x.fillRect(0, 0, 1, 20); x.fillRect(19, 0, 1, 20);
   const url = c.toDataURL(); AVA_CACHE.set(key, url); return url;

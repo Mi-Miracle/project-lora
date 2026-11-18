@@ -36,6 +36,10 @@ async function splashUpdate() {
 function startServer(root) {
   return new Promise(res => {
     const srv = http.createServer((req, rsp) => {
+      // проксі для завантаження голосових моделей (обхід CORS): лише GitHub і HuggingFace
+      if (req.url.startsWith('/__dl?')) { const u = new URL(req.url, 'http://x').searchParams.get('u') || ''; let host = ''; try { host = new URL(u).host; } catch (e) { }
+        if (!/^(github\.com|huggingface\.co|registry\.npmjs\.org)$/.test(host)) { rsp.writeHead(403); rsp.end(); return; }
+        net.fetch(u).then(async r => { const hd = { 'Content-Type': 'application/octet-stream' }; if (r.headers.get('content-length')) hd['Content-Length'] = r.headers.get('content-length'); rsp.writeHead(r.status, hd); const rd = r.body.getReader(); for (;;) { const { done, value } = await rd.read(); if (done) break; rsp.write(Buffer.from(value)); } rsp.end(); }).catch(e => { try { rsp.writeHead(502); rsp.end(String(e)); } catch (x) { } }); return; }
       let p = decodeURIComponent(req.url.split('?')[0]); if (p === '/') p = '/index.html';
       const f = path.join(root, path.normalize(p).replace(/^([/\\])+/, ''));
       if (!f.startsWith(root)) { rsp.writeHead(403); rsp.end(); return; }
@@ -50,7 +54,7 @@ async function create() {
   await splashUpdate();
   const root = gameRoot(); await startServer(root);
   win = new BrowserWindow({ width: 1600, height: 900, minWidth: 1100, minHeight: 650, title: 'Project LORA', backgroundColor: '#0b1118', icon: path.join(root, 'assets', 'lora.png'), autoHideMenuBar: true, webPreferences: { contextIsolation: true, backgroundThrottling: false } });
-  Menu.setApplicationMenu(null); win.maximize();
+  Menu.setApplicationMenu(null); win.maximize(); if (!process.argv.includes('--windowed')) win.setFullScreen(true); // безрамковий повноекранний режим за замовчуванням (F11 — перемкнути)
   win.loadURL(`http://localhost:${PORT}/index.html`); ready = true;
   // зовнішні посилання (Twitch, GitHub) — у звичайному браузері; вхід Twitch повертається на localhost — лишаємо у вікні
   win.webContents.setWindowOpenHandler(({ url }) => { if (url.startsWith(`http://localhost:${PORT}`)) return { action: 'allow' }; shell.openExternal(url); return { action: 'deny' }; });

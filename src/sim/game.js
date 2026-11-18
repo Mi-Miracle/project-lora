@@ -75,7 +75,7 @@ LORA.sim.register('game', 100, function (G) {
     G.arsenalDaily(); G.unitsDaily(); G.generalsDaily(); G.intelDaily();
     G.supplyAndAttrition();
     G.occupation();
-    G.buildingsDaily(); G.linksDaily(); G.stockDaily(); if (G.day % 7 === 0) { G.nationLogistics(); G.victoryWeekly(); G.nukesWeekly(); }
+    G.buildingsDaily(); G.linksDaily(); G.stockDaily(); if (G.day % 7 === 0) { G.nationLogistics(); G.victoryWeekly(); G.nukesWeekly(); G.humorWeekly(); }
     G.building = G.building.filter(b => { if (b.done <= G.day) { if (N[b.n].alive) G.newFleet(b.n, b.node, b.s, 'Новий флот'); G.say(`⚓ Нові кораблі (${b.s}) введено до строю`, 'good', [b.n]); return false; } return true; });
     N.forEach(n => {
       if (!n.alive) return;
@@ -87,7 +87,7 @@ LORA.sim.register('game', 100, function (G) {
     // поповнення армій гравця в межах ліміту мобілізації
     const pn = N[G.player];
     if (pn && pn.alive) { const pool = pn.agg.pop * 1000 * pn.pol.mob, tr = G.troopsOf(pn.id); if (tr < pool) { const add = Math.min(pool - tr, pool * 0.002); const arm = G.armies.filter(a => a.n === pn.id && G.friendlyTo(pn.id, ter[a.t].ctrl)).sort((a, b) => a.k - b.k)[0]; if (arm) { arm.k += add; pn.cash -= add * 0.02 * (0.5 + pn.pc / 20000); if (pn.cash < 0) { pn.debt -= pn.cash; pn.cash = 0; } } } }
-    if (G.day % 30 === 0) { G.foreignAid(); G.balanceMonthly(); G.alertsMonthly(); G.pressureMonthly(); G.decisionsMonthly(); G.spaceMonthly(); G.projectsMonthly(); G.monthlyExtra(); G.nukesMonthly(); G.radaMonthly(); G.stockMonthly(); G.recoveryMonthly(); G.reparMonthly(); G.chronMonthly(); G.corpMonthly(); G.corp2Tenders(); G.corp2Close(); G.corp2Monthly(); G.digMonthly(); G.coDipMonthly(); G.careerMonthly(); G.lifeMonthly(); G.securityMonthly(); G.progressMonthly(); G.corpEventsMonthly(); G.depletionMonthly(); G.ecologyMonthly(); G.climateMonthly(); G.tariffMonthly(); G.wevMonthly(); G.impeachMonthly(); }
+    if (G.day % 30 === 0) { G.foreignAid(); G.balanceMonthly(); G.alertsMonthly(); G.pressureMonthly(); G.decisionsMonthly(); G.spaceMonthly(); G.projectsMonthly(); G.monthlyExtra(); G.nukesMonthly(); G.radaMonthly(); G.stockMonthly(); G.recoveryMonthly(); G.reparMonthly(); G.chronMonthly(); G.corpMonthly(); G.corp2Tenders(); G.corp2Close(); G.corp2Monthly(); G.digMonthly(); G.coDipMonthly(); G.careerMonthly(); G.lifeMonthly(); G.securityMonthly(); G.progressMonthly(); G.ministersMonthly(); G.questsMonthly(); G.corpEventsMonthly(); G.depletionMonthly(); G.ecologyMonthly(); G.climateMonthly(); G.tariffMonthly(); G.wevMonthly(); G.impeachMonthly(); }
     G.researchDaily();
     G.leaderDaily(); G.agentsDaily();
     G.parliamentDaily();

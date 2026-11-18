@@ -39,10 +39,10 @@ function doProg(k) { const r = G.act.startProgram(k); hint(r.ok ? '🚀 ' + t_('
 function doIntel(x, k) { const r = G.act.intelDeal(x, k); hint(r.ok ? '🛰 ' + t_('Угоду укладено') : '⚠ ' + r.err, 3500); renderTab(true); fogCache = null; }
 function doAsat(x) { const r = G.act.asat(x, 3); hint(r.ok ? `☄ ${t_('Збито')} ${r.hit}` : '⚠ ' + r.err, 3000); renderTab(true); }
 // ---- туман війни на мапі
-let fogCache = null, fogDay = -1;
+let fogCache = null, fogDay = -1, fogG = null, fogP = null;
 function fogOn() { return LORA.config.fog !== false && G && G.player >= 0 && !(NET.S.spectator) && !window._follow && !streamView && G.visibleFor; }
-function fogVis() { if (!fogOn()) return null; if (!fogCache || G.day - fogDay >= 3) { const v = G.visibleFor(G.player); if (fogCache && v.some((x, i) => x !== fogCache[i])) mapDirty = true; fogCache = v; fogDay = G.day; } return fogCache; }
+function fogVis() { if (!fogOn()) return null; if (!fogCache || fogG !== G || fogP !== G.player || G.day < fogDay || G.day - fogDay >= 3) { if (fogG !== G || fogP !== G.player) { fogCache = null; fogSeaCache = null; } fogG = G; fogP = G.player; const v = G.visibleFor(G.player); if (fogCache && v.some((x, i) => x !== fogCache[i])) mapDirty = true; fogCache = v; fogDay = G.day; } return fogCache; }
 try { if (localStorage.getItem('lora_fog') === '0') LORA.config.fog = false; } catch (e) { }
-let fogSeaCache = null, fogSeaDay = -1;
-function fogSea() { const v = fogVis(); if (!v) return null; if (fogSeaCache && fogSeaDay === fogDay) return fogSeaCache; const s = new Set(); D.regions.forEach((r, i) => { if (v[i]) (r.p || []).forEach(p => { s.add(p[0]); (seaAdj()[p[0]] || []).forEach(x => s.add(x)); }); }); if (G.hasRecon(G.player)) G.fleets.forEach(f => { if (G.atWar(G.player, f.n)) s.add(f.node); }); fogSeaCache = s; fogSeaDay = fogDay; return s; }
+let fogSeaCache = null, fogSeaDay = -1, fogSeaG = null;
+function fogSea() { const v = fogVis(); if (!v) return null; if (fogSeaCache && fogSeaDay === fogDay && fogSeaG === G) return fogSeaCache; fogSeaG = G; const s = new Set(); D.regions.forEach((r, i) => { if (v[i]) (r.p || []).forEach(p => { s.add(p[0]); (seaAdj()[p[0]] || []).forEach(x => s.add(x)); }); }); if (G.hasRecon(G.player)) G.fleets.forEach(f => { if (G.atWar(G.player, f.n)) s.add(f.node); }); fogSeaCache = s; fogSeaDay = fogDay; return s; }
 let _seaAdj = null; function seaAdj() { if (_seaAdj) return _seaAdj; _seaAdj = {}; D.sea.edges.forEach(([a, b]) => { (_seaAdj[a] = _seaAdj[a] || []).push(b); (_seaAdj[b] = _seaAdj[b] || []).push(a); }); return _seaAdj; }

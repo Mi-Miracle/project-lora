@@ -49,6 +49,8 @@ LORA.sim.register('stock2', 96.3, function (G) {
       const d = Math.max(0, c.profitY) * divOf(c) / 12 * h[cid] / 100; if (d > 0 && c.cash > d) { c.cash -= d; try { addCash(w, d); } catch (e) { } } } }
     // дивіденди інвесторам із вільного обігу теж виходять із компанії й повертаються в пул
     G.companies.forEach(c => { if (!c.alive) return; const free = G.stockFree(c.id); const d = Math.max(0, c.profitY) * 0.3 / 12 * free / 100; if (d > 0 && c.cash > d * 2) { c.cash -= d; s.pool += d; } });
+    // ШІ-компанії не накопичують гроші безкінечно: надлишок іде акціонерам (дивіденди/викуп) і в інвестиції
+    G.companies.forEach(c => { if (!c.alive || !c.ai) return; const v = G.coValue(c), ex = c.cash - v * 0.25; if (ex > 0) { const d = ex * 0.25; c.cash -= d; s.pool += d * 0.5; const n = N[c.home]; if (n && n.alive && n.agg) n.fdiG = Math.min(0.01, (n.fdiG || 0) + d * 0.5 / Math.max(20, n.agg.gdp) * 0.5); } });
     // ШІ-компанії з касовим розривом роблять допемісію
     G.companies.forEach(c => { if (c.alive && c.ai && c.cash < 0 && fl(c.id) < 70) G.stockIssue(c, 5); });
     // інвестори реінвестують: пул підживлює зростання країн, де є біржові компанії
@@ -69,7 +71,9 @@ LORA.sim.register('stock2', 96.3, function (G) {
   G.stockCountries = function () { const s = S(), m = {}; G.companies.forEach(c => { if (c.alive && s.px[c.id]) { const k = c.home; m[k] = m[k] || { cap: 0, n: 0, ch: 0 }; m[k].cap += s.px[c.id] * 100; m[k].n++; const h = s.hist[c.id] || []; const p0 = h.length > 4 ? h[h.length - 5] : h[0] || s.px[c.id]; m[k].ch += (s.px[c.id] / p0 - 1) * s.px[c.id] * 100; } });
     return Object.entries(m).map(([k, v]) => ({ nid: +k, cap: v.cap, n: v.n, ch: v.ch / Math.max(1e-9, v.cap) })).sort((a, b) => b.cap - a.cap); };
   // паніка тисне на настрій
-  const baseDaily = G.stockDaily; G.stockDaily = function () { baseDaily(); const s = S(); if (s.panic > G.day) s.mood = Math.max(0.5, s.mood - 0.002); };
+  const baseDaily = G.stockDaily; G.stockDaily = function () { baseDaily(); const s = S();
+    if (G.day === 90 && !s.rebased) { s.rebased = 1; const cap = G.companies.reduce((a, c) => a + (c.alive && s.px[c.id] ? s.px[c.id] * 100 : 0), 0); s.idx0 = cap; s.idx = [100]; } // базу індексу ставимо після початкової переоцінки ринку
+    if (s.panic > G.day) s.mood = Math.max(0.5, s.mood - 0.002); };
   G.act.stockTrade = (cid, pct) => G.stockTrade(G.wallet(), cid, pct);
   G.act.stockIssue = pct => G.pc >= 0 ? G.stockIssue(G.myCo(), pct) : { ok: false };
   G.act.stockBuyback = pct => G.pc >= 0 ? G.stockBuyback(G.myCo(), pct) : { ok: false };

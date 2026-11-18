@@ -15,7 +15,7 @@ function checkPopups() {
   setSpeed(0);
   openModal(t + `<div class="btns"><button class="pri" onclick="G.act.answerPending(${pi},true);closeModal();mapDirty=true;renderTab(true)">Погодитись</button><button onclick="G.act.answerPending(${pi},false);closeModal()">Відхилити</button></div>`);
 }
-function menu() {
+function menu() { if (typeof pauseMenu === 'function') { pauseMenu(true); return; }
   openModal(`<h2>⚙ Меню</h2><div class="btns" style="flex-direction:column;align-items:stretch"><button onclick="saveGame();closeModal()">💾 Зберегти гру</button><button onclick="if(loadGame())closeModal()">📂 Завантажити збереження</button>
   <button onclick="closeModal();help()">❓ Як грати</button><button onclick="closeModal();NEWSCAST.open()">📺 Випуск новин за місяць</button><button onclick="closeModal();streamPanel()">📡 Інтеграція зі стрімом</button>
   <button class="dang" onclick="this.textContent==='Точно? Натисніть ще раз'?location.reload():this.textContent='Точно? Натисніть ще раз'">Нова гра</button><button onclick="closeModal()">Закрити</button></div>
@@ -83,12 +83,15 @@ function loadGame() {
 // налаштування голосу: вибір системного голосу, швидкість, тон; що озвучувати
 function voiceSettings() {
   const I = AUD.voiceInfo(), V = AUD.voices().filter(v => AUD.S.vAnyLang || /^(uk|en)/i.test(v.lang)), E = VOICE.state(), S = AUD.S;
-  const ENG = [['auto', 'Авто'], ['system', 'Системні голоси'], ['espeak', 'eSpeak NG (офлайн)'], ['azure', 'Azure — Поліна/Остап (ваш ключ)'], ['eleven', 'ElevenLabs (ваш ключ)']];
+  const ENG = [['auto', 'Авто'], ['piper', 'Piper — живий офлайн-голос (укр)'], ['system', 'Системні голоси'], ['espeak', 'eSpeak NG (офлайн)'], ['azure', 'Azure — Поліна/Остап (ваш ключ)'], ['eleven', 'ElevenLabs (ваш ключ)']];
   const inp = (k, ph, w) => `<input type="${/Key$/.test(k) ? 'password' : 'text'}" value="${esc(S[k] || '')}" placeholder="${esc(ph)}" style="width:${w || 55}%" onchange="AUD.set('${k}',this.value.trim());voiceRefresh()">`;
   return `<div class="grp">🗣 ${t_('Озвучка')}</div>
   <div class="row"><span>${t_('Рушій')}</span><select onchange="AUD.set('engine',this.value);voiceRefresh()">${ENG.map(([k, n]) => `<option value="${k}" ${(S.engine || 'auto') === k ? 'selected' : ''}>${t_(n)}</option>`).join('')}</select></div>
   <div class="small ${I.engine ? 'g' : 'y'}">${I.engine ? t_('Зараз говорить') + ': <b>' + esc({ system: t_('системний голос') + ' ' + I.cur, espeak: 'eSpeak NG', azure: 'Azure Speech', eleven: 'ElevenLabs' }[I.engine]) + '</b>' : t_('Немає доступного голосу для цієї мови — оберіть рушій нижче')}${I.err ? ' · <span class="r">' + esc(I.err) + '</span>' : ''}</div>
   <div class="small mut">${t_('Голосів у системі')}: ${I.all} · ${t_('українських')}: ${I.uk} · ${t_('англійських')}: ${I.en}</div>
+  <div class="card small"><b>🎧 Piper — ${t_('живий нейронний голос без інтернету (українська)')}</b><div class="mut">${t_('Модель «ukrainian_tts» (датасет CC0, 3 голоси). Один раз завантажується (~80 МБ) з GitHub або HuggingFace і зберігається на компʼютері; далі працює офлайн. Рушій onnxruntime-web (MIT) уже в грі.')}</div>
+    <div class="row"><span>${E.ps === 'ready' ? '✅ ' + t_('Встановлено') : E.ps === 'loading' ? '⏳ ' + t_('Завантаження') + ' ' + Math.round(E.pprog * 100) + '%' + (E.pprog > 0.6 && E.pprog < 0.9 ? ' (' + t_('розпаковую') + ')' : '') : E.ps === 'error' ? '⚠ ' + esc(E.perr) : t_('Не встановлено')}</span><button onclick="voicePiper()" ${E.ps === 'loading' ? 'disabled' : ''}>${E.ps === 'ready' ? t_('Увімкнено') : t_('Завантажити й увімкнути')}</button></div>
+    <div class="row"><span>${t_('Голос')}</span><select onchange="AUD.set('piperSpk',+this.value);AUD.speak(t_('Привіт! Я ваш диктор новин.'))">${[['0', 'Лада'], ['1', 'Микита'], ['2', 'Тетяна']].map(([k, n]) => `<option value="${k}" ${String(S.piperSpk || 0) === k ? 'selected' : ''}>${t_(n)}</option>`).join('')}</select></div></div>
   <div class="card small"><b>🖥 eSpeak NG — ${t_('офлайн, українська й англійська')}</b><div class="mut">${t_('Роботизований, але працює без інтернету. Не входить до гри: за вашою командою завантажується (~9 МБ) з публічного реєстру npm, перевіряється й зберігається локально. Ліцензія GPL-3.0, код:')} github.com/espeak-ng/espeak-ng</div>
     <div class="row"><span>${E.es === 'ready' ? '✅ ' + t_('Встановлено') : E.es === 'loading' ? '⏳ ' + t_('Завантаження') + ' ' + Math.round(E.prog * 100) + '%' : E.es === 'error' ? '⚠ ' + esc(E.err) : t_('Не встановлено')}</span><button onclick="voiceEsp()" ${E.es === 'loading' ? 'disabled' : ''}>${E.es === 'ready' ? t_('Увімкнено') : t_('Завантажити й увімкнути')}</button></div></div>
   <div class="card small"><b>☁ Microsoft Azure Speech — ${t_('живі нейронні голоси (Поліна, Остап)')}</b><div class="mut">${t_('Офіційний сервіс за вашим власним ключем: portal.azure.com → Speech service → «Keys and Endpoint». Безкоштовний тариф F0 — 0,5 млн символів на місяць. Ключ зберігається лише на цьому компʼютері.')}</div>
@@ -107,8 +110,11 @@ function voiceSettings() {
   <div class="btns"><button onclick="AUD.speak(t_('Перевірка голосу. Проєкт Лора: світ чекає на ваші рішення.'))">🔊 ${t_('Перевірити голос')}</button></div>`;
 }
 function voiceRefresh() { const el = document.getElementById('voiceBox'); if (el) el.innerHTML = voiceSettings(); }
+function voicePiper() { AUD.set('piper', true); if (!AUD.S.engine || AUD.S.engine === 'system' || AUD.S.engine === 'espeak') AUD.set('engine', 'auto'); const t = setInterval(voiceRefresh, 500);
+  VOICE.piperInstall().then(() => { clearInterval(t); voiceRefresh(); hint('✅ Piper', 2000); AUD.speak(t_('Голос встановлено. Слава Україні!')); }, e => { clearInterval(t); voiceRefresh(); hint('⚠ ' + e.message, 5000); }); voiceRefresh(); }
 function voiceEsp() { AUD.set('espeak', true); if (!AUD.S.engine || AUD.S.engine === 'system') AUD.set('engine', 'auto'); const t = setInterval(voiceRefresh, 400);
   VOICE.esInstall().then(() => { clearInterval(t); voiceRefresh(); hint('✅ eSpeak NG', 2000); AUD.speak(t_('Голос встановлено.')); }, e => { clearInterval(t); voiceRefresh(); hint('⚠ ' + e.message, 4000); }); voiceRefresh(); }
 if (window.speechSynthesis) try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => { }; } catch (e) { }
 
 if (AUD.S.espeak) setTimeout(() => VOICE.esInstall().catch(() => { }), 3000);
+if (AUD.S.piper) setTimeout(() => caches.open('lora-voice-v1').then(c => c.match(location.href.replace(/[^/]*([?#].*)?$/, '') + '__cache/piper/uk.onnx')).then(m => { if (m) VOICE.piperInstall().catch(() => { }); }).catch(() => { }), 4000);

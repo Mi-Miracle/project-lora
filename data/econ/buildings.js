@@ -30,7 +30,7 @@ LORA.data.buildings = {
   food_plant:   { g: 'agro', n: 'Харчовий комбінат', ic: '🥩', in: { grain: 3 }, out: { food: 0.15 }, days: 240 },
   fert_plant:   { g: 'agro', n: 'Завод добрив', ic: '🧪', in: { gas: 1.5 }, out: { fert: 1 }, days: 365 },
   // ---- промисловість
-  steel_plant:  { g: 'industry', n: 'Металургійний комбінат', ic: '🏗', in: { coal: 4, metal: 6 }, out: { machinery: 0.08, metal: 4 }, days: 540 },
+  steel_plant:  { g: 'industry', n: 'Металургійний комбінат', ic: '🏗', in: { coal: 3, metal: 4.5 }, out: { machinery: 0.1, metal: 4.2 }, days: 540 },
   machine_plant:{ g: 'industry', n: 'Машинобудівний завод', ic: '⚙', in: { metal: 2, nonfer: 0.05, chips: 0.3 }, out: { machinery: 0.35 }, days: 400 },
   chem_plant:   { g: 'industry', n: 'Хімічний комбінат', ic: '⚗', in: { oil: 0.03, gas: 1 }, out: { chem: 0.3 }, days: 400 },
   pharma_plant: { g: 'industry', n: 'Фармацевтичний завод', ic: '💊', in: { chem: 0.05 }, out: { chem: 0.2 }, days: 450, req: { tech: 0.9 } },

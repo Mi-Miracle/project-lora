@@ -1,7 +1,7 @@
 // ЗВУК І МУЗИКА: усе синтезується WebAudio (без аудіофайлів). Ефекти — sfx(тип); музика — генеративний чіптюн-ембієнт,
 // що стає напруженішим під час війни. Налаштування зберігаються в localStorage('lora_audio').
 const AUD = (() => {
-  let S = { sfx: true, music: true, vol: 0.55, mvol: 0.32, tts: true, toasts: true, newscast: true, advisors: true, style: 'auto', voice: '', vrate: 1.03, vpitch: 1, vEvents: true, vAdv: false, vAnyLang: false, engine: 'auto', espeak: false, azKey: '', azRegion: 'westeurope', azVoice: 'uk-UA-PolinaNeural', azVoiceEn: 'en-US-AvaMultilingualNeural', elKey: '', elVoice: '', voiceVol: 0.9 };
+  let S = { sfx: true, music: true, vol: 0.55, mvol: 0.32, tts: true, toasts: true, newscast: true, advisors: true, style: 'auto', voice: '', vrate: 1.03, vpitch: 1, vEvents: true, vAdv: false, vAnyLang: false, engine: 'auto', espeak: false, piper: false, piperSpk: 0, azKey: '', azRegion: 'westeurope', azVoice: 'uk-UA-PolinaNeural', azVoiceEn: 'en-US-AvaMultilingualNeural', elKey: '', elVoice: '', voiceVol: 0.9 };
   try { Object.assign(S, JSON.parse(localStorage.getItem('lora_audio') || '{}')); } catch (e) { }
   let ctx = null, master = null, sfxG = null, musG = null, noiseBuf = null;
   const save = () => { try { localStorage.setItem('lora_audio', JSON.stringify(S)); } catch (e) { } };
@@ -56,20 +56,27 @@ const AUD = (() => {
     industrial:{ n: 'Індастріал', bpm: 118, progs: [[[40, 47, 52], [40, 46, 52], [38, 45, 50], [41, 48, 53]]], pad: 'square', bass: 'sawtooth', lead: 'sawtooth', arp: [0, 0, 1, 0, 2, 0, 1, 0], drums: 'four' },
     night:   { n: 'Нічне місто', bpm: 64, progs: [[[49, 53, 56, 60], [46, 49, 53, 56], [51, 54, 58, 61], [44, 48, 51, 54]]], pad: 'sine', bass: 'triangle', lead: 'sine', arp: [3, 2, 1, 0, 1, 2, 3, 2], drums: 'soft' },
     doom:    { n: 'Ядерна загроза', bpm: 60, progs: [[[40, 43, 46], [39, 42, 45], [40, 43, 46], [41, 44, 47]]], pad: 'sawtooth', bass: 'sine', lead: 'sine', arp: [0, 0, 1, 0, 0, 2, 0, 1], drums: 'heart' },
+    folk:    { n: 'Український фолк', bpm: 96, progs: [[[50, 53, 57], [55, 58, 62], [49, 52, 57], [50, 53, 57]], [[50, 53, 57], [46, 50, 53], [45, 49, 52], [50, 53, 57]]], pad: 'triangle', bass: 'triangle', lead: 'triangle', arp: [0, 1, 2, 1, 2, 0, 1, 2], drums: 'march' },
+    jazz:    { n: 'Нічний джаз', bpm: 84, progs: [[[50, 53, 57, 60], [55, 59, 62, 65], [48, 52, 55, 59], [57, 61, 64, 67]], [[53, 57, 60, 64], [52, 55, 59, 62], [50, 53, 57, 60], [55, 59, 62, 65]]], pad: 'sine', bass: 'triangle', lead: 'sine', arp: [0, 2, 1, 3, 2, 0, 3, 1], drums: 'lofi' },
+    rock:    { n: 'Рок-драйв', bpm: 128, progs: [[[40, 47, 52], [43, 50, 55], [45, 52, 57], [38, 45, 50]]], pad: 'sawtooth', bass: 'square', lead: 'sawtooth', arp: [0, 1, 0, 2, 0, 1, 0, 2], drums: 'four' },
+    space:   { n: 'Космос', bpm: 58, progs: [[[48, 55, 62], [50, 57, 64], [45, 52, 59], [47, 54, 61]]], pad: 'sine', bass: 'sine', lead: 'triangle', arp: [0, 2, 1, 2, 0, 2, 1, 2], drums: 'none' },
+    arcade:  { n: 'Аркада', bpm: 140, progs: [[[60, 64, 67], [57, 60, 64], [53, 57, 60], [55, 59, 62]]], pad: 'square', bass: 'square', lead: 'square', arp: [0, 1, 2, 1, 0, 2, 1, 2], drums: 'four' },
+    funk:    { n: 'Фанк біржі', bpm: 104, progs: [[[52, 55, 59, 62], [57, 60, 64, 67], [52, 55, 59, 62], [55, 59, 62, 65]]], pad: 'triangle', bass: 'sawtooth', lead: 'square', arp: [0, 0, 2, 1, 3, 0, 2, 1], drums: 'lofi' },
     victory: { n: 'Тріумф', bpm: 108, progs: [[[48, 52, 55], [53, 57, 60], [55, 59, 62], [48, 52, 55]]], pad: 'triangle', bass: 'triangle', lead: 'square', arp: [0, 1, 2, 2, 1, 2, 0, 2], drums: 'march' }
   };
   Object.values(STY).forEach(st => { st.prog = st.progs[0]; });
+  // авто: стиль за ситуацією, але плейлист змінюється кожні ~2.5 хв реального часу, щоб не грала одна мелодія
   function autoStyle() {
     if (!window.G || !G.day) return 'menu'; const P = G.pv ? G.pv() : G.player; const n = P >= 0 ? G.N[P] : null; const war = P >= 0 && G.enemiesOf(P).length > 0;
-    const cyc = (a, d) => a[Math.floor(G.day / d) % a.length];
-    if (n && n.nk && n.nk.esc >= 3) return 'doom';
-    if (G.player < 0 && G.leader && G.leader.role === 'char' && G.pc < 0) return war ? 'tension' : cyc(['piano', 'night', 'ambient'], 75);
-    if (G.player < 0 && G.pc >= 0) return war ? cyc(['industrial', 'tension'], 90) : cyc(['business', 'synth', 'night'], 90);
-    if (war) { if (n && n.stab < 35) return 'tension'; return cyc(['epic', 'march', 'heroic', 'industrial'], 90); }
-    if (n && n.stab < 30) return 'tension';
-    if (n && /RUS|CHN|USA|PRK|IRN/.test(n.a3) && G.wars && G.wars.size > 2) return cyc(['cold', 'ambient'], 120);
-    if (n && /SAU|IRN|IRQ|EGY|TUR|ARE|SYR|ISR|JOR|QAT|KWT|OMN|YEM|MAR|DZA|PAK|AFG/.test(n.a3)) return cyc(['eastern', 'ambient', 'synth'], 120);
-    return cyc(['ambient', 'synth', 'business', 'night'], 120);
+    const cyc = a => a[Math.floor(performance.now() / 150000) % a.length];
+    if (n && n.nk && n.nk.esc >= 3) return cyc(['doom', 'tension']);
+    if (G.player < 0 && G.leader && G.leader.role === 'char' && G.pc < 0) return war ? cyc(['tension', 'piano', 'cold']) : cyc(['piano', 'jazz', 'night', 'ambient', 'folk', 'space']);
+    if (G.player < 0 && G.pc >= 0) return war ? cyc(['industrial', 'tension', 'rock']) : cyc(['business', 'funk', 'synth', 'jazz', 'night', 'arcade']);
+    if (war) { if (n && n.stab < 35) return cyc(['tension', 'cold', 'doom']); return cyc(['epic', 'march', 'heroic', 'industrial', 'rock', 'folk']); }
+    if (n && n.stab < 30) return cyc(['tension', 'cold']);
+    if (n && /SAU|IRN|IRQ|EGY|TUR|ARE|SYR|ISR|JOR|QAT|KWT|OMN|YEM|MAR|DZA|PAK|AFG/.test(n.a3)) return cyc(['eastern', 'ambient', 'synth', 'space']);
+    if (n && /UKR/.test(n.a3)) return cyc(['folk', 'ambient', 'heroic', 'synth', 'jazz']);
+    return cyc(['ambient', 'synth', 'business', 'night', 'jazz', 'space', 'funk', 'folk']);
   }
   function startMusic() { if (timer) return; musT = ctx.currentTime + 0.1; timer = setInterval(schedule, 120); }
   function schedule() {
@@ -107,8 +114,8 @@ const AUD = (() => {
   // який рушій говоритиме: вибраний у налаштуваннях або «авто» (хмарний із ключем → системний голос мови → eSpeak)
   function engineFor() {
     const want = S.engine || 'auto'; const sysOk = !!(window.speechSynthesis && pickVoice());
-    if (want === 'system') return sysOk ? 'system' : null; if (want === 'azure') return S.azKey ? 'azure' : null; if (want === 'eleven') return S.elKey ? 'eleven' : null; if (want === 'espeak') return (typeof VOICE !== 'undefined') ? 'espeak' : null;
-    if (S.azKey) return 'azure'; if (S.elKey) return 'eleven'; if (sysOk) return 'system'; if (S.espeak && (typeof VOICE !== 'undefined')) return 'espeak'; return null;
+    if (want === 'system') return sysOk ? 'system' : null; if (want === 'azure') return S.azKey ? 'azure' : null; if (want === 'eleven') return S.elKey ? 'eleven' : null; if (want === 'espeak') return (typeof VOICE !== 'undefined') ? 'espeak' : null; if (want === 'piper') return (typeof VOICE !== 'undefined') && LORA.lang !== 'en' ? 'piper' : null;
+    if (S.azKey) return 'azure'; if (S.elKey) return 'eleven'; if (S.piper && LORA.lang !== 'en' && typeof VOICE !== 'undefined') return 'piper'; if (sysOk) return 'system'; if (S.espeak && (typeof VOICE !== 'undefined')) return 'espeak'; return null;
   }
   function speak(text, onEnd, prio) {
     const eng = S.tts ? engineFor() : null; if (!eng) { onEnd && onEnd(); return false; }

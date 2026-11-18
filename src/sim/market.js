@@ -21,6 +21,12 @@ LORA.sim.register('market', 99.656, function (G) {
         if (b.out) for (const r in b.out) n.agg.prod[r] = Math.max(0, n.agg.prod[r] - b.out[r] * lvl * eff * inR * (t.depl && t.depl[r] ? 1 - t.depl[r] : 1)); } }
   };
 
+  // ---- ШІ-компанії теж за правилами ринку: прибуток лише з того, що купили (непроданий надлишок країни-господаря
+  //      зменшує виручку), і лише якщо сировина реально є (дефіцит країни зменшує випуск — враховано в assetProfit)
+  const baseAP = G.assetProfit;
+  G.assetProfit = function (c, a) { let p = baseAP(c, a); if (!c || !c.ai || !p) return p; const b = BD[a.type]; if (!b || !b.out) return p; const n = N[ter[a.t].owner]; if (!n || !n.agg) return p;
+    let k = 0, w = 0; for (const r in b.out) { const pr = n.agg.prod[r] || 0, un = G.unsold ? G.unsold[r][n.id] || 0 : 0; const sold = pr > 0 ? clamp(1 - un / pr, 0, 1) : 1; k += sold * b.out[r] * G.prices[r]; w += b.out[r] * G.prices[r]; }
+    return w > 0 ? p * (0.25 + 0.75 * k / w) : p; };
   // ---- місячні пули: що держави реально готові продати (профіцит) і купити (дефіцит)
   G.mkt2 = null;
   G.mktOpen = function () {
