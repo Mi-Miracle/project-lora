@@ -33,7 +33,7 @@ const ADV = (() => {
     box.querySelector('.adv-n').innerHTML = `<b>${esc(t_(a.who))}</b> · ${esc(t_(a.n))}`;
     box.querySelector('.btns').innerHTML = `<button class="pri" onclick="ADV.open()">${t_('Відкрити')} →</button><button onclick="ADV.skip()">✕</button>`;
     const el = box.querySelector('.adv-t'); el.textContent = ''; let i = 0; talk = true; clearTimeout(hideT);
-    const text = cur.text; AUD.sfx(cur.kind === 'war' ? 'alert' : 'pop');
+    const text = cur.text; AUD.sfx(cur.kind === 'war' ? 'alert' : 'pop'); if (AUD.S.vAdv) AUD.speak(text, null, 'queue');
     const iv = setInterval(() => { if (!cur || cur.text !== text) { clearInterval(iv); return; } i += 2; el.textContent = text.slice(0, i); if (i % 6 === 0) AUD.blip(a.pitch);
       if (i >= text.length) { clearInterval(iv); talk = false; hideT = setTimeout(() => { box.classList.remove('on'); setTimeout(() => { cur = null; next(); }, 450); }, 6500); } }, 32);
   }

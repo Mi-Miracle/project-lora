@@ -53,20 +53,22 @@ function strikeTab(n) {
   const S = window._stk; let h = `<div class="mut small">${t_('Удари по тилу ворога: енергетика, оборонні заводи, склади й війська. ППО ворога збиває частину цілей.')}</div>`;
   if (!en.length) return h + `<div class="card">${t_('Ви не воюєте.')}</div>`;
   const WL = ['strike', 'missiles', 'ballistic', 'hyper', 'glide', 'bombing'];
+  const tgt0 = sel && sel.type === 't' ? sel.id : -1, hg = tgt0 >= 0 && G.strikeGoalsFor ? G.strikeGoalsFor(n.id, tgt0) : null; if (hg && !hg.includes(S.goal)) S.goal = 'military';
   // що стоїть за кожним засобом ураження і як його отримати
   const how = w => { if (w === 'bombing') return (n.air && n.air.bmb >= 1) ? '' : t_('Потрібні бомбардувальники — «Армія → Авіація»'); const u = D.units[w]; if ((n.ars[w] || 0) >= 1) return '';
     const rt = u.rt && !G.has(n, u.rt) ? `${t_('дослідження')} «${esc(D.techs[u.rt] ? techName(u.rt) : u.rt)}»` : ''; const pb = Object.keys(u.prod || {}).map(b => `«${esc(t_(D.buildings[b].n))}»`).join(' / ');
     return (rt ? t_('Потрібне') + ' ' + rt + ', ' + t_('далі') + ' ' : t_('Потрібне виробництво') + ': ') + pb + (w === 'glide' ? ' + ' + t_('штурмовики') : ''); };
   h += `<div class="sub wsel">${WL.map(w => { const q = w === 'bombing' ? (n.air ? n.air.bmb : 0) : (n.ars[w] || 0); return `<button class="${S.w === w ? 'on' : ''}" ${q < 1 ? 'disabled' : ''} data-tip="${esc(w === 'bombing' ? D.airTypes.bmb.d : D.units[w].d)} · ${t_('дальність')} ${G.WP[w].r} ${t_('км')}" onclick="_stk.w='${w}';renderTab(true)">${pxi(w === 'bombing' ? 'bomber' : UNIT_PX[w])} ${esc(w === 'bombing' ? t_('Бомбардування') : unitName(w))} · ${fmtQ(q)}</button>`; }).join('')}</div>
-  <div class="sub">${Object.entries(D.strikeGoals).map(([k, g]) => `<button class="${S.goal === k ? 'on' : ''}" title="${esc(g.d)}" onclick="_stk.goal='${k}';renderTab(true)">${ico(g.ic)} ${esc(LORA.lang === 'en' ? g.en : g.n)}</button>`).join('')}</div>
+  <div class="sub">${Object.entries(D.strikeGoals).filter(([k]) => !hg || hg.includes(k)).map(([k, g]) => `<button class="${S.goal === k ? 'on' : ''}" title="${esc(g.d)}" onclick="_stk.goal='${k}';renderTab(true)">${ico(g.ic)} ${esc(LORA.lang === 'en' ? g.en : g.n)}</button>`).join('')}</div>
   ${WL.filter(w => how(w)).length ? `<div class="card small"><b>${t_('Недоступні засоби')}</b>${WL.filter(w => how(w)).map(w => `<div class="row"><span>${pxi(w === 'bombing' ? 'bomber' : UNIT_PX[w])} ${esc(w === 'bombing' ? t_('Бомбардування') : unitName(w))}</span><span class="mut">${how(w)}</span></div>`).join('')}</div>` : ''}
   ${slider('stkCnt', t_('Кількість у залпі'), 5, 500, 5, S.cnt, v => v, '')}
   <label class="row" style="cursor:pointer"><span>🤖 ${t_('Автоматичні ударні кампанії (ШІ)')}</span><input type="checkbox" ${n.strikeAuto ? 'checked' : ''} onchange="nat(G.player).strikeAuto=this.checked"></label>`;
   const tgt = sel && sel.type === 't' ? sel.id : -1;
-  if (tgt >= 0 && G.atWar(n.id, G.ter[tgt].ctrl)) { const err = G.canStrike(n.id, tgt, S.w, S.cnt);
-    h += `<div class="card"><div class="row"><b>${pxi('target')} ${esc(regName(tgt))}</b><span>${esc(nat(G.ter[tgt].ctrl).name)}</span></div><div class="small mut">${t_('ППО регіону')}: ${pct(G.ter[tgt].shield, 0)}</div>
+  const home = tgt >= 0 ? G.strikeHome(n.id, tgt) : null;
+  if (tgt >= 0 && (home || G.atWar(n.id, G.ter[tgt].ctrl))) { const err = G.canStrike(n.id, tgt, S.w, S.cnt);
+    h += `<div class="card"><div class="row"><b>${pxi('target')} ${esc(regName(tgt))}</b><span>${esc(nat(home || G.ter[tgt].ctrl).name)}</span></div><div class="small mut">${home ? '🎯 ' + t_('Ворожі війська на вашій території: удари лише по військах і постачанню, ваша інфраструктура не страждає') : t_('ППО регіону') + ': ' + pct(G.ter[tgt].shield, 0)}</div>
     <div class="btns"><button class="dang" ${err ? `disabled title="${esc(err)}"` : ''} onclick="doStrike(${tgt})">${ico(G.WP[S.w].ic)} ${t_('Удар')}</button></div>${err ? `<div class="small y">${esc(err)}</div>` : ''}</div>`; }
-  else h += `<div class="card small">${t_('Оберіть на мапі ворожий регіон як ціль.')}</div>`;
+  else h += `<div class="card small">${t_('Оберіть на мапі ворожий регіон або свій регіон із ворожими військами як ціль.')}</div>`;
   const last = (G.strikes || []).filter(x => x.from === n.id || G.ter[x.i].ctrl === n.id).slice(-8).reverse();
   if (last.length) h += `<div class="grp">${t_('Останні удари')}</div>` + last.map(x => `<div class="row small"><span>${x.from === n.id ? '➡' : '⬅'} ${esc(regName(x.i))} · ${ico((G.WP[x.w] || G.WP.missiles).ic)}${x.cnt}</span><span>${t_('збито')} ${x.intc} · ${t_('влучань')} ${x.hits}</span></div>`).join('');
   { const x = tgt >= 0 ? G.ter[tgt].ctrl : null, ce = G.cyberCan(G.player, x);
@@ -74,7 +76,7 @@ function strikeTab(n) {
     <div class="btns">${Object.entries(G.CYBER).map(([k, v]) => `<button ${ce ? 'disabled' : ''} data-tip="${esc(t_(v.d))}" onclick="doCyber(${x},'${k}')">${ico(v.ic)} ${esc(t_(v.n))}</button>`).join('')}</div>${ce ? `<div class="small y">${esc(t_(ce))}</div>` : ''}</div>`; }
   return h;
 }
-function doStrike(i) { const S = window._stk; const r = G.strike(G.player, i, S.w, S.w === 'bombing' ? Math.min(S.cnt, Math.floor(nat(G.player).air.bmb)) : S.cnt, S.goal); hint(r.ok ? `💥 ${t_('влучань')} ${r.hits}, ${t_('збито')} ${r.intc}${r.airLost >= 0.5 ? ' · ' + t_('втрачено літаків') + ' ' + r.airLost.toFixed(0) : ''}` : '⚠ ' + r.err, 3500); renderTab(true); mapDirty = true; }
+function doStrike(i) { const S = window._stk; const r = G.act.strike(i, S.w, S.cnt, S.goal); hint(r.ok ? `💥 ${t_('влучань')} ${r.hits}, ${t_('збито')} ${r.intc}${r.airLost >= 0.5 ? ' · ' + t_('втрачено літаків') + ' ' + r.airLost.toFixed(0) : ''}` : '⚠ ' + r.err, 3500); renderTab(true); mapDirty = true; }
 
 function tplTip(v) { return v.n + ': ' + Object.keys(D.armyTypes).filter(k => v.c[k] > 0).map(k => `${D.armyTypes[k].n.toLowerCase()} ${Math.round(v.c[k] * 100)}%`).join(', '); }
 // ---- авіація

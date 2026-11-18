@@ -38,7 +38,7 @@ function menu() {
   <div class="row"><span>Як часто, хвилин</span><input type="number" min="3" max="60" value="${AUD.S.chaosMin || 8}" onchange="AUD.set('chaosMin',+this.value)" style="width:70px"></div>
   <div class="row"><span>Twitch Client ID (для входу)</span><input type="text" id="twId" value="${esc(TW.cfg().id)}" placeholder="dev.twitch.tv/console" style="width:45%"></div>
   <div class="btns"><button onclick="TW.setClient(document.getElementById('twId').value);hint('✅ Збережено',1500)">Зберегти Client ID</button>${TW.S.user ? `<span class="small">Ви: <b>${esc(TW.S.user.name)}</b></span>` : `<button onclick="TW.login()">🟣 Увійти через Twitch</button>`}</div>
-  <label class="row"><span>Озвучувати новини голосом (якщо браузер має голос)</span><input type="checkbox" ${AUD.S.tts ? 'checked' : ''} onchange="AUD.set('tts',this.checked)"></label>`);
+  <label class="row"><span>Озвучувати новини голосом (якщо браузер має голос)</span><input type="checkbox" ${AUD.S.tts ? 'checked' : ''} onchange="AUD.set('tts',this.checked)"></label>${voiceSettings()}`);
 }
 function streamPanel() {
   const st = LORA.stream.status ? LORA.stream.status() : {};
@@ -54,7 +54,7 @@ function streamPanel() {
   <div class="sl"><div class="lab"><span>Гучність музики</span></div><input type="range" min="0" max="1" step="0.05" value="${AUD.S.mvol}" oninput="AUD.set('mvol',+this.value)"></div>
   <label class="row"><span>Спливаючі сповіщення</span><input type="checkbox" ${AUD.S.toasts ? 'checked' : ''} onchange="AUD.set('toasts',this.checked)"></label>
   <label class="row"><span>Щомісячний випуск новин</span><input type="checkbox" ${AUD.S.newscast ? 'checked' : ''} onchange="AUD.set('newscast',this.checked)"></label>
-  <label class="row"><span>Озвучувати новини голосом (якщо браузер має голос)</span><input type="checkbox" ${AUD.S.tts ? 'checked' : ''} onchange="AUD.set('tts',this.checked)"></label>`);
+  <label class="row"><span>Озвучувати новини голосом (якщо браузер має голос)</span><input type="checkbox" ${AUD.S.tts ? 'checked' : ''} onchange="AUD.set('tts',this.checked)"></label>${voiceSettings()}`);
 }
 function help() {
   const sec = (ic, t, d) => `<div class="card"><b>${ic} ${t_(t)}</b><div class="small" style="line-height:1.55">${t_(d)}</div></div>`;
@@ -77,3 +77,19 @@ function loadGame() {
   try { const o = JSON.parse(s); G = LORA.createGame({ seed: Date.now() % 1e9 }); G.init(G.N[o.player].a3, 'peace'); G.load(s); } catch (e) { hint('⚠ Збереження несумісне з цією версією', 3000); return false; }
   $('#start').style.display = 'none'; startUI(); return true;
 }
+
+// налаштування голосу: вибір системного голосу, швидкість, тон; що озвучувати
+function voiceSettings() {
+  const I = AUD.voiceInfo(), V = AUD.voices().filter(v => AUD.S.vAnyLang || /^(uk|en)/i.test(v.lang));
+  return `<div class="grp">🗣 ${t_('Озвучка')}</div>
+  <div class="small ${I.uk ? 'g' : 'y'}">${t_('Голосів у системі')}: ${I.all} · ${t_('українських')}: ${I.uk} · ${t_('англійських')}: ${I.en}${I.cur ? ' · ' + t_('зараз') + ': <b>' + esc(I.cur) + '</b>' : ''}</div>
+  ${!I.uk ? `<div class="small mut">${t_('Українського голосу немає: у Windows додайте його в «Параметри → Час і мова → Мовлення → Додати голоси», у браузері Chrome/Edge — онлайн-голоси Google/Microsoft. Або увімкніть читання будь-яким голосом.')}</div>` : ''}
+  <div class="row"><span>${t_('Голос')}</span><select onchange="AUD.set('voice',this.value)"><option value="">${t_('Авто')}</option>${V.map(v => `<option value="${esc(v.name)}" ${AUD.S.voice === v.name ? 'selected' : ''}>${esc(v.name)} (${esc(v.lang)})</option>`).join('')}</select></div>
+  <div class="sl"><div class="lab"><span>${t_('Швидкість мовлення')}</span><b>${(AUD.S.vrate || 1).toFixed(2)}</b></div><input type="range" min="0.6" max="1.6" step="0.05" value="${AUD.S.vrate || 1.03}" onchange="AUD.set('vrate',+this.value)"></div>
+  <div class="sl"><div class="lab"><span>${t_('Тон голосу')}</span><b>${(AUD.S.vpitch || 1).toFixed(2)}</b></div><input type="range" min="0.5" max="1.6" step="0.05" value="${AUD.S.vpitch || 1}" onchange="AUD.set('vpitch',+this.value)"></div>
+  <label class="row"><span>${t_('Озвучувати важливі події (війни, вибори, катастрофи)')}</span><input type="checkbox" ${AUD.S.vEvents ? 'checked' : ''} onchange="AUD.set('vEvents',this.checked)"></label>
+  <label class="row"><span>${t_('Озвучувати поради радників')}</span><input type="checkbox" ${AUD.S.vAdv ? 'checked' : ''} onchange="AUD.set('vAdv',this.checked)"></label>
+  <label class="row"><span>${t_('Читати будь-яким доступним голосом, якщо немає потрібної мови')}</span><input type="checkbox" ${AUD.S.vAnyLang ? 'checked' : ''} onchange="AUD.set('vAnyLang',this.checked)"></label>
+  <div class="btns"><button onclick="AUD.speak(t_('Перевірка голосу. Проєкт Лора: світ чекає на ваші рішення.'))">🔊 ${t_('Перевірити голос')}</button></div>`;
+}
+if (window.speechSynthesis) try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => { }; } catch (e) { }

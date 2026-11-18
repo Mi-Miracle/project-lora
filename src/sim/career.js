@@ -92,7 +92,7 @@ LORA.sim.register('career', 99.66, function (G) {
     const L = G.leader; if (!L) return; const nid = L.home;
     if (o.stage === 'mp' || o.stage === 'owner') { L.money = Math.max(L.money, o.stage === 'owner' ? 0.5 : 0.25); L.popu[nid] = 30; L.cont[nid] = 30; L.fame = 12; }
     if (o.stage === 'mp') { L.party = { nid, name: 'Партія «' + (L.name.split(' ')[1] || L.name) + '»', r: 6 }; L.mp = nid; L.mpInfl = 12; L.job = { k: 'lawyer', nid, lvl: 2, xp: 0 }; G.say(`🗳 ${L.name} — депутат парламенту: ${N[nid].name}`, 'big', [nid]); }
-    if (o.stage === 'owner') { L.job = { k: 'manager', nid, lvl: 3, xp: 0 }; L._sector = o.sector || 'tech'; L.money = 2.2; G.careerDo('found_co', o.coName || null, 1.8); L.busy = 0; }
+    if (o.stage === 'owner') { L.job = { k: 'manager', nid, lvl: 3, xp: 0 }; L._sector = o.sector || 'tech'; L.money = (o.coCash || 1.8) + 0.4; G.careerDo('found_co', o.coName || null, o.coCash || 1.8); L.busy = 0; }
   };
   G.act.careerDo = (k, a, b) => G.careerDo(k, a, b);
   G.act.charDo = (k, p) => G.charDo(k, p);

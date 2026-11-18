@@ -12,27 +12,42 @@ function techEff(e) {
 }
 const techName = id => LORA.lang === 'en' ? D.techs[id].en : D.techs[id].n;
 function resAct(fn) { const r = fn(); if (r && r.ok === false) hint('⚠ ' + r.err, 3000); renderTab(true); }
+let resGrantAmt = 1;
+function resBranchCard(n, b, B) {
+  const R = G.resEnsure(n), A = R.act[b], yr = G.resBranchPts(n, b), w = R.alloc[b] || 0;
+  let h = `<div class="card small resbr"><div class="row"><b>${ico(B.ic)} ${esc(LORA.lang === 'en' ? B.en : B.n)}</b><span>${pct(G.resShare(n, b), 0)} · ${yr.toFixed(0)} ${t_('очок/рік')} · ${t_('пул')} <b>${Math.floor(R.bp[b] || 0)}</b></span></div>`;
+  h += `<div class="row"><span>${t_('Частка бюджету')}</span><input type="range" min="0" max="10" step="1" value="${w}" onchange="resAct(()=>G.act.resAlloc('${b}',+this.value))" style="width:45%"><b>${w}</b></div>`;
+  if (A) { const c = G.techCost(n, A.id), p = Math.min(1, A.p / c); h += `<div class="row"><span>🔬 ${esc(techName(A.id))}</span><b>${pct(p, 0)}</b></div><div class="bar"><i style="width:${p * 100}%;background:#9b7bff"></i></div><div class="mut">${t_('Залишилось')} ≈ ${yr > 0 ? Math.ceil((c - A.p) / yr * 365) + ' ' + t_('дн.') : '∞'}</div>`; }
+  else h += `<div class="y">${t_('Немає активного дослідження — очки накопичуються в пулі')}</div>`;
+  h += `<div class="btns"><button class="small" ${n.cash < resGrantAmt ? 'disabled' : ''} data-tip="${t_('Разовий грант у сферу: гроші з бюджету → очки цієї сфери')}" onclick="resAct(()=>G.act.resGrant('${b}',resGrantAmt))">💰 ${t_('Грант')} ${money(resGrantAmt)} → +${G.resGrantPts(n, resGrantAmt)}</button></div></div>`;
+  return h;
+}
 TAB_FN.tech = function () {
-  const n = nat(G.player), R = n.res, TT = D.techs, era = +curSub('tech', '1'); const pts = R.pts || G.sciencePerYear(n);
-  let h = subnav('tech', [['1', t_('Епоха I')], ['2', t_('Епоха II')], ['3', t_('Епоха III')], ['4', t_('Епоха IV')]]);
+  const n = nat(G.player), R = G.resEnsure(n), TT = D.techs, era = +curSub('tech', '1'); const pts = R.pts || G.sciencePerYear(n);
+  let h = subnav('tech', [['sph', '💡 ' + t_('Сфери')], ['1', t_('Епоха I')], ['2', t_('Епоха II')], ['3', t_('Епоха III')], ['4', t_('Епоха IV')]]);
   const doneN = Object.keys(R.done).length;
-  h += `<div class="card"><div class="row"><span>${t_('Очки науки / рік')}</span><b>${pts.toFixed(0)}</b></div><div class="row"><span>${t_('Досліджено')}</span><b>${doneN} / ${Object.keys(TT).length}</b></div>`;
-  if (R.cur) { const c = G.techCost(n, R.cur), p = Math.min(1, R.prog / c); h += `<div class="row"><span>🔬 ${esc(techName(R.cur))}</span><b>${pct(p, 0)}</b></div><div class="bar"><i style="width:${p * 100}%;background:#9b7bff"></i></div><div class="small mut">${t_('Залишилось')} ≈ ${Math.ceil((c - R.prog) / Math.max(1, pts) * 365)} ${t_('дн.')}</div>`; }
-  else h += `<div class="small y">${t_('Дослідження не обрано')}</div>`;
+  h += `<div class="card"><div class="row"><span>${t_('Очки науки / рік')}</span><b>${pts.toFixed(0)}</b></div><div class="row"><span>${t_('Досліджено')}</span><b>${doneN} / ${Object.keys(TT).length}</b></div><div class="row"><span>${t_('Активних досліджень')}</span><b>${Object.keys(R.act).length}</b></div>`;
   if (R.queue.length) h += `<div class="small mut">${t_('Черга')}: ${R.queue.map(id => esc(techName(id))).join(' → ')} <a href="#" onclick="nat(G.player).res.queue=[];renderTab(true);return false">✕</a></div>`;
-  h += `<label class="row" style="cursor:pointer"><span>🤖 ${t_('Автовибір наступного дослідження')}</span><input type="checkbox" ${R.auto ? 'checked' : ''} onchange="nat(G.player).res.auto=this.checked"></label>`
-    + slider('res', t_('Видатки на науку (% ВВП)'), 0, 0.06, 0.001, n.pol.res, v => (v * 100).toFixed(1) + '%', t_('Більше очок науки, але менше грошей у бюджеті')) + '</div>';
+  h += `<label class="row" style="cursor:pointer"><span>🤖 ${t_('Автовибір дослідження в кожній сфері')}</span><input type="checkbox" ${R.auto ? 'checked' : ''} onchange="G.act.resAuto(this.checked)"></label>`
+    + slider('res', t_('Видатки на науку (% ВВП)'), 0, 0.06, 0.001, n.pol.res, v => (v * 100).toFixed(1) + '%', t_('Бюджет науки ділиться між сферами за частками; у кожній сфері — свій пул очок і своє дослідження')) + '</div>';
+  if (curSub('tech', '1') === 'sph') {
+    h += `<div class="mut small">${t_('Вкладайте гроші у сфери: щорічний бюджет розподіляється за частками, разові гранти миттєво дають очки сфери. Очки витрачаються на дослідження цієї сфери (вибір — у вкладках епох).')}</div>`;
+    h += `<div class="btns small"><span class="mut" style="align-self:center">${t_('Грант')}:</span>${[0.5, 1, 5, 20].map(v => `<button class="${resGrantAmt === v ? 'on' : ''}" onclick="resGrantAmt=${v};renderTab(true)">${money(v)}</button>`).join('')}</div>`;
+    Object.entries(D.techBranches).forEach(([b, B]) => { h += resBranchCard(n, b, B); });
+    return h;
+  }
   h += `<div class="mut small">${esc(LORA.lang === 'en' ? D.techEras[era].en : D.techEras[era].n)}. ${t_('Що більше країн уже має технологію, то дешевше її освоїти; союзники діляться знаннями; під час війни військові дослідження вдвічі дешевші.')}</div>`;
   Object.entries(D.techBranches).forEach(([b, B]) => {
     const list = Object.entries(TT).filter(([, t]) => t.br === b && t.era === era); if (!list.length) return;
-    h += `<div class="grp">${ico(B.ic)} ${esc(LORA.lang === 'en' ? B.en : B.n)}</div>`;
+    h += `<div class="grp">${ico(B.ic)} ${esc(LORA.lang === 'en' ? B.en : B.n)} <span class="small mut">· ${pct(G.resShare(n, b), 0)} ${t_('бюджету')} · ${t_('пул')} ${Math.floor(R.bp[b] || 0)}</span></div>`;
     list.forEach(([id, t]) => {
-      const done = R.done[id] != null, av = G.techAvail(n, id), cur = R.cur === id, cost = G.techCost(n, id), share = G.techOwnersShare(id);
+      const done = R.done[id] != null, av = G.techAvail(n, id), cur = !!(R.act[t.br] && R.act[t.br].id === id), cost = G.techCost(n, id), share = G.techOwnersShare(id), bpts = G.resBranchPts(n, t.br);
       const reqs = (t.req || []).map(r => `<span class="${R.done[r] != null ? 'g' : 'r'}">${esc(techName(r))}</span>`).join(', ');
       const unl = [...(t.unlock || []).map(k => ico(D.buildings[k].ic) + ' ' + esc(t_(D.buildings[k].n))), ...Object.entries(D.models || {}).flatMap(([ty, L]) => L.filter(m => m.rt === id).map(m => ico(m.ic) + ' ' + esc(t_(m.n)))), ...Object.entries(D.buildings).filter(([k, b]) => b.req && b.req.rt === id && !(t.unlock || []).includes(k)).map(([k, b]) => ico(b.ic) + ' ' + esc(t_(b.n)))].join(', ');
-      h += `<div class="card ${done ? '' : av ? '' : 'soon'}" style="${cur ? 'border-color:#9b7bff' : ''}"><div class="row"><b>${done ? '✅' : cur ? '🔬' : av ? '◻' : '🔒'} ${esc(techName(id))}</b><span class="small">${done ? t_('готово') : cost + ' ' + t_('очок') + ' · ≈' + (cost / Math.max(1, pts)).toFixed(1) + ' ' + t_('р.')}</span></div>
-        <div class="small">${techEff(t.e || {})}${t.d ? `<br><span class="y">${esc(t_(t.d))}</span>` : ''}${unl ? `<br>${t_('Відкриває')}: ${unl}` : ''}</div>${reqs ? `<div class="small mut">${t_('Потрібно')}: ${reqs}</div>` : ''}<div class="small mut">${t_('Має у світі')}: ${pct(share, 0)} ${t_('ВВП')}</div>
-        ${!done ? `<div class="btns">${av && !cur ? `<button class="pri" onclick="resAct(()=>G.setResearch(G.player,'${id}'))">🔬 ${t_('Дослідити')}</button>` : ''}${!R.queue.includes(id) && !cur ? `<button onclick="resAct(()=>G.queueResearch(G.player,'${id}'))">➕ ${t_('В чергу')}</button>` : ''}</div>` : ''}</div>`;
+      const coU = Object.values(D.corpRD || {}).flat().filter(r => r[5] === id).map(r => esc(t_(r[1]))); 
+      h += `<div class="card ${done ? '' : av ? '' : 'soon'}" style="${cur ? 'border-color:#9b7bff' : ''}"><div class="row"><b>${done ? '✅' : cur ? '🔬' : av ? '◻' : '🔒'} ${esc(techName(id))}</b><span class="small">${done ? t_('готово') : cost + ' ' + t_('очок') + ' · ≈' + (cost / Math.max(1, bpts)).toFixed(1) + ' ' + t_('р.') + (t.gr ? ' · ' + t_('грейд') + ' ' + ['I', 'II', 'III'][t.gr - 1] : '')}</span></div>
+        <div class="small">${techEff(t.e || {})}${t.d ? `<br><span class="y">${esc(t_(t.d))}</span>` : ''}${unl ? `<br>${t_('Відкриває')}: ${unl}` : ''}${coU.length ? `<br>🏢 ${t_('Компаніям країни')}: ${coU.join(', ')}` : ''}</div>${reqs ? `<div class="small mut">${t_('Потрібно')}: ${reqs}</div>` : ''}<div class="small mut">${t_('Має у світі')}: ${pct(share, 0)} ${t_('ВВП')}</div>
+        ${!done ? `<div class="btns">${av && !cur ? `<button class="pri" onclick="resAct(()=>G.setResearch(G.player,'${id}'))">🔬 ${t_('Дослідити')}${R.act[t.br] ? ' (' + t_('замість поточного') + ')' : ''}</button>` : ''}${!R.queue.includes(id) && !cur ? `<button onclick="resAct(()=>G.queueResearch(G.player,'${id}'))">➕ ${t_('В чергу')}</button>` : ''}</div>` : ''}</div>`;
     });
   });
   return h;

@@ -118,7 +118,7 @@ LORA.sim.register('intel', 93.5, function (G) {
       if (!n.alive) return; const base = clamp((Math.log10(Math.max(500, n.pc || 5000)) - 2.7) / 2, 0.08, 0.85);
       const pop = Math.max(1, n.agg ? n.agg.pop : 10); const b = Math.min(0.25, (bn[n.id] || 0) / Math.sqrt(pop) * 0.6);
       const sat = Math.min(G.has(n, 'sat_internet') ? 0.15 : 0.06, (n.sats ? n.sats.comms : 0) / 400) + (G.has(n, 'net6g') ? 0.05 : 0);
-      n.net = clamp(base + b + sat + (n.netB || 0) - (n._netCut > G.day ? 0.3 : 0), 0, 1);
+      n.net = clamp(base + b + sat + (n.netB || 0) + (n.netDig || 0) - (n._netCut > G.day ? 0.3 : 0), 0, 1);
       if (!init) { const g = (n.net - 0.55) * 0.00018; if (g) for (const t of ter) if (t.owner === n.id && t.ctrl === n.id) t.gdp *= 1 + g; }
     });
   };

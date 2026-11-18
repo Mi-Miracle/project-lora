@@ -20,7 +20,7 @@
     const el = document.createElement('div'); el.className = 'toast ' + c.lvl; el.innerHTML = `<div class="ti">${ic}</div><div><b>${esc(c.ttl)}</b><div>${esc(txt)}</div></div>`;
     el.onclick = () => el.remove(); box.prepend(el); while (box.children.length > 4) box.lastChild.remove();
     setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 400); }, 7000);
-    AUD.sfx(c.snd);
+    AUD.sfx(c.snd); if (AUD.S.vEvents && /war|big|bad/.test(c.lvl)) AUD.speak(c.ttl + '. ' + txt, null, 'queue');
   }
   LORA.bus.on('news', it => { try { if (window.ADV && ADV.handles(it)) return; const c = classify(it); if (c) show(it, c); } catch (e) { } });
 })();

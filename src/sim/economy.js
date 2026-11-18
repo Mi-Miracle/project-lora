@@ -57,7 +57,7 @@ LORA.sim.register('economy', 30, function (G) {
       const debtR = n.debt / Math.max(1, gdp); if (debtR > 0.9) g -= (debtR - 0.9) * 0.012;
       g -= sancGDP[n.id] / Math.max(1, worldGDP) * 0.03;
       if (n.stab < 40) g -= (40 - n.stab) * 0.0008;
-      if (G.worldMod.until > G.day) g += G.worldMod.growth;
+      if (G.worldMod.until > G.day) g += G.worldMod.growth; if (n.fdiG) g += n.fdiG;
       n.mods.forEach(m => { if (m.growth && m.until > G.day) g += m.growth; });
       g = clamp(g, -0.25, 0.12); n.growth = g; growthOf[n.id] = g;
       // ---- бюджет

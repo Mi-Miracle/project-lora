@@ -2,7 +2,7 @@
 let chName = '', chType = 'diplomat'; const CHAR_T = { diplomat: { n: 'Дипломат', ic: '🎩', d: 'Зв\'язки з елітами ростуть удвічі швидше' }, tycoon: { n: 'Бізнесмен', ic: '💼', d: 'Більше грошей з консультацій і угод' }, star: { n: 'Медійна зірка', ic: '🎤', d: 'Популярність серед виборців росте вдвічі швидше' }, general: { n: 'Генерал у відставці', ic: '🎖', d: 'Повага у країнах, що воюють: звʼязки й популярність там ×2' } };
 let startSel = 'UKR', scen = 'war2026', startDiff = 'normal', startMode = 'nation', coSector = 'tech', coName = '', coBudget = null;
 let startTab = 'game';
-const START_AS = [['char', '🧑', 'Персонаж', 'Почніть із нуля: робота, звʼязки, популярність. Далі — партія, депутатство, власна компанія і президентство.'], ['mp', '🏛', 'Депутат', 'Ви вже депутат парламенту зі своєю партією: голосуйте, вносьте закони, набирайте вплив для президентських виборів.'], ['owner', '💼', 'Власник компанії', 'Ви персонаж і власник молодої компанії: керуйте бізнесом і політичною кар\'єрою одночасно.'], ['company', '🏢', 'Компанія', 'Лише корпорація: виробництво, тендери, R&D, торгівля й вплив на уряди. Можна перебрати владу.'], ['nation', '👑', 'Президент (держава)', 'Класична гра за державу: економіка, армія, дипломатія.']];
+const START_AS = [['char', '🧑', 'Персонаж', 'Почніть із нуля: робота, навчання, звʼязки, популярність. Далі — партія, депутатство, власна компанія і президентство.'], ['party', '🎗', 'Лідер партії', 'Ви очолюєте молоду партію: осередки, спонсори, мітинги, дебати, вибори до парламенту, коаліція і закони.'], ['mp', '🏛', 'Депутат', 'Ви вже депутат парламенту зі своєю партією: голосуйте, вносьте закони, набирайте вплив для президентських виборів.'], ['company', '🏢', 'Компанія (власник)', 'Ви — власник корпорації: виробництво, тендери, R&D, торгівля й вплив на уряди. Як персонаж можете балотуватися, виступати, вступати в партію.'], ['nation', '👑', 'Президент (держава)', 'Класична гра за державу: економіка, армія, дипломатія.']];
 function startScreen() {
   if (!window._themed) { window._themed = 1; setTimeout(() => applyTheme(startSel), 0); }
   if (!window._startList) { const tmp = LORA.createGame({ seed: 1 }); tmp.aggregate();
@@ -32,15 +32,15 @@ function gameBlock() {
   <label class="row"><span>🌫 ${t_('Туман війни')} <span class="small mut">${t_('(глядачі й вивід на стрім — без туману)')}</span></span><input type="checkbox" ${LORA.config.fog !== false ? 'checked' : ''} onchange="LORA.config.fog=this.checked;try{localStorage.setItem('lora_fog',this.checked?'1':'0')}catch(e){}"></label>
   ${startMode === 'rada' ? '' : `<h3>${t_(host ? 'Ви (хост) граєте як' : 'Почати як')}</h3><div class="btns">${START_AS.map(([k, ic, n]) => `<button class="${startMode === k ? 'on' : ''}" onclick="startMode='${k}';startScreen()">${ico(ic)} ${t_(n)}</button>`).join('')}</div><div class="small mut">${t_((START_AS.find(x => x[0] === startMode) || START_AS[4])[3])}</div>`}
   ${startMode === 'rada' && !host ? radaStartBlock() : ''}
-  ${(startMode === 'company' || startMode === 'owner') ? `<div class="card"><div class="row"><span>${t_('Назва компанії')}</span><input type="text" id="coname" value="${esc(coName)}" placeholder="${t_('Моя компанія')}" oninput="coName=this.value" style="width:55%"></div>
+  ${(startMode === 'company') ? `<div class="card"><div class="row"><span>${t_('Назва компанії')}</span><input type="text" id="coname" value="${esc(coName)}" placeholder="${t_('Моя компанія')}" oninput="coName=this.value" style="width:55%"></div>
     <div class="small mut" style="margin-top:6px">${t_('Галузь')}</div><div class="btns">${Object.entries(SEC).map(([k, v]) => `<button class="${coSector === k ? 'on' : ''}" data-tip="${esc(t_(v.d))}" onclick="coSector='${k}';startScreen()">${ico(v.ic)} ${esc(t_(v.n))}</button>`).join('')}</div>
     <div class="small mut">${esc(t_(SEC[coSector].d))}</div><div class="row"><span>${t_('Стартовий капітал')}</span><b>${money(LORA.config.companyCash)}</b></div>
     <div class="small mut">${t_('Штаб-офіс буде у столиці обраної країни. Мета — вирости, набрати вплив і перебрати владу в державі.')}</div></div>` : ''}
-  ${(startMode === 'char' || startMode === 'mp' || startMode === 'owner') ? `<div class="card"><div class="row"><span>${t_('Імʼя персонажа')}</span><input type="text" value="${esc(chName)}" placeholder="${t_('Олена Коваль')}" oninput="chName=this.value" style="width:55%"></div>
+  ${(startMode === 'char' || startMode === 'mp' || startMode === 'party' || startMode === 'company') ? `<div class="card"><div class="row"><span>${t_('Імʼя персонажа')}</span><input type="text" value="${esc(chName)}" placeholder="${t_('Олена Коваль')}" oninput="chName=this.value" style="width:55%"></div>
     <div class="small mut" style="margin-top:6px">${t_('Хто ви')}</div><div class="btns">${Object.entries(CHAR_T).map(([k, v]) => `<button class="${chType === k ? 'on' : ''}" onclick="chType='${k}';startScreen()">${ico(v.ic)} ${esc(t_(v.n))}</button>`).join('')}</div>
     <div class="small mut">${esc(t_(CHAR_T[chType].d))}. ${t_('Ви не керуєте ні державою, ні компанією: подорожуйте, здобувайте звʼязки й популярність, заробляйте на посередництві — і виграйте вибори, щоб очолити країну.')}</div></div>` : ''}
   </div><div>
-  <h3>${startMode === 'company' ? t_('Країна штаб-офісу') : /char|mp|owner/.test(startMode) ? t_('Країна, де ви починаєте') : t_('Оберіть державу')}</h3><input type="text" id="csearch" placeholder="${t_('Пошук країни…')}" style="width:100%" oninput="renderClist(this.value)"><div id="clist"></div>
+  <h3>${startMode === 'company' ? t_('Країна штаб-офісу') : /char|mp|party/.test(startMode) ? t_('Країна, де ви починаєте') : t_('Оберіть державу')}</h3><input type="text" id="csearch" placeholder="${t_('Пошук країни…')}" style="width:100%" oninput="renderClist(this.value)"><div id="clist"></div>
   </div></div>`;
 }
 function twitchBlock() {
@@ -101,8 +101,7 @@ function renderClist(q) {
 }
 function startGame() {
   G = LORA.createGame({ seed: (Date.now() % 1e9) | 0 });
-  if (startMode === 'char' || startMode === 'mp' || startMode === 'owner') G.init(null, scen, { difficulty: startDiff, char: { name: (chName || '').trim() || t_('Олена Коваль'), type: chType, home: startSel, stage: startMode === 'char' ? null : startMode, sector: coSector, coName: (coName || '').trim() || null } });
-  else if (startMode === 'company') G.init(null, scen, { difficulty: startDiff, company: { name: (coName || '').trim() || t_('Моя компанія'), sector: coSector, home: startSel, cash: LORA.config.companyCash } });
+  if (/^(char|mp|party|company)$/.test(startMode)) G.init(null, scen, { difficulty: startDiff, char: { name: (chName || '').trim() || t_('Олена Коваль'), type: chType, home: startSel, stage: startMode === 'char' ? null : startMode === 'company' ? 'owner' : startMode, sector: coSector, coName: (coName || '').trim() || null, coCash: startMode === 'company' ? LORA.config.companyCash : 0 } });
   else G.init(startSel, scen, { difficulty: startDiff });
   if (startMode === 'rada' && G.player >= 0) G.radaEnable(true);
   $('#start').style.display = 'none'; startUI(); setTimeout(help, 300);

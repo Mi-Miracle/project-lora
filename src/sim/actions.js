@@ -4,6 +4,10 @@ LORA.sim.register('actions', 90, function (G) {
   const P = G.act = {};
   const pay = (n, amt) => { n.cash -= amt; if (n.cash < 0) { n.debt -= n.cash; n.cash = 0; } };
   P.setPolicy = (k, v) => { N[G.player].pol[k] = v; };
+  P.resAlloc = (b, w) => G.resAlloc(G.player, b, w);
+  P.resGrant = (b, amt) => G.resGrant(G.player, b, amt);
+  P.resAuto = v => { N[G.player].res.auto = !!v; return { ok: true }; };
+  P.strike = (i, w, cnt, goal) => G.strike(G.player, i, w, w === 'bombing' ? Math.min(cnt, Math.floor((N[G.player].air || {}).bmb || 0)) : cnt, goal);
   P.recruit = (ti, k, tpl) => {
     const n = N[G.player]; const pool = n.agg.pop * 1000 * n.pol.mob, tr = G.troopsOf(n.id);
     if (ter[ti].ctrl !== n.id) return { ok: false, err: 'Набір можливий лише на власній території' };

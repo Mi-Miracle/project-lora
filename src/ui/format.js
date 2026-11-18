@@ -14,7 +14,7 @@ const RES = LORA.data.resourceOrder, RI = LORA.data.resources, RGROUPS = LORA.da
 const D = LORA.data;
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-function money(bn) { const a = Math.abs(bn); const sgn = bn < 0 ? '−' : ''; if (a >= 1000) return sgn + '$' + (a / 1000).toFixed(a >= 10000 ? 1 : 2) + ' трлн'; if (a >= 1) return sgn + '$' + a.toFixed(a >= 100 ? 0 : 1) + ' млрд'; return sgn + '$' + (a * 1000).toFixed(0) + ' млн'; }
+function money(bn) { const a = Math.abs(bn); const sgn = bn < 0 ? '−' : ''; if (a >= 1000) return sgn + '$' + (a / 1000).toFixed(a >= 10000 ? 1 : 2) + ' трлн'; if (a >= 1) return sgn + '$' + a.toFixed(a >= 100 ? 0 : 1) + ' млрд'; return sgn + '$' + (a * 1000).toFixed(a >= 0.0095 || a === 0 ? 0 : a >= 0.001 ? 1 : 2) + ' млн'; }
 const pct = (x, d = 1) => (x * 100).toFixed(d) + '%';
 const sgnPct = (x, d = 1) => (x >= 0 ? '+' : '') + (x * 100).toFixed(d) + '%';
 const people = k => k >= 1000 ? (k / 1000).toFixed(2) + ' млн' : k.toFixed(0) + ' тис.';

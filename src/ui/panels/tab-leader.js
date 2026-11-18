@@ -43,7 +43,7 @@ TAB_FN.char = function () {
   if (L.cand != null) { const p = nat(L.cand).parl; h += `<div class="card g">🗳 ${t_('Ви кандидат')}: ${esc(nat(L.cand).name)} · ${t_('вибори')} ${p ? G.dateStr(p.next) : '?'}</div>`; }
   const all = [...new Set([...Object.keys(L.cont), ...Object.keys(L.popu)].map(Number))].sort((a, b) => ((L.cont[b] || 0) + (L.popu[b] || 0)) - ((L.cont[a] || 0) + (L.popu[a] || 0)));
   h += `<div class="grp">${t_('Зв\'язки й популярність')}</div><table><tr><th>${t_('Країна')}</th><th>🤝</th><th>🎤</th><th>🗳</th></tr>` + all.slice(0, 16).map(k => `<tr><td>${ndot(k)}${esc(nat(k).name)}</td><td>${(L.cont[k] || 0).toFixed(0)}</td><td>${(L.popu[k] || 0).toFixed(0)}</td><td class="small">${nat(k).parl ? G.dateStr(nat(k).parl.next).replace(/ р\.$/, '') : ''}</td></tr>`).join('') + '</table>';
-  if (!G.leader.mv) h += `<div class="grp">${t_('Дії тут')}</div>` + charActionsBlock();
+  h += `<div class="card small">📍 ${t_('Дії на місцевості (знайомства, виступи, благодійність, медіа…) — клацніть на мапі регіон країни, де перебуває персонаж: вони відкриються в правій панелі.')}</div>`;
   return h;
 };
 function renderTopChar(sp) {

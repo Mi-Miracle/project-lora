@@ -19,20 +19,10 @@ LORA.sim.register('corp', 99.6, function (G) {
     _: [['Державне замовлення', 2, 0.6, 150], ['Інфраструктурний проєкт', 3, 1.0, 240]]
   };
   // ---- R&D дерева: e.rate (+% виробництва), e.cost (−% собівартості), e.qual (+ якість, перемоги в тендерах), e.profit (+% прибутку активів), e.cap (+ потужність проєктів)
-  const RD = {
-    military: [
-      ['c_lines', 'Конвеєрні лінії', 300, [], { rate: 0.15 }], ['c_quality', 'Контроль якості НАТО-стандарту', 400, [], { qual: 0.15 }],
-      ['c_missile', 'Власна крилата ракета', 900, ['c_lines'], { unlock: 'missiles', qual: 0.05 }], ['c_sam', 'Зенітна ракета власної розробки', 800, ['c_lines'], { unlock: 'sam' }],
-      ['c_glide', 'Модулі планування для бомб', 500, ['c_lines'], { unlock: 'glide' }], ['c_ai_drone', 'ШІ-наведення дронів', 900, ['c_quality'], { qual: 0.15, rate: 0.1 }],
-      ['c_ballistic', 'Балістична програма', 1600, ['c_missile'], { unlock: 'ballistic' }], ['c_robotic', 'Роботизовані заводи', 1400, ['c_lines', 'c_quality'], { rate: 0.25, cost: 0.1 }],
-      ['c_hyper', 'Гіперзвуковий демонстратор', 3000, ['c_ballistic', 'c_robotic'], { unlock: 'hyper', qual: 0.1 }], ['c_export', 'Експортна ліцензія', 600, ['c_quality'], { qual: 0.1, cap: 1 }]
-    ],
-    tech: [['c_cloud', 'Власна хмара', 400, [], { profit: 0.08 }], ['c_ai', 'Великі мовні моделі', 900, ['c_cloud'], { profit: 0.12, qual: 0.1 }], ['c_chip', 'Власний чип', 1200, ['c_cloud'], { profit: 0.15, cap: 1 }], ['c_secure', 'Кібербезпека рівня держави', 700, ['c_cloud'], { qual: 0.15, cap: 1 }], ['c_quantum', 'Квантовий прототип', 2500, ['c_ai', 'c_chip'], { profit: 0.2, qual: 0.15 }]],
-    energy: [['c_eff', 'Цифрові електростанції', 400, [], { profit: 0.08 }], ['c_storage', 'Промислові акумулятори', 700, ['c_eff'], { profit: 0.1, cap: 1 }], ['c_smr', 'Малі реактори', 1500, ['c_eff'], { profit: 0.15, qual: 0.1 }], ['c_hydrogen', 'Водневі технології', 1000, ['c_storage'], { profit: 0.1, cap: 1 }], ['c_fusion', 'Термоядерний стартап', 3500, ['c_smr', 'c_hydrogen'], { profit: 0.3 }]],
-    agro: [['c_seeds', 'Власна селекція', 300, [], { profit: 0.08 }], ['c_drones_ag', 'Агродрони', 500, ['c_seeds'], { profit: 0.1 }], ['c_logist', 'Власні елеватори й логістика', 600, ['c_seeds'], { cap: 1, qual: 0.1 }], ['c_bio', 'Біотех і добрива', 1200, ['c_drones_ag'], { profit: 0.15 }]],
-    _: [['c_ops', 'Оптимізація процесів', 300, [], { profit: 0.08 }], ['c_brand', 'Сильний бренд', 500, ['c_ops'], { qual: 0.15 }], ['c_scale', 'Масштабування', 900, ['c_ops'], { profit: 0.12, cap: 1 }], ['c_digital', 'Цифрова трансформація', 1300, ['c_brand', 'c_scale'], { profit: 0.15, qual: 0.1 }]]
-  };
-  G.corpTree = c => (RD[c.sector] || RD._).map(([id, n, cost, req, e]) => ({ id, n, cost, req, e }));
+  const RD = G.D.corpRD;
+  G.corpTree = c => (RD[c.sector] || RD._).map(([id, n, cost, req, e, st]) => ({ id, n, cost, req, e, st }));
+  // держтехнологія-передумова: є в країні штабу або в будь-якій країні з офісом компанії
+  G.corpStOk = (c, st) => !st || !G.D.techs[st] || c.offices.some(o => N[o.n] && N[o.n].res && N[o.n].res.done[st] != null) || (N[c.home] && N[c.home].res.done[st] != null);
   G.corpInit = function (c) {
     if (c.rd) return; c.rd = { pts: 0, budget: 0.15, done: {}, cur: null }; c.inv = {}; c.lines = {}; c.debt = 0; c.rep = 50; c.contracts = []; c.bids = [];
   };
@@ -46,7 +36,7 @@ LORA.sim.register('corp', 99.6, function (G) {
   G.corpRate = (c, k) => { const g = GOODS[k]; let r = 0; c.assets.forEach(a => { if (g.rate[a.type]) r += g.rate[a.type] * a.lvl / 12; }); return r * COMM * (1 + fx(c, 'rate')); };
   G.corpUnitCost = (c, k) => GOODS[k].price * 0.62 * (1 - fx(c, 'cost'));
   // ---- R&D
-  G.corpSetRD = function (c, id) { const t = G.corpTree(c).find(x => x.id === id); if (!t) return { ok: false, err: 'Невідома розробка' }; if (c.rd.done[id] != null) return { ok: false, err: 'Вже розроблено' }; if (t.req.some(r => c.rd.done[r] == null)) return { ok: false, err: 'Спершу потрібні попередні розробки' }; c.rd.cur = id; return { ok: true }; };
+  G.corpSetRD = function (c, id) { const t = G.corpTree(c).find(x => x.id === id); if (!t) return { ok: false, err: 'Невідома розробка' }; if (c.rd.done[id] != null) return { ok: false, err: 'Вже розроблено' }; if (t.req.some(r => c.rd.done[r] == null)) return { ok: false, err: 'Спершу потрібні попередні розробки' }; if (!G.corpStOk(c, t.st)) return { ok: false, err: `Держава ще не дослідила «${G.D.techs[t.st].n}»` }; c.rd.cur = id; return { ok: true }; };
   // ---- тендери
   G.tenders = G.tenders || [];
   function genTenders() {
@@ -106,7 +96,7 @@ LORA.sim.register('corp', 99.6, function (G) {
       // R&D: бюджет = частка прибутку (мін. $5 млн/міс), очки: $1 млрд ≈ 1000 очок; лабораторії (університети, дата-центри) +20% кожна
       const labs = c.assets.filter(a => a.type === 'university' || a.type === 'datacenter' || a.type === 'ai_datacenter').reduce((s, a) => s + a.lvl, 0);
       if (c.rd.budget < 0.05 || c.rd.budget > 3) c.rd.budget = 0.15; const spend = c.rd.budget / 12; c.rd.pts += 8 * (1 + labs * 0.2); if (c.cash > spend) { c.cash -= spend; c.rd.pts += spend * 3500 * (1 + labs * 0.2); }
-      if (!c.rd.cur && !human) { const nx = G.corpTree(c).find(t => c.rd.done[t.id] == null && t.req.every(r => c.rd.done[r] != null)); if (nx) c.rd.cur = nx.id; }
+      if (!c.rd.cur && !human) { const nx = G.corpTree(c).find(t => c.rd.done[t.id] == null && t.req.every(r => c.rd.done[r] != null) && G.corpStOk(c, t.st)); if (nx) c.rd.cur = nx.id; }
       const cur = c.rd.cur && G.corpTree(c).find(t => t.id === c.rd.cur);
       if (cur && c.rd.pts >= cur.cost) { c.rd.pts -= cur.cost; c.rd.done[cur.id] = G.day; c.rd.cur = null; if (human) G.say(`🔬 R&D «${c.name}»: розроблено «${cur.n}»`, 'good', [c.home]); }
       // виробництво: лінії, увімкнені гравцем (ШІ — під свої контракти)

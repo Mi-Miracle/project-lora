@@ -92,18 +92,30 @@ LORA.sim.register('arsenal', 59, function (G) {
   };
   const RANGE = new Proxy({}, { get: (o, k) => (WP[k] || WP.missiles).r });
   G.strikeRange = function (nid, i, w, own) { if (w === 'glide') return T[i].nb.some(j => ter[j].ctrl === nid); const c = T[i].c; let best = 1e9; for (const t of (own || ter)) { if (t.ctrl !== nid) continue; const d = hav(T[t.i].c[0], T[t.i].c[1], c[0], c[1]); if (d < best) best = d; if (best < 50) break; } return best <= RANGE[w]; };
+  // удар по власному (або окупованому у вас) регіону, де стоять ворожі війська: лише по військах і постачанню
+  // повертає null — звичайна ворожа ціль; 0 — своя без ворогів; ід ворога з найбільшим угрупуванням
+  G.strikeHome = function (nid, i) {
+    const t = ter[i]; if (t.ctrl !== nid && !(t.owner === nid && !G.atWar(nid, t.ctrl))) return null;
+    let best = 0, bk = 0; for (const a of G.armies) if (a.t === i && a.n !== nid && G.atWar(nid, a.n) && a.k > bk) { bk = a.k; best = a.n; }
+    return bk > 0 ? best : 0;
+  };
+  G.strikeGoalsFor = (nid, i) => G.strikeHome(nid, i) ? ['military', 'rail'] : null;
   G.canStrike = function (nid, i, w, cnt) {
-    const t = ter[i], n = N[nid]; if (!G.atWar(nid, t.ctrl)) return 'Удари можливі лише по державі, з якою ви воюєте';
+    const t = ter[i], n = N[nid]; const home = G.strikeHome(nid, i);
+    if (home === 0) return 'У регіоні немає ворожих військ — удари по своїй території неможливі';
+    if (home == null && !G.atWar(nid, t.ctrl)) return 'Удари можливі лише по державі, з якою ви воюєте';
     const wp = WP[w]; if (!wp) return 'Невідомий засіб';
     if (wp.sortie) { const av = n.air ? Math.floor(n.air.bmb || 0) : 0; if (!(cnt > 0) || av < cnt) return `Недостатньо бомбардувальників: ${av}`; if ((n._raidT || 0) > G.day) return `Бомбардувальники повертаються на бази: ще ${n._raidT - G.day} дн.`; }
     else if (!(cnt > 0) || (n.ars[w] || 0) < cnt) return `Недостатньо: ${UN[w].n.toLowerCase()} ${Math.floor(n.ars[w] || 0)}`;
     if (wp.air === 'atk' && !(n.air && n.air.atk >= 4)) return 'Потрібні штурмовики (щонайменше 4) — замовте авіацію у вкладці «Армія → Авіація»';
-    if (!G.strikeRange(nid, i, w)) return w === 'glide' ? 'КАБ скидають лише на прифронтові регіони (сусідні з вашими)' : `Поза дальністю (${RANGE[w]} км від вашої території)`;
+    if (!home && !G.strikeRange(nid, i, w)) return w === 'glide' ? 'КАБ скидають лише на прифронтові регіони (сусідні з вашими)' : `Поза дальністю (${RANGE[w]} км від вашої території)`;
     return '';
   };
   G.strike = function (nid, i, w, cnt, goal, quiet) {
     const err = G.canStrike(nid, i, w, cnt); if (err) return { ok: false, err };
-    const n = N[nid], t = ter[i], d = N[t.ctrl], wp = WP[w]; if (wp.sortie) n._raidT = G.day + 7; else n.ars[w] -= cnt;
+    const n = N[nid], t = ter[i], wp = WP[w]; const home = G.strikeHome(nid, i);
+    if (home) return homeStrike(nid, i, w, cnt, goal === 'rail' ? 'rail' : 'military', home, quiet);
+    const d = N[t.ctrl]; if (wp.sortie) n._raidT = G.day + 7; else n.ars[w] -= cnt;
     // перехоплення: ППО регіону/сусідів + запас перехоплювачів + лазери
     const shield = Math.max(t.shield, ...T[i].nb.map(j => ter[j].ctrl === t.ctrl ? ter[j].shield * 0.6 : 0));
     const samCov = clamp(d.ars.sam / Math.max(1, cnt * wp.cov), 0, 1);
@@ -156,6 +168,20 @@ LORA.sim.register('arsenal', 59, function (G) {
     }
     return { ok: true, hits, intc, res, airLost };
   };
+  // удар по ворожих військах на своїй землі: ППО ворога слабке (лише польове), власна інфраструктура не страждає
+  function homeStrike(nid, i, w, cnt, goal, en, quiet) {
+    const n = N[nid], t = ter[i], d = N[en], wp = WP[w]; if (wp.sortie) n._raidT = G.day + 7; else n.ars[w] -= cnt;
+    const fieldAD = clamp((d.ars.sam || 0) / Math.max(1, cnt * wp.cov * 6), 0, 1);
+    const pInt = clamp(0.06 + 0.22 * fieldAD * wp.ik, 0, 0.5), intc = Math.round(cnt * pInt), hits = cnt - intc; d.ars.sam = Math.max(0, (d.ars.sam || 0) - intc * wp.sc * 0.5);
+    let airLost = 0; if (wp.sortie) { airLost = Math.min(n.air.bmb, intc * 0.2); n.air.bmb -= airLost; }
+    d.arsM.intercepted = (d.arsM.intercepted || 0) + intc; n.arsM.hitsOut = (n.arsM.hitsOut || 0) + hits;
+    const pow = hits * wp.pow; const ar = G.armies.filter(a => a.t === i && G.atWar(nid, a.n)); let res, lost = 0;
+    if (goal === 'rail') { ar.forEach(a => { a.sup = Math.max(0.25, (a.sup || 1) - pow * 0.006); }); N[en].milStock = Math.max(0, N[en].milStock - pow * 0.02); res = `постачання ворожого угруповання зірвано (−${Math.round(pow * 0.6)}%)`; }
+    else { ar.forEach(a => { a.org = Math.max(0.1, a.org - pow * 0.005); const l = Math.min(a.k * 0.025, pow * 0.06); a.k -= l; lost += l; N[a.n].casualties += l; a.sup = Math.max(0.3, (a.sup || 1) - pow * 0.002); }); res = `ворожі війська дезорганізовано, втрати ${lost.toFixed(1)} тис.`; }
+    G.strikes = G.strikes || []; G.strikes.push({ d: G.day, from: nid, i, w, cnt, hits, intc, home: 1 }); if (G.strikes.length > 60) G.strikes.shift();
+    if (!quiet) G.say(`${wp.ic} ${n.name} → ворог у ${T[i].n}: ${cnt} ${wp.noun}, збито ${intc}, влучань ${hits}${hits ? ' · ' + res : ''}`, 'war', [nid, en]);
+    return { ok: true, hits, intc, res, airLost };
+  }
   // ---- ШІ: ударні кампанії (раз на тиждень)
   function aiStrikes(n) {
     const en = G.enemiesOf(n.id); if (!en.length) return; const own = ter.filter(t => t.ctrl === n.id);
@@ -167,7 +193,7 @@ LORA.sim.register('arsenal', 59, function (G) {
       if (cnt < (w === 'hyper' ? 1 : w === 'bombing' ? 3 : 5)) return;
       const rr = G.rnd(); const goal = w === 'glide' ? (rr < 0.7 ? 'military' : 'rail') : w === 'missiles' || w === 'ballistic' || w === 'hyper' || w === 'bombing' ? (rr < 0.4 ? 'energy' : rr < 0.7 ? 'industry' : rr < 0.85 ? 'airfields' : 'ports') : (rr < 0.45 ? 'energy' : rr < 0.7 ? 'military' : 'rail');
       const want = { energy: ENERGY, industry: INDUSTRY, military: MILT, rail: ['rail_hub', 'depot'], ports: ['port', 'lng_terminal', 'shipyard'], airfields: ['airport', 'military_base'] }[goal];
-      let best = null; for (const t of ter) { if (!en.includes(t.ctrl) || (t.ctrl !== t.owner && w !== 'glide')) continue; let v = 0; for (const k of want) if (t.bld[k]) v += t.bld[k] * BD[k].cost; if (goal === 'energy') v += t.gdp * 0.05; if (w === 'glide') v += G.armies.filter(a => a.t === t.i && a.n === t.ctrl).reduce((s, a) => s + a.k, 0) * 0.3; if (!v) continue; if (w === 'bombing' && t.shield > 0.25) continue; v *= 1 - t.shield * 0.6; if (!best || v > best.v) { if (G.strikeRange(n.id, t.i, w, own)) best = { i: t.i, v }; } }
+      let best = null; for (const t of ter) { const hm = goal === 'military' && t.ctrl === n.id ? G.strikeHome(n.id, t.i) : 0; if (hm) { const v = G.armies.filter(a => a.t === t.i && a.n === hm).reduce((s, a) => s + a.k, 0) * 0.5; if (v > 0 && (!best || v > best.v)) best = { i: t.i, v }; continue; } if (!en.includes(t.ctrl) || (t.ctrl !== t.owner && w !== 'glide')) continue; let v = 0; for (const k of want) if (t.bld[k]) v += t.bld[k] * BD[k].cost; if (goal === 'energy') v += t.gdp * 0.05; if (w === 'glide') v += G.armies.filter(a => a.t === t.i && a.n === t.ctrl).reduce((s, a) => s + a.k, 0) * 0.3; if (!v) continue; if (w === 'bombing' && t.shield > 0.25) continue; v *= 1 - t.shield * 0.6; if (!best || v > best.v) { if (G.strikeRange(n.id, t.i, w, own)) best = { i: t.i, v }; } }
       if (best) G.strike(n.id, best.i, w, cnt, goal, true);
     });
   }
