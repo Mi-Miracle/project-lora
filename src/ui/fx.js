@@ -8,20 +8,97 @@ const FX = (() => {
     blackout: ['🌐 ІНТЕРНЕТ ВПАВ', 'INTERNET DOWN'], robots: ['🤖 СТРАЙК РОБОТІВ', 'ROBOT STRIKE'], time: ['⏳ МАНДРІВНИК У ЧАСІ', 'TIME TRAVELLER'], flood: ['🌊 МОРЕ НАСТУПАЄ', 'SEAS ARE RISING'],
     rocket: ['🏁 ПЕРШІ В КОСМОСІ', 'FIRST IN SPACE'], sport: ['🏆 ПЕРЕМОГА', 'VICTORY'], leak: ['📰 ЗЛИВ!', 'LEAKED!'], exercise: ['🎯 НАВЧАННЯ', 'MILITARY DRILLS']
   };
-  function play(e) { if (!e || !TXT[e.kind] || (typeof AUD !== 'undefined' && AUD.S.fx === false) || !G || document.body.classList.contains('stream') && !AUD.S.fxStream) return; Q.push(e); if (!busy) next(); }
+  // СЦЕНИ з емодзі: bg — фон, items — [емодзі, режим руху, кількість, розмір], shake — трясіння, flash — спалах
+  const SCN = {
+    welcome: { bg: ['#0b2a3a', '#071420'], items: [['🛸', 'pulse', 1, 120], ['🤝', 'zoom', 1, 90], ['✨', 'burst', 40, 26], ['📡', 'float', 6, 34]] },
+    cows: { bg: ['#0a1a10', '#05080d'], items: [['🛸', 'fly', 3, 80], ['🐄', 'rise', 14, 44], ['😱', 'float', 5, 38]] },
+    burger: { bg: ['#2a1a05', '#100802'], items: [['🍔', 'rain', 30, 40], ['👽', 'march', 8, 48], ['🎉', 'burst', 30, 26]] },
+    science: { bg: ['#101040', '#05050f'], items: [['⚛', 'orbit', 8, 40], ['🔬', 'pulse', 1, 110], ['⚗', 'float', 8, 34], ['💡', 'burst', 20, 26]] },
+    battle: { bg: ['#300808', '#080202'], items: [['💥', 'burst', 40, 40], ['🛸', 'fly', 4, 70], ['✈', 'flyL', 5, 50]], shake: 1, flash: 1, laser: 1 },
+    leaving: { bg: ['#06122a', '#020610'], items: [['🛸', 'rise', 3, 90], ['👋', 'float', 6, 40], ['⭐', 'rain', 50, 14]] },
+    kaiju: { bg: ['#1a2a3a', '#050a10'], items: [['🦖', 'stomp', 1, 240], ['🏢', 'march', 7, 60], ['🚁', 'fly', 3, 46]], shake: 1 },
+    tame: { bg: ['#1a3a1a', '#050f05'], items: [['🦖', 'pulse', 1, 200], ['❤', 'burst', 30, 30], ['🍖', 'rain', 12, 36]] },
+    evac: { bg: ['#2a2a10', '#0a0a05'], items: [['🚌', 'marchL', 8, 54], ['🏃', 'marchL', 14, 36], ['🦖', 'stomp', 1, 160]] },
+    dino: { bg: ['#203010', '#081005'], items: [['🦕', 'march', 5, 90], ['🦖', 'marchL', 4, 80], ['🧪', 'float', 6, 34]] },
+    zoo: { bg: ['#1a3a1a', '#050f05'], items: [['🦕', 'pulse', 1, 180], ['🎟', 'rain', 20, 30], ['📸', 'float', 10, 34], ['💰', 'rise', 12, 30]] },
+    cat: { bg: ['#2a1a2a', '#0a050a'], items: [['🐈', 'stomp', 1, 300], ['🏛', 'march', 5, 60], ['😹', 'float', 8, 40]] },
+    catfed: { bg: ['#2a1a2a', '#0a050a'], items: [['🐈', 'pulse', 1, 220], ['🐟', 'rain', 30, 34], ['💤', 'float', 6, 40]] },
+    laserdot: { bg: ['#200a0a', '#050202'], items: [['🐈', 'chase', 1, 200], ['🔴', 'dot', 1, 30]] },
+    geese: { bg: ['#1a2a1a', '#050a05'], items: [['🪿', 'march', 30, 40], ['🪧', 'float', 6, 40], ['📢', 'pulse', 1, 70]] },
+    geesepeace: { bg: ['#1a2a1a', '#050a05'], items: [['🪿', 'orbit', 10, 40], ['🍞', 'rain', 30, 30], ['🕊', 'fly', 5, 40]] },
+    money: { bg: ['#0a2a0a', '#020a02'], items: [['💸', 'rain', 40, 36], ['💰', 'pulse', 1, 120], ['📈', 'float', 4, 46]] },
+    crash: { bg: ['#2a0a0a', '#0a0202'], items: [['📉', 'pulse', 1, 140], ['💸', 'rise', 30, 30], ['😭', 'float', 8, 40]], shake: 1 },
+    party: { bg: ['#2a0a2a', '#0a020a'], items: [['🎉', 'burst', 40, 32], ['🕺', 'march', 8, 50], ['💃', 'marchL', 8, 50], ['🎶', 'float', 10, 30]] },
+    sad: { bg: ['#1a1a24', '#05050a'], items: [['🌧', 'float', 8, 60], ['💧', 'rain', 60, 18], ['😢', 'march', 6, 40]] },
+    robotsparty: { bg: ['#101a2a', '#05080d'], items: [['🤖', 'march', 10, 50], ['🛢', 'rain', 20, 30], ['🎉', 'burst', 30, 26]] },
+    reboot: { bg: ['#05080d', '#000'], items: [['💾', 'pulse', 1, 120], ['🔄', 'spin', 1, 90], ['0️⃣', 'rain', 50, 18], ['1️⃣', 'rain', 50, 18]] },
+    council: { bg: ['#101a2a', '#05080d'], items: [['🤖', 'orbit', 8, 46], ['🏛', 'pulse', 1, 110], ['📜', 'float', 6, 34]] },
+    future: { bg: ['#1a0a3a', '#05020f'], items: [['🔮', 'pulse', 1, 120], ['🚀', 'fly', 4, 46], ['🏙', 'march', 6, 60], ['✨', 'burst', 30, 24]] },
+    jail: { bg: ['#1a1a1a', '#050505'], items: [['🚔', 'march', 3, 70], ['🧑‍🚀', 'pulse', 1, 110], ['⛓', 'float', 6, 40]] },
+    minister: { bg: ['#2a2a0a', '#0a0a02'], items: [['🧑‍🚀', 'pulse', 1, 110], ['🎩', 'float', 6, 40], ['📜', 'rain', 20, 28]] },
+    navy: { bg: ['#0d3b66', '#05182a'], items: [['🚢', 'march', 5, 60], ['💥', 'burst', 30, 34], ['🦑', 'stomp', 1, 160]], shake: 1 },
+    fish: { bg: ['#0d3b66', '#05182a'], items: [['🦑', 'pulse', 1, 200], ['🐟', 'rain', 40, 30], ['❤', 'float', 8, 34]] },
+    tourists: { bg: ['#0d3b66', '#05182a'], items: [['🦑', 'pulse', 1, 160], ['📸', 'float', 12, 34], ['🚤', 'march', 6, 46], ['💰', 'rise', 14, 28]] },
+    spray: { bg: ['#1a2a0a', '#050a02'], items: [['🚁', 'fly', 4, 60], ['☁', 'float', 8, 60], ['🦗', 'rise', 30, 26]] },
+    snack: { bg: ['#2a1a05', '#0a0502'], items: [['🍽', 'pulse', 1, 120], ['🦗', 'rain', 30, 28], ['😋', 'float', 8, 40]] },
+    birds: { bg: ['#1a2a3a', '#05080d'], items: [['🐦', 'fly', 30, 30], ['🦗', 'rain', 20, 22], ['🐓', 'march', 8, 40]] },
+    ice: { bg: ['#a8d8ff', '#3a6a9a'], items: [['❄', 'rain', 60, 26], ['⛄', 'march', 6, 56], ['🥶', 'float', 6, 40]] },
+    heat: { bg: ['#ff8a2a', '#5a1a00'], items: [['🔥', 'float', 10, 50], ['🌡', 'pulse', 1, 120], ['🧊', 'rise', 12, 30]] },
+    furcoat: { bg: ['#6a8ab0', '#1a2a3a'], items: [['🧥', 'march', 12, 46], ['❄', 'rain', 40, 22], ['😎', 'float', 6, 40]] },
+    portal: { bg: ['#1a0a3a', '#020010'], items: [['🌀', 'spin', 1, 260], ['✨', 'burst', 40, 24]] },
+    portalexp: { bg: ['#1a0a3a', '#020010'], items: [['🌀', 'spin', 1, 200], ['🧑‍🔬', 'rise', 6, 40], ['🦄', 'burst', 10, 40], ['💎', 'rain', 20, 30]] },
+    portalbad: { bg: ['#2a0a1a', '#0a0205'], items: [['🌀', 'spin', 1, 200], ['👾', 'burst', 20, 40]], shake: 1 },
+    meme: { bg: ['#2a2a2a', '#0a0a0a'], items: [['🐸', 'pulse', 1, 160], ['😂', 'rain', 40, 30], ['📱', 'float', 10, 36]] },
+    meteorgold: { bg: ['#2a2005', '#0a0802'], items: [['☄', 'fly', 1, 90], ['🪙', 'burst', 40, 30], ['🌾', 'march', 10, 36]] },
+    auction: { bg: ['#2a2005', '#0a0802'], items: [['🔨', 'pulse', 1, 110], ['💰', 'rain', 30, 30], ['🤵', 'march', 6, 46]] },
+    signal: { bg: ['#05081a', '#000'], items: [['📡', 'pulse', 1, 140], ['〰', 'burst', 20, 30], ['⭐', 'rain', 60, 12]] },
+    aigov: { bg: ['#051a1a', '#020808'], items: [['🤖', 'stomp', 1, 220], ['🗳', 'float', 8, 40], ['💻', 'march', 6, 46]] },
+    off: { bg: ['#000', '#000'], items: [['🔌', 'pulse', 1, 140], ['💤', 'float', 8, 40]] },
+    debate: { bg: ['#10102a', '#05050f'], items: [['🎙', 'pulse', 1, 110], ['🤖', 'marchL', 1, 120], ['🧑‍💼', 'march', 1, 120], ['🔥', 'burst', 20, 26]] },
+    shield: { bg: ['#051a2a', '#02080f'], items: [['🛡', 'pulse', 1, 160], ['✨', 'orbit', 12, 26], ['☄', 'rain', 10, 30]] },
+    orbital: { bg: ['#05081a', '#000'], items: [['🛰', 'fly', 3, 60], ['⚡', 'rain', 20, 40], ['💥', 'burst', 30, 34]], flash: 1, laser: 1 },
+    offline: { bg: ['#1a2a1a', '#050a05'], items: [['📖', 'float', 10, 36], ['🌳', 'march', 8, 60], ['🧺', 'pulse', 1, 100]] },
+    fax: { bg: ['#2a2a24', '#0a0a08'], items: [['📠', 'pulse', 1, 130], ['📄', 'rain', 40, 28], ['👴', 'float', 4, 46]] }
+  };
+  const SCN_T = {};
+  function drawScene(cx, W, H, u, t, S, P) {
+    const g = cx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, S.bg[0]); g.addColorStop(1, S.bg[1]); cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+    if (S.shake) cx.translate((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 8);
+    if (S.laser) for (let i = 0; i < 4; i++) { if (Math.random() < 0.5) { cx.strokeStyle = i % 2 ? '#ff3b6b' : '#3bffb0'; cx.lineWidth = 4; cx.beginPath(); cx.moveTo(Math.random() * W, 0); cx.lineTo(Math.random() * W, H); cx.stroke(); } }
+    const mx = W / 2, my = H * 0.5; cx.textAlign = 'center'; cx.textBaseline = 'middle'; let pi = 0;
+    S.items.forEach(([e, mode, n, sz]) => { cx.font = `${sz}px serif`; for (let i = 0; i < n; i++) { const p = P[(pi++) % P.length]; let x = mx, y = my, sc = 1, rot = 0;
+      if (mode === 'rain') { x = p.x; y = (p.y + u * 140 * p.v) % (H + 60) - 30; rot = Math.sin(u * 2 + i) * 0.4; }
+      else if (mode === 'rise') { x = p.x; y = H + 30 - ((p.y + u * 120 * p.v) % (H + 60)); }
+      else if (mode === 'float') { x = p.x; y = p.y * 0.7 + H * 0.15 + Math.sin(u * 2 + i) * 20; }
+      else if (mode === 'march' || mode === 'marchL') { const d = mode === 'march' ? 1 : -1; const span = W + 200; x = ((i * span / n + u * 110 * d) % span + span) % span - 100; y = H * 0.78 - Math.abs(Math.sin(u * 7 + i)) * 14; if (d < 0) x = W - x; }
+      else if (mode === 'fly' || mode === 'flyL') { const d = mode === 'fly' ? 1 : -1; const span = W + 300; x = ((i * span / Math.max(1, n) + u * 260) % span) - 150; if (d < 0) x = W - x; y = H * 0.22 + (i % 3) * 50 + Math.sin(u * 3 + i) * 15; }
+      else if (mode === 'stomp') { y = H * 0.62 - Math.abs(Math.sin(u * 2.2)) * 40; sc = 1 + Math.abs(Math.sin(u * 2.2)) * 0.06; x = mx + Math.sin(u * 0.8) * 80; }
+      else if (mode === 'pulse') { sc = 1 + Math.sin(u * 4) * 0.08; y = my; }
+      else if (mode === 'zoom') { sc = Math.min(1.2, t * 2.5); y = my - 40; }
+      else if (mode === 'orbit') { const a = u * 1.4 + i / n * 6.28; x = mx + Math.cos(a) * W * 0.28; y = my + Math.sin(a) * H * 0.22; }
+      else if (mode === 'burst') { const a = p.a, d = ((u * 180 * p.v) % (Math.max(W, H) * 0.7)); x = mx + Math.cos(a) * d; y = my + Math.sin(a) * d; }
+      else if (mode === 'spin') { rot = u * 3; y = my; }
+      else if (mode === 'dot') { x = mx + Math.cos(u * 3.1) * W * 0.35; y = my + Math.sin(u * 4.3) * H * 0.25; }
+      else if (mode === 'chase') { x = mx + Math.cos(u * 3.1 - 0.5) * W * 0.3; y = my + 40 + Math.sin(u * 4.3 - 0.5) * H * 0.2; rot = Math.sin(u * 6) * 0.2; }
+      cx.save(); cx.translate(x, y); cx.rotate(rot); cx.scale(sc, sc); cx.fillText(e, 0, 0); cx.restore(); } });
+    if (S.flash && Math.random() < 0.08) { cx.fillStyle = 'rgba(255,255,255,0.35)'; cx.fillRect(0, 0, W, H); }
+    cx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+  const isBusy = () => busy;
+  function play(e) { if (!e || !(TXT[e.kind] || SCN[e.kind]) || (typeof AUD !== 'undefined' && AUD.S.fx === false) || !G || document.body.classList.contains('stream') && !AUD.S.fxStream) return; Q.push(e); if (!busy) next(); }
   function next() {
     const e = Q.shift(); if (!e) { busy = false; return; } busy = true;
     const cv = document.createElement('canvas'); cv.id = 'fxcv'; document.body.appendChild(cv); const W = cv.width = innerWidth, H = cv.height = innerHeight, cx = cv.getContext('2d');
     const T0 = performance.now(), DUR = 4300, en = LORA.lang === 'en'; let done = false; const end = () => { if (done) return; done = true; cv.style.opacity = 0; setTimeout(() => { cv.remove(); next(); }, 400); }; cv.onclick = end;
     try { AUD.sfx && AUD.sfx(e.kind === 'sport' || e.kind === 'rocket' || e.kind === 'asteroid_ok' ? 'good' : 'news'); } catch (x) { }
     const R = Math.random, P = Array.from({ length: 160 }, () => ({ x: R() * W, y: R() * H, v: 0.5 + R() * 2, s: 1 + R() * 3, a: R() * 6.28 }));
-    const title = (TXT[e.kind] || ['', ''])[en ? 1 : 0] + (e.where ? ' · ' + (en && typeof t_ === 'function' ? t_(e.where) : e.where) : '') + (e.who ? ' · ' + e.who : '') + (e.win ? ' · ' + e.win : '');
+    const tr = x => (en && typeof t_ === 'function') ? t_(x) : x; const title = e.title ? tr(e.title) : (TXT[e.kind] || ['', ''])[en ? 1 : 0] + (e.where ? ' · ' + (en && typeof t_ === 'function' ? t_(e.where) : e.where) : '') + (e.who ? ' · ' + e.who : '') + (e.win ? ' · ' + e.win : '');
     const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
     function frame(now) {
       if (done) return; const t = (now - T0) / DUR, u = (now - T0) / 1000; if (t > 1) { end(); return; }
       const fade = Math.min(1, t * 6, (1 - t) * 6); cx.clearRect(0, 0, W, H); cx.globalAlpha = fade;
       cx.fillStyle = 'rgba(3,6,12,0.55)'; cx.fillRect(0, 0, W, H);
-      const k = e.kind, mx = W / 2, my = H * 0.45;
+      const k = e.kind, mx = W / 2, my = H * 0.45; if (SCN[k]) { drawScene(cx, W, H, u, t, SCN[k], P); cx.globalAlpha = fade; }
       if (k === 'ufo') { const x = W * (0.15 + 0.7 * ease(t * 1.4)), y = H * 0.28 + Math.sin(u * 3) * 10; // промінь і корова
         if (t > 0.45) { cx.fillStyle = 'rgba(140,255,170,0.25)'; cx.beginPath(); cx.moveTo(x - 30, y + 10); cx.lineTo(x + 30, y + 10); cx.lineTo(x + 110, H * 0.85); cx.lineTo(x - 110, H * 0.85); cx.fill();
           const cy2 = H * 0.8 - (H * 0.5) * ease((t - 0.5) * 2.2); cx.font = '42px serif'; cx.textAlign = 'center'; cx.fillText('🐄', x, cy2); }
@@ -51,6 +128,7 @@ const FX = (() => {
       if (k === 'exercise') { for (let i = 0; i < 8; i++) { const x = (i * W / 8 + u * 140) % (W + 100) - 50; cx.font = '46px serif'; cx.fillText(i % 3 ? '🪖' : '🛡', x, H * 0.7); } for (let i = 0; i < 3; i++) { cx.font = '40px serif'; cx.fillText('✈', (W - (u * 400 + i * 300) % (W + 200)), H * 0.25 + i * 40); } }
       // заголовок
       cx.globalAlpha = fade; cx.textAlign = 'center'; cx.font = `700 ${Math.round(Math.min(W, H) * 0.06)}px Pixelify, system-ui`; cx.lineWidth = 8; cx.strokeStyle = '#05080d'; cx.strokeText(title, mx, H * 0.14); cx.fillStyle = '#ffd34d'; cx.fillText(title, mx, H * 0.14);
+      if (e.sub) { cx.font = `600 ${Math.round(Math.min(W, H) * 0.026)}px system-ui`; cx.lineWidth = 6; cx.strokeStyle = '#05080d'; const sub = tr(String(e.sub)).slice(0, 160); cx.strokeText(sub, mx, H * 0.21); cx.fillStyle = '#e8f0f8'; cx.fillText(sub, mx, H * 0.21); }
       cx.font = '13px system-ui'; cx.fillStyle = 'rgba(220,230,240,0.6)'; cx.fillText(en ? 'click to skip' : 'клік — пропустити', mx, H - 40);
       requestAnimationFrame(frame);
     }
@@ -58,5 +136,5 @@ const FX = (() => {
   }
   LORA.bus.on('fx', play);
   LORA.bus.on('disaster', d => { if (d && /метеорит/.test(d.label || '')) play({ kind: 'impact', where: '' }); });
-  return { play };
+  return { play, busy: isBusy, scenes: () => Object.keys(SCN) };
 })();

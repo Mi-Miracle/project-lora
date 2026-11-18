@@ -192,14 +192,42 @@ function drawUnits(sh) {
   });
 }
 
+// шляхи логістики як у реальності: суходолом — через сусідні регіони (дороги, залізниці, труби), морем — морськими шляхами
+const _linkPath = new Map();
+function landPath(a, b) {
+  const R = D.regions, n = R.length; const dist = new Float64Array(n).fill(Infinity), prev = new Int32Array(n).fill(-1), done = new Uint8Array(n);
+  const d2 = (i, j) => { let dx = R[i].c[0] - R[j].c[0]; if (dx > 180) dx -= 360; if (dx < -180) dx += 360; return Math.hypot(dx * Math.cos(R[i].c[1] * Math.PI / 180), R[i].c[1] - R[j].c[1]); };
+  dist[a] = 0; const Q = [a]; let guard = 0;
+  while (Q.length && guard++ < 20000) { let bi = 0; for (let k = 1; k < Q.length; k++) if (dist[Q[k]] < dist[Q[bi]]) bi = k; const u = Q.splice(bi, 1)[0]; if (done[u]) continue; done[u] = 1; if (u === b) break;
+    for (const v of R[u].nb) { if (done[v]) continue; const w = dist[u] + d2(u, v) * (R[v].t === 'mountain' ? 1.6 : 1); if (w < dist[v]) { dist[v] = w; prev[v] = u; Q.push(v); } } }
+  if (prev[b] < 0 && a !== b) return null; const out = []; for (let v = b; v >= 0; v = prev[v]) { out.push(R[v].c.slice()); if (v === a) break; } return out.reverse();
+}
+function seaPath(a, b) {
+  const S = D.sea, R = D.regions, pa = R[a].p && R[a].p[0], pb = R[b].p && R[b].p[0]; if (!pa || !pb) return null;
+  const adj = S._adj || (S._adj = (() => { const m = S.nodes.map(() => []); S.edges.forEach(([x, y]) => { m[x].push(y); m[y].push(x); }); return m; })());
+  const nd = i => [S.nodes[i].lon, S.nodes[i].lat]; const dd = (p, q) => { let dx = p[0] - q[0]; if (dx > 180) dx -= 360; if (dx < -180) dx += 360; return Math.hypot(dx, p[1] - q[1]); };
+  const s0 = pa[0], t0 = pb[0]; const dist = S.nodes.map(() => Infinity), prev = S.nodes.map(() => -1), done = S.nodes.map(() => 0); dist[s0] = 0;
+  for (let it = 0; it < S.nodes.length; it++) { let u = -1; for (let k = 0; k < S.nodes.length; k++) if (!done[k] && (u < 0 || dist[k] < dist[u])) u = k; if (u < 0 || dist[u] === Infinity) break; done[u] = 1; if (u === t0) break; for (const v of adj[u]) { const w = dist[u] + dd(nd(u), nd(v)); if (w < dist[v]) { dist[v] = w; prev[v] = u; } } }
+  const mid = []; if (s0 !== t0) { if (prev[t0] < 0) return null; for (let v = t0; v >= 0 && v !== s0; v = prev[v]) mid.push(nd(v)); mid.push(nd(s0)); mid.reverse(); } else mid.push(nd(s0));
+  // узбережні порти: від центру регіону до порту, далі море
+  const out = [R[a].c.slice(), [pa[1], pa[2]], ...mid, [pb[1], pb[2]], R[b].c.slice()];
+  return out;
+}
+function linkPath(l) {
+  const k = l.type + ':' + l.a + ':' + l.b; if (_linkPath.has(k)) return _linkPath.get(k);
+  let p = null; try { p = l.type === 'sea' ? seaPath(l.a, l.b) : l.type === 'air' ? null : landPath(l.a, l.b); } catch (e) { p = null; }
+  if (p) { for (let i = 1; i < p.length; i++) { while (p[i][0] - p[i - 1][0] > 180) p[i][0] -= 360; while (p[i - 1][0] - p[i][0] > 180) p[i][0] += 360; } }
+  _linkPath.set(k, p); return p;
+}
 function drawLinks(lw) {
   if (!G.links || !G.links.length) return;
   for (const l of G.links) {
     const L = D.linkTypes[l.type]; const a = D.regions[l.a].c, b = D.regions[l.b].c; let bx = b[0]; if (bx - a[0] > 180) bx -= 360; else if (a[0] - bx > 180) bx += 360;
     const st = G.linkVisible(l); ctx.globalAlpha = st === 'build' ? 0.45 : 1;
-    ctx.strokeStyle = st === 'cut' ? '#ff3b3b' : L.col; ctx.lineWidth = lw * (l.type === 'air' ? 1.5 : 3); ctx.setLineDash(L.dash.map(x => x * lw * 1.5));
-    ctx.beginPath(); ctx.moveTo(a[0], -a[1]);
-    if (l.type === 'sea') { const mx = (a[0] + bx) / 2, my = (a[1] + b[1]) / 2 - Math.hypot(bx - a[0], b[1] - a[1]) * 0.08; ctx.quadraticCurveTo(mx, -my, bx, -b[1]); } else if (l.type === 'air') { const mx = (a[0] + bx) / 2, my = (a[1] + b[1]) / 2 + Math.hypot(bx - a[0], b[1] - a[1]) * 0.15; ctx.quadraticCurveTo(mx, -my, bx, -b[1]); } else ctx.lineTo(bx, -b[1]);
+    ctx.strokeStyle = st === 'cut' ? '#ff3b3b' : L.col; ctx.lineWidth = lw * (l.type === 'air' ? 1.5 : 3); ctx.setLineDash(L.dash.map(x => x * lw * 1.5)); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.beginPath(); const P = l.type === 'air' ? null : linkPath(l);
+    if (P && P.length >= 2) { ctx.moveTo(P[0][0], -P[0][1]); for (let i = 1; i < P.length - 1; i++) { const mx = (P[i][0] + P[i + 1][0]) / 2, my = (P[i][1] + P[i + 1][1]) / 2; ctx.quadraticCurveTo(P[i][0], -P[i][1], mx, -my); } const z = P[P.length - 1]; ctx.lineTo(z[0], -z[1]); }
+    else { ctx.moveTo(a[0], -a[1]); const mx = (a[0] + bx) / 2, my = (a[1] + b[1]) / 2 + Math.hypot(bx - a[0], b[1] - a[1]) * (l.type === 'air' ? 0.15 : 0.08) * (l.type === 'sea' ? -1 : 1); ctx.quadraticCurveTo(mx, -my, bx, -b[1]); }
     ctx.stroke(); if (l.type === 'rail') { ctx.strokeStyle = '#fff'; ctx.lineWidth = lw; ctx.setLineDash([3 * lw, 7 * lw]); ctx.stroke(); }
     ctx.setLineDash([]); ctx.globalAlpha = 1;
   }

@@ -480,3 +480,4 @@ body.stream #funTk { display: none !important; }
 .mincard.stf { border-left-color: #ffd34d; }
 .mincard.nohire { opacity: .8; border-style: dashed; }
 #fxcv { position: fixed; inset: 0; z-index: 9300; cursor: pointer; transition: opacity .4s; }
+#mm .mm-full { color: #ffd34d; font: 700 15px system-ui; letter-spacing: .35em; margin: -2px 0 6px; }

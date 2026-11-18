@@ -32,7 +32,7 @@ LORA.sim.register('world', 10, function (G) {
   ter.forEach((t, i) => {
     const s = T[i].sh, c = cTot[t.cc] || { pop: 0.3, gdp: 1 };
     t.pop = c.pop * (s.pop || 0); t.gdp = c.gdp * (s.gdp || 0); t.gdp0 = t.gdp; W_gdp += t.gdp; W_pop += t.pop;
-    RES.forEach(r => { let v = (P[r] && P[r][t.cc]) || 0; if (!v && r === 'grain') v = c.pop * 0.05; if (!v && r === 'food') v = c.pop * 0.01; t.prod[r] = v * (s[r] || 0); W_prod[r] += t.prod[r]; });
+    RES.forEach(r => { const R0 = RI[r]; let v = (P[r] && P[r][t.cc]) || 0; if (!v && r === 'grain') v = c.pop * 0.05; if (!v && r === 'food') v = c.pop * 0.01; if (!v && R0.pOf) { v = ((P[R0.pOf] || {})[t.cc] || 0) * R0.pK; if (!v && R0.pOf === 'grain') v = c.pop * 0.05 * R0.pK; } const sh = s[r] != null ? s[r] : R0.shOf ? (s[R0.shOf] || 0) : 0; t.prod[r] = R0.only ? 0 : v * sh; W_prod[r] += t.prod[r]; });
   });
   const sumP = r => Object.values(P[r] || {}).reduce((a, b) => a + b, 0) || 1;
   ter.forEach(t => RES.forEach(r => {

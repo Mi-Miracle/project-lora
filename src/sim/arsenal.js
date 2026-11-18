@@ -88,7 +88,9 @@ LORA.sim.register('arsenal', 59, function (G) {
     ballistic: { r: 900, ik: 0.4, sc: 3, cov: 3, pow: 1.5, ic: '☄', noun: 'балістичних ракет' },
     hyper:     { r: 2000, ik: 0.12, sc: 3, cov: 3, pow: 2.2, ic: '⚡', noun: 'гіперзвукових ракет' },
     glide:     { r: 90, ik: 0.25, sc: 0.3, cov: 0.4, pow: 0.035, ic: '💣', noun: 'КАБ', air: 'atk' },
-    bombing:   { r: 1600, ik: 0.9, sc: 1, cov: 1.5, pow: 3.2, ic: '🛩', noun: 'бомбардувальників', air: 'bmb', sortie: true }
+    bombing:   { r: 1600, ik: 0.9, sc: 1, cov: 1.5, pow: 3.2, ic: '🛩', noun: 'бомбардувальників', air: 'bmb', sortie: true },
+    orbital:   { r: 40000, ik: 0.03, sc: 4, cov: 3, pow: 4, ic: '☄', noun: 'орбітальних кінетичних ударів' },
+    laser:     { r: 40000, ik: 0.0, sc: 0.2, cov: 0.3, pow: 0.7, ic: '🔆', noun: 'орбітальних лазерних пострілів' }
   };
   const RANGE = new Proxy({}, { get: (o, k) => (WP[k] || WP.missiles).r });
   G.strikeRange = function (nid, i, w, own) { if (w === 'glide') return T[i].nb.some(j => ter[j].ctrl === nid); const c = T[i].c; let best = 1e9; for (const t of (own || ter)) { if (t.ctrl !== nid) continue; const d = hav(T[t.i].c[0], T[t.i].c[1], c[0], c[1]); if (d < best) best = d; if (best < 50) break; } return best <= RANGE[w]; };
@@ -185,13 +187,13 @@ LORA.sim.register('arsenal', 59, function (G) {
   // ---- ШІ: ударні кампанії (раз на тиждень)
   function aiStrikes(n) {
     const en = G.enemiesOf(n.id); if (!en.length) return; const own = ter.filter(t => t.ctrl === n.id);
-    ['missiles', 'strike', 'ballistic', 'hyper', 'glide', 'bombing'].forEach(w => {
+    ['missiles', 'strike', 'ballistic', 'hyper', 'glide', 'bombing', 'orbital', 'laser'].forEach(w => {
       const wp = WP[w]; let cnt;
       if (w === 'bombing') { const b = n.air ? n.air.bmb || 0 : 0; if (b < 8 || (n.airEdge || 1) < 1.02 || G.rnd() > 0.35 || (n._raidT || 0) > G.day) return; cnt = Math.floor(b * 0.3); }
-      else { const stock = n.ars[w] || 0; const minS = { missiles: 20, strike: 80, ballistic: 15, hyper: 6, glide: 60 }[w]; if (stock < minS) return;
-        if (w === 'glide' && !(n.air && n.air.atk >= 4)) return; cnt = Math.floor(stock * { missiles: 0.025, strike: 0.1, ballistic: 0.03, hyper: 0.12, glide: 0.18 }[w]); if (w === 'glide') cnt = Math.min(cnt, Math.floor(n.air.atk * 1.5)); }
-      if (cnt < (w === 'hyper' ? 1 : w === 'bombing' ? 3 : 5)) return;
-      const rr = G.rnd(); const goal = w === 'glide' ? (rr < 0.7 ? 'military' : 'rail') : w === 'missiles' || w === 'ballistic' || w === 'hyper' || w === 'bombing' ? (rr < 0.4 ? 'energy' : rr < 0.7 ? 'industry' : rr < 0.85 ? 'airfields' : 'ports') : (rr < 0.45 ? 'energy' : rr < 0.7 ? 'military' : 'rail');
+      else { const stock = n.ars[w] || 0; const minS = { missiles: 20, strike: 80, ballistic: 15, hyper: 6, glide: 60, orbital: 2, laser: 10 }[w]; if (stock < minS) return;
+        if (w === 'glide' && !(n.air && n.air.atk >= 4)) return; cnt = Math.floor(stock * { missiles: 0.025, strike: 0.1, ballistic: 0.03, hyper: 0.12, glide: 0.18, orbital: 0.5, laser: 0.3 }[w]); if (w === 'glide') cnt = Math.min(cnt, Math.floor(n.air.atk * 1.5)); }
+      if (cnt < (w === 'hyper' || w === 'orbital' ? 1 : w === 'bombing' ? 3 : 5)) return;
+      const rr = G.rnd(); const goal = w === 'glide' ? (rr < 0.7 ? 'military' : 'rail') : w === 'missiles' || w === 'ballistic' || w === 'hyper' || w === 'bombing' || w === 'orbital' ? (rr < 0.4 ? 'energy' : rr < 0.7 ? 'industry' : rr < 0.85 ? 'airfields' : 'ports') : (rr < 0.45 ? 'energy' : rr < 0.7 ? 'military' : 'rail');
       const want = { energy: ENERGY, industry: INDUSTRY, military: MILT, rail: ['rail_hub', 'depot'], ports: ['port', 'lng_terminal', 'shipyard'], airfields: ['airport', 'military_base'] }[goal];
       let best = null; for (const t of ter) { const hm = goal === 'military' && t.ctrl === n.id ? G.strikeHome(n.id, t.i) : 0; if (hm) { const v = G.armies.filter(a => a.t === t.i && a.n === hm).reduce((s, a) => s + a.k, 0) * 0.5; if (v > 0 && (!best || v > best.v)) best = { i: t.i, v }; continue; } if (!en.includes(t.ctrl) || (t.ctrl !== t.owner && w !== 'glide')) continue; let v = 0; for (const k of want) if (t.bld[k]) v += t.bld[k] * BD[k].cost; if (goal === 'energy') v += t.gdp * 0.05; if (w === 'glide') v += G.armies.filter(a => a.t === t.i && a.n === t.ctrl).reduce((s, a) => s + a.k, 0) * 0.3; if (!v) continue; if (w === 'bombing' && t.shield > 0.25) continue; v *= 1 - t.shield * 0.6; if (!best || v > best.v) { if (G.strikeRange(n.id, t.i, w, own)) best = { i: t.i, v }; } }
       if (best) G.strike(n.id, best.i, w, cnt, goal, true);

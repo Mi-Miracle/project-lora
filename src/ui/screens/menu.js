@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['Dynasty: marriage, children, education and heirs', 'Aliens, supervolcano, asteroid, kraken — with animations', 'TV debates, journalist investigations, Olympics and World Cup', 'Secret protocols you can leak, gifts, trolling and ultimatums between states', 'Climate change, space race, shady deals for characters']
-  : ['Династія: шлюб, діти, освіта й спадкоємці', 'Прибульці, супервулкан, астероїд, кальмар — з анімаціями', 'Теледебати, журналістські розслідування, Олімпіади й чемпіонати світу', 'Таємні протоколи (можна злити), подарунки, тролінг і ультиматуми між державами', 'Зміна клімату, космічні перегони, тіньові справи персонажа'];
+  ? ['New name: L.O.R.A. — Lords Of Real Atlas', '18 interactive world events: start animation → your choice → random outcome animation', 'New resources: lithium, timber, medicine, hydrogen, graphene, helium-3 — with buildings and techs', 'Space weapons: orbital kinetic strikes and lasers, killer satellites', 'Roads follow the land and sea lanes follow the sea']
+  : ['Нова назва: L.O.R.A. — Lords Of Real Atlas', '18 інтерактивних світових подій: анімація → ваш вибір → випадковий наслідок', 'Нові ресурси: літій, деревина, ліки, водень, графен, гелій-3 — з будівлями й технологіями', 'Космічна зброя: орбітальні кінетичні удари й лазери, супутники-перехоплювачі', 'Дороги прокладаються суходолом, морські лінії — морем'];
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }
@@ -11,7 +11,7 @@ function mainMenu() {
     ['rada', '🏛', 'Президент і Рада', 'ви — президент, чат Twitch — парламент'], ['load', '📂', 'Завантажити', 'збереження з цього компʼютера'], ['set', '⚙', 'Налаштування', 'звук, озвучка, гра, Twitch, стрім'],
     ['help', '❓', 'Як грати', 'основи й гарячі клавіші'], ['credits', '✨', 'Автори', 'Mi_Miracle і бібліотеки'], ['quit', '⏻', 'Вихід', '']].filter(Boolean);
   el.innerHTML = `<canvas id="mmcv"></canvas><div class="mm-shade"></div>
-  <div class="mm-left"><div class="mm-logo"><div class="mm-dev">Mi_Miracle ${t_('представляє')}</div><h1>PROJECT <b>LORA</b></h1><div class="mm-sub">${t_('Глобальна стратегія на реальній мапі світу')}</div></div>
+  <div class="mm-left"><div class="mm-logo"><div class="mm-dev">Mi_Miracle ${t_('представляє')}</div><h1><b>L.O.R.A.</b></h1><div class="mm-full">LORDS OF REAL ATLAS</div><div class="mm-sub">${t_('Глобальна стратегія на реальній мапі світу')}</div></div>
   <nav class="mm-nav">${B.map(([k, ic, n, d], i) => `<button style="animation-delay:${i * 60}ms" onclick="mmGo('${k}')"><i>${ic}</i><span>${t_(n)}${d ? `<small>${t_(d)}</small>` : ''}</span></button>`).join('')}</nav></div>
   <div class="mm-right"><div class="mm-card"><div class="mm-h">🆕 ${t_('Що нового')} · v${LORA.version}</div>${MM_NEWS().map(x => `<div class="mm-n">▸ ${esc(x)}</div>`).join('')}</div>
   <div class="mm-card mm-tw">${typeof twBadge === 'function' ? twBadge() : ''} ${typeof langSwitch === 'function' ? langSwitch() : ''}</div></div>
@@ -36,13 +36,13 @@ function modHead() {
   const solo = netMode === 'solo', rada = startMode === 'rada';
   const T = rada ? ['🏛', 'Президент і Рада', 'Ви — президент, чат Twitch — Верховна Рада'] : solo ? ['🎮', 'Нова гра', 'Оберіть сценарій, складність, ким почати і країну'] : ['🌐', 'Мультиплеєр', 'Створіть кімнату або приєднайтеся до друзів'];
   const MULTI = [['host', '📡', 'Створити гру', 'ви — хост, роздаєте посилання'], ['guest', '🔗', 'Приєднатися', 'за кодом або посиланням'], ['watch', '👁', 'Дивитися', 'глядач без керування']];
-  return `<div class="ns-head"><button id="st-back" class="ns-back" onclick="mainMenu()">← ${t_('Головне меню')}</button><div class="ns-t"><div class="mm-dev">Mi_Miracle · PROJECT LORA</div><h1>${T[0]} ${t_(T[1])}</h1><div class="mut">${t_(T[2])}</div></div><div class="ns-r">${typeof twBadge === 'function' ? twBadge() : ''}</div></div>
+  return `<div class="ns-head"><button id="st-back" class="ns-back" onclick="mainMenu()">← ${t_('Головне меню')}</button><div class="ns-t"><div class="mm-dev">Mi_Miracle · L.O.R.A.</div><h1>${T[0]} ${t_(T[1])}</h1><div class="mut">${t_(T[2])}</div></div><div class="ns-r">${typeof twBadge === 'function' ? twBadge() : ''}</div></div>
   ${solo ? '' : `<div class="ns-cards">${MULTI.map(([k, ic, n, d]) => `<button class="${netMode === k ? 'on' : ''}" onclick="netMode='${k}';startScreen()"><i>${ic}</i><b>${t_(n)}</b><small>${t_(d)}</small></button>`).join('')}</div>`}`;
 }
 // ---- автори
 function credits() {
   const en = LORA.lang === 'en';
-  openModal(`<div class="cr"><div class="cr-logo">Mi_Miracle</div><div class="mut" style="letter-spacing:.2em;font-size:12px">${t_('представляє')} · PROJECT LORA v${LORA.version}</div>
+  openModal(`<div class="cr"><div class="cr-logo">Mi_Miracle</div><div class="mut" style="letter-spacing:.2em;font-size:12px">${t_('представляє')} · L.O.R.A. — Lords Of Real Atlas · v${LORA.version}</div>
   <div class="card"><b>👤 Mi_Miracle</b><div class="small" style="line-height:1.6">${t_('Автор і розробник гри: ідея, геймдизайн, баланс, тестування, стріми')}.<br>🟣 <a href="https://twitch.tv/mi_miracle" target="_blank">twitch.tv/mi_miracle</a> · 💻 <a href="https://github.com/Mi-Miracle/project-lora" target="_blank">github.com/Mi-Miracle/project-lora</a></div></div>
   <div class="card"><b>🗣 ${t_('Озвучка (синтез мовлення)')}</b><div class="small" style="line-height:1.6">
   <b>Piper TTS</b> — ${t_('нейронний синтез мовлення від проєкту Rhasspy, автор Michael Hansen')} (<a href="https://github.com/rhasspy/piper" target="_blank">github.com/rhasspy/piper</a>).<br>

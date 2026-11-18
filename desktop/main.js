@@ -24,7 +24,7 @@ async function splashUpdate() {
 .r{width:96px;height:96px;border-radius:50%;border:2px solid #2b5d8f;position:relative;box-shadow:inset 0 0 30px #12325a}.r:before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(255,200,80,.0),rgba(255,200,80,.45) 12%,rgba(255,200,80,0) 13%);animation:sp 2.2s linear infinite}
 .r:after{content:"";position:absolute;inset:22px;border-radius:50%;border:1px dashed #2b5d8f}.m{font:700 30px system-ui;letter-spacing:1px;color:#ffd34d;margin-top:16px;animation:gl 2.4s ease-in-out infinite,fi .8s ease}
 .t{font:600 13px system-ui;letter-spacing:6px;color:#9cc8f0;margin-top:4px;animation:fi 1.4s ease}.s{margin-top:18px;color:#8aa0b8;min-height:18px}</style>
-<div class="r"></div><div class="m">Mi_Miracle</div><div class="t">PROJECT LORA</div><div class="s" id="m"></div></body>`;
+<div class="r"></div><div class="m">Mi_Miracle</div><div class="t">L.O.R.A. · LORDS OF REAL ATLAS</div><div class="s" id="m"></div></body>`;
   sp.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(page));
   await new Promise(r => sp.webContents.once('did-finish-load', r));
   const log = m => { try { sp.webContents.executeJavaScript(`document.getElementById('m').textContent=${JSON.stringify(String(m))}`); } catch (e) { } };
@@ -53,7 +53,7 @@ let win;
 async function create() {
   await splashUpdate();
   const root = gameRoot(); await startServer(root);
-  win = new BrowserWindow({ width: 1600, height: 900, minWidth: 1100, minHeight: 650, title: 'Project LORA', backgroundColor: '#0b1118', icon: path.join(root, 'assets', 'lora.png'), autoHideMenuBar: true, webPreferences: { contextIsolation: true, backgroundThrottling: false } });
+  win = new BrowserWindow({ width: 1600, height: 900, minWidth: 1100, minHeight: 650, title: 'L.O.R.A. — Lords Of Real Atlas', backgroundColor: '#0b1118', icon: path.join(root, 'assets', 'lora.png'), autoHideMenuBar: true, webPreferences: { contextIsolation: true, backgroundThrottling: false } });
   Menu.setApplicationMenu(null); win.maximize(); if (!process.argv.includes('--windowed')) win.setFullScreen(true); // безрамковий повноекранний режим за замовчуванням (F11 — перемкнути)
   win.loadURL(`http://localhost:${PORT}/index.html`); ready = true;
   // зовнішні посилання (Twitch, GitHub) — у звичайному браузері; вхід Twitch повертається на localhost — лишаємо у вікні
