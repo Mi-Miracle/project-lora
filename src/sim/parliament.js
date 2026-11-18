@@ -76,6 +76,7 @@ LORA.sim.register('parliament', 93, function (G) {
   // вибори
   function election(n) {
     const p = n.parl; p.next = G.day + p.cyc;
+    if (G.radaOn && G.radaOn() && n.id === G.player) { G.radaElection(n); return; }
     if (p.regime === 'autocracy') { if (G.charElection && G.leader && G.leader.cand === n.id && (G.leader.cont[n.id] || 0) >= 80) G.charElection(n.id); return; }
     const before = p.gov + p.coal; const mood = (n.stab - 50) / 100 + (n.growth - 0.02) * 4 - (n.warExh || 0) * 0.15;
     p.gov = clamp(p.gov + mood * 0.35 + (G.rnd() - 0.5) * 0.12, 0.15, p.regime === 'hybrid' ? 0.75 : 0.6); p.coal = clamp(0.08 + G.rnd() * 0.12, 0, 0.25);

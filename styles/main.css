@@ -357,7 +357,7 @@ button.big{padding:9px 22px;font-size:15px}
 .linkrow span{flex:none;width:170px;font-size:12px}
 .linkrow input{flex:1;font-size:11px;padding:4px;background:#0006;color:#cfe;border:1px solid #ffffff22;border-radius:4px}
 .lb-links{margin:8px 0;padding:8px;background:#ffffff08;border-radius:8px}
-.modeSel{grid-template-columns:repeat(4,1fr)!important}
+.modeSel{grid-template-columns:repeat(5,1fr)!important}
 
 .help-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:65vh;overflow:auto}
 /* аватарки */
@@ -377,3 +377,4 @@ table.compedit td{vertical-align:top;padding:4px 3px}table.compedit input[type=r
 .paper-main{font-size:18px;font-weight:700;line-height:1.25;margin:6px 0 8px}.paper-i{font-size:13px;margin:3px 0;border-top:1px solid #0002;padding-top:3px}
 .chron h2{margin-bottom:2px}.chron-ch{margin:6px 0;background:#0b121a;border:1px solid #1d2b3a;padding:4px 6px}.chron-e{font-size:13px;padding:3px 0;border-bottom:1px solid #ffffff10}
 #mbox.wide{width:min(1100px,94vw)!important;max-width:94vw!important}.chron-full{font-size:15px}.chron-full .chron-e{font-size:15px}
+.modeSel button.rada-m{border-color:#7a5cff;background:linear-gradient(#2a1f5a,#151033)}.modeSel button.rada-m.on{box-shadow:0 0 0 2px #a48bff inset}

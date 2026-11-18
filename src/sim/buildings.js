@@ -129,6 +129,14 @@ LORA.sim.register('buildings', 55, function (G) {
     if (!G.isHuman(n.id) || n.dev.prio === 'auto') { if (G.enemiesOf(n.id).length) return 'military'; if (n.ai && n.ai.threat > 1.5) return 'military'; return n.ai && n.ai.econ > 0.85 ? 'industry' : 'balanced'; }
     return n.dev.prio;
   }
+  // найкраще місце для будівлі серед власних регіонів (для інтерфейсу)
+  G.bestSpot = function (nid, type) {
+    const n = N[nid]; const w = (PRIO[prioOf(n)] || {}).w; const regs = ter.filter(t => t.ctrl === nid && t.owner === nid).sort((a, b) => b.gdp - a.gdp);
+    const pool = regs.slice(0, 25); regs.forEach(t => { if (pool.length < 45 && !pool.includes(t) && Object.keys(T[t.i].sh).some(r => T[t.i].sh[r] > 0.1)) pool.push(t); });
+    let best = null, bs = -1e9, why = '';
+    for (const t of pool) { const e = G.canBuild(nid, t.i, type); if (e) { why = why || e; continue; } const s = score(n, t.i, type, w); if (s > bs) { bs = s; best = t.i; } }
+    return { i: best, err: best == null ? (/покладів/.test(why) ? 'У вашій країні немає потрібних покладів' : why) : '' };
+  };
   function score(n, i, type, w) {
     const b = BD[type], t = ter[i], e = b.eff || {}; let s = b.va / b.cost * 3;
     if (b.out) for (const r in b.out) { if (n.ratio[r] < 0.97) s += 2.5 * (1 - n.ratio[r]) + 0.4; if (G.prices[r] / G.priceBase[r] > 1.2) s += 0.3; }

@@ -62,13 +62,13 @@ function parlSvg(p, n) {
   return `<svg viewBox="0 0 240 118" width="100%">${pts.slice(0, tot).map((q, i) => `<rect x="${(q[1] - 2).toFixed(1)}" y="${(q[2] - 2).toFixed(1)}" width="4" height="4" fill="${col(i)}"/>`).join('')}<text x="120" y="108" text-anchor="middle" fill="#fff" font-family="Pixelify,system-ui" font-size="15">${gov + coal}/${tot}</text></svg>`;
 }
 function parlTab(n) {
+  if (n.id === G.player && G.rada && G.rada.on) return radaPanel(true);
   const p = n.parl; if (!p) return ''; const sup = G.parlSupport(n); const RG = { democracy: 'демократія', hybrid: 'гібридний режим', autocracy: 'автократія' };
   let h = `<h3>🏛 ${esc(t_(p.name))}</h3><div class="small mut">${t_('Режим')}: ${t_(RG[p.regime])}</div>${parlSvg(p, n)}
   <div class="row small"><span><i class="dot" style="background:var(--acc)"></i>${t_('Партія влади')}</span><b>${(p.gov * 100).toFixed(0)}%</b></div><div class="row small"><span><i class="dot" style="background:var(--acc2)"></i>${t_('Коаліція')}</span><b>${(p.coal * 100).toFixed(0)}%</b></div><div class="row small"><span><i class="dot" style="background:#8f2a30"></i>${t_('Опозиція')}</span><b>${((1 - p.gov - p.coal) * 100).toFixed(0)}%</b></div>
   <div class="row"><span data-tip="${t_('Частка голосів, на яку можна розраховувати: залежить від фракцій і стабільності')}">${t_('Підтримка рішень')}</span><b class="${sup > 0.55 ? 'g' : sup > 0.48 ? 'y' : 'r'}">${pct(sup, 0)}</b></div>
   <div class="row"><span>${t_('Наступні вибори')}</span><b>${G.dateStr(p.next)}</b></div>`;
   h += `<div class="card small">${p.regime === 'autocracy' ? t_('В автократії парламент не заважає: рішення ухвалюються без голосувань.') : t_('Великі зміни податків, мобілізації, оборонного й соціального бюджету та оголошення війни виносяться на голосування. Провалене рішення можна повторити через 30 днів. Підтримка росте зі стабільністю й економікою.')}</div>`;
-  if (n.id === G.player && G.rada && G.rada.on) h += radaPanel();
   if (p.regime !== 'autocracy' && n.id === G.player) {
     h += `<div class="grp">${t_('Вплив на парламент')}</div>` + (p.decree > G.day ? `<div class="card small y">⚖ ${t_('Діють надзвичайні повноваження ще')} ${p.decree - G.day} ${t_('дн.')}</div>` : '');
     for (const [k, A] of Object.entries(G.PARL_ACT)) { const e = G.parlCan(n.id, k), c = G.parlActCost(n.id, k);

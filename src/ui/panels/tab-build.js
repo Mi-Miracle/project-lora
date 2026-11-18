@@ -10,11 +10,21 @@ TAB_FN.build = function () {
   const n = nat(G.player), P = G.player; const sub = curSub('build', 'new');
   let h = subnav('build', [['new', 'Будувати'], ['queue', `Черга (${G.constructions.filter(c => c.n === P).length})`], ['adv', 'Радник'], ['cap', 'Потужності']]);
   if (sub === 'new') {
-    const i = sel && sel.type === 't' ? sel.id : -1;
-    if (i < 0 || G.ter[i].ctrl !== P || G.ter[i].owner !== P) return h + `<div class="card">Оберіть <b>свій регіон</b> на мапі — тут з'явиться перелік доступних будівель.</div>` + advisorCard(n);
-    const t = G.ter[i]; const g = curSub('bgrp', 'extract');
-    h += `<div class="row"><b>${esc(regName(i))}</b><span class="mut">${G.TERRAIN[D.regions[i].t].n} · ${money(t.gdp)}</span></div>`;
+    const g = curSub('bgrp', 'extract');
+    let i = sel && sel.type === 't' && G.ter[sel.id].ctrl === P && G.ter[sel.id].owner === P ? sel.id : -1;
     h += `<div class="sub">${BGR.map(x => `<button class="${g === x.id ? 'on' : ''}" onclick="subtab.bgrp='${x.id}';renderTab(true)">${ico(x.ic)} ${x.n}</button>`).join('')}</div>`;
+    if (i < 0) {
+      // каталог: для кожної будівлі — найкраще місце в країні
+      h += `<div class="card small">💡 ${t_('Нижче — що можна збудувати й де це найвигідніше. Щоб будувати в конкретному регіоні — оберіть свій регіон на мапі.')}</div>`;
+      Object.entries(BD).filter(([, b]) => b.g === g).forEach(([k, b]) => {
+        const sp = G.bestSpot(P, k); const ok = sp.i != null; const cost = ok ? G.buildCost(P, sp.i, k) : 0;
+        h += `<div class="card ${ok ? '' : 'soon'}"><div class="row"><b>${ico(b.ic)} ${esc(t_(b.n))}</b><span>${ok ? money(cost) : ''}</span></div><div class="small">${fmtIO(b)}</div>
+        <div class="row small"><span class="mut">${b.days} ${t_('дн.')}${ok ? ' · 📍 ' + esc(regName(sp.i)) : ''}</span>${ok ? `<span style="white-space:nowrap"><button onclick="sel={type:'t',id:${sp.i}};focusLonLat(D.regions[${sp.i}].c[0],D.regions[${sp.i}].c[1],Math.max(view.s,6));renderRight();renderTab(true)">🗺</button><button class="pri" onclick="doBuild(${sp.i},'${k}')">${t_('Будувати')}</button></span>` : `<span class="r">${esc(t_(sp.err || 'Недоступно'))}</span>`}</div></div>`;
+      });
+      return h;
+    }
+    const t = G.ter[i];
+    h += `<div class="row"><b>📍 ${esc(regName(i))}</b><span class="mut">${G.TERRAIN[D.regions[i].t].n} · ${money(t.gdp)} <button class="small" onclick="sel=null;renderRight();renderTab(true)">✕ ${t_('усі регіони')}</button></span></div>`;
     Object.entries(BD).filter(([, b]) => b.g === g).forEach(([k, b]) => {
       const err = G.canBuild(P, i, k); const cost = G.buildCost(P, i, k); const lvl = t.bld[k] || 0; const roi = b.va ? (b.va / cost * 100).toFixed(0) + '%/рік' : '';
       h += `<div class="card ${err ? 'soon' : ''}"><div class="row"><b>${ico(b.ic)} ${esc(b.n)}${lvl ? ` <span class="tag">рів. ${lvl}</span>` : ''}</b><span>${money(cost)}</span></div>

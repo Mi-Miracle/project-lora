@@ -3,13 +3,14 @@
 // Чат-депутати також вносять власні ініціативи; ухвалені — президент підписує або ветує.
 LORA.sim.register('rada', 93.7, function (G) {
   const { N, ter } = G; const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  G.radaOn = () => !!(G.rada && G.rada.on && G.rada.live && G.player >= 0);
+  G.radaOn = () => !!(G.rada && G.rada.on && G.player >= 0); // у цьому режимі ШІ-парламент не голосує ніколи — лише чат (або вручну)
   G.radaEnable = function (on) { G.rada = G.rada || { on: false, bills: [], log: [], next: 1, trust: 50, vetoes: 0 }; G.rada.on = !!on; };
   // ---- перехоплення голосувань парламенту для гравця
   const baseVote = G.parlVote;
   G.parlVote = function (n, key, what) {
     if (!G.radaOn() || n.id !== G.player) return baseVote(n, key, what);
     const R = G.rada;
+    if (n.parl.regime === 'autocracy') return { ok: true };
     if (R._pass === key) { R._pass = null; n.parl.votes.unshift({ d: G.day, what: what + ' (чат)', yes: R._yes || 0, need: 0, ok: true }); n.parl.votes.length = Math.min(n.parl.votes.length, 12); return { ok: true }; }
     if (R.bills.some(b => b.key === key && (b.st === 'vote' || b.st === 'voting'))) return { ok: false, err: 'Цей законопроєкт уже чекає на голосування чату' };
     R.bills.push({ id: R.next++, key, what, by: 'pres', st: 'vote', replay: R._replay || null, d: G.day }); R._replay = null;
@@ -43,7 +44,7 @@ LORA.sim.register('rada', 93.7, function (G) {
     if (!G.radaOn()) return null; const n = N[G.player]; const R = G.rada;
     const recent = new Set(R.log.slice(0, 6).map(l => l.what));
     const opts = G.RADA_INIT.map(f => f(n)).filter(b => b && !recent.has(b.what) && !R.bills.some(x => x.what === b.what));
-    if (!opts.length) return null; const b = opts[Math.floor(G.rnd() * opts.length)];
+    if (!opts.length || !G.rada.live && G.rada.bills.length > 2) return null; const b = opts[Math.floor(G.rnd() * opts.length)];
     const k = G.RADA_INIT.findIndex(f => { const x = f(n); return x && x.what === b.what; });
     const bill = { id: R.next++, key: 'init' + k, what: b.what, ic: b.ic, by: 'chat', st: 'vote', init: k, d: G.day }; R.bills.push(bill); return bill;
   };
@@ -52,6 +53,12 @@ LORA.sim.register('rada', 93.7, function (G) {
     const R = G.rada, b = R && R.bills.find(x => x.id === id); if (!b) return null; const n = N[G.player];
     const ok = yes > no && yes > 0; b.yes = yes; b.no = no; R.log.unshift({ d: G.day, what: b.what, yes, no, ok, by: b.by }); R.log.length = Math.min(R.log.length, 30);
     G.say(`🏛 ${t('Рада (чат)')}: «${b.what}» — ${ok ? 'ухвалено' : 'провалено'} (${yes} за / ${no} проти)`, ok ? 'good' : 'bad', [G.player]);
+    if (b.by === 'elect') {
+      R.bills = R.bills.filter(x => x !== b);
+      if (ok) { R.trust = clamp(R.trust + 10, 0, 100); n.stab = clamp(n.stab + 4, 0, 100); G.say('🗳 Чат переобрав президента на новий термін!', 'good', [G.player]); }
+      else { R.trust = 40; n.stab = clamp(n.stab - 8, 0, 100); G.say('🗳 Чат висловив недовіру президенту: стабільність −8. Доведіть, що варті посади!', 'bad', [G.player]); }
+      return { ok };
+    }
     if (b.by === 'pres') {
       R.trust = clamp(R.trust + (ok ? 2 : -3), 0, 100); R.bills = R.bills.filter(x => x !== b);
       if (ok && b.replay && G.act[b.replay.fn]) { R._pass = b.key; R._yes = yes; const r = G.act[b.replay.fn](...b.replay.args); R._pass = null; return { ok, res: r }; }
@@ -72,5 +79,12 @@ LORA.sim.register('rada', 93.7, function (G) {
   };
   // довіра чату до президента впливає на стабільність
   G.radaMonthly = function () { const R = G.rada; if (!R || !R.on || G.player < 0) return; const n = N[G.player]; n.stab = clamp(n.stab + (R.trust - 50) * 0.02, 0, 100); };
+  // вибори: замість ШІ-парламенту чат вирішує, чи довіряє президенту далі
+  G.radaElection = function (n) {
+    const R = G.rada; if (R.bills.some(b => b.key === 'reelect')) return;
+    R.bills.push({ id: R.next++, key: 'reelect', what: 'Вибори: довіряєте президенту ще на один термін?', ic: '🗳', by: 'elect', st: 'vote', d: G.day });
+  };
+  const baseCan = G.parlCan;
+  G.parlCan = function (nid, k) { if (G.radaOn() && nid === G.player) return 'У режимі «Президент і Рада» парламент — це ваш чат'; return baseCan(nid, k); };
   function t(s) { return s; }
 });

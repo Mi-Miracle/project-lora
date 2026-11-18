@@ -29,17 +29,21 @@ setInterval(() => {
   const sign = G.rada.bills.find(x => x.st === 'sign'); if (sign && !modalOpen) { radaSignModal(sign); return; }
   if (speedIdx && Date.now() - radaT > (AUD.S.radaMin || 6) * 60000) { radaT = Date.now(); if (G.radaInitiative()) radaT = Date.now(); }
 }, 2000);
-// панель у вкладці «Держава → Парламент»
-function radaPanel() {
+// панель у вкладці «Держава → Парламент»: у режимі «Президент і Рада» замість ШІ-парламенту
+function radaPanel(full) {
   const R = G.rada; if (!R || !R.on) return '';
-  let h = `<div class="grp">🏛 ${t_('Рада (чат Twitch)')}</div><div class="card small" style="border-color:#7a5cff">${R.live ? '🟣 ' + t_('Чат підключено: ваші закони ухвалює чат.') : '⚠ ' + t_('Чат Twitch не підключено — голосує звичайний парламент.')}
+  let h = `<div class="grp">🏛 ${t_('Верховна Рада — ваш чат Twitch')}</div><div class="card small" style="border-color:#7a5cff">${R.live ? '🟣 ' + t_('Чат підключено: законопроєкти голосує чат (!1 — за, !2 — проти).') : '⚠ ' + t_('Чат Twitch не підключено. Законопроєкти чекають — підключіть чат на стартовому екрані або вирішіть вручну нижче.')}
     <div class="row"><span>${t_('Довіра чату до президента')}</span><b class="${R.trust >= 50 ? 'g' : 'r'}">${Math.round(R.trust)}%</b></div><div class="bar"><i style="width:${R.trust}%"></i></div>
-    <div class="row"><span>${t_('Вето')}</span><b>${R.vetoes}</b></div>
-    <div class="btns"><button ${R.live ? '' : 'disabled'} onclick="G.radaInitiative();radaT=Date.now()">📜 ${t_('Нова ініціатива депутатів')}</button></div></div>`;
-  const q = R.bills.filter(b => b.st === 'vote' || b.st === 'voting'); if (q.length) h += `<div class="small mut">${t_('У черзі')}: ${q.map(b => esc(t_(b.what))).join(' · ')}</div>`;
-  if (R.log.length) h += R.log.slice(0, 8).map(l => `<div class="row small"><span>${l.ok ? '✅' : '❌'} ${esc(t_(l.what))}${l.sign === false ? ' <span class="r">(' + t_('вето') + ')</span>' : ''}</span><span class="mut">${l.yes}/${l.no}</span></div>`).join('');
+    <div class="row"><span>${t_('Вето')}</span><b>${R.vetoes}</b></div><div class="row"><span>${t_('Наступні вибори (голосування довіри)')}</span><b>${nat(G.player).parl ? G.dateStr(nat(G.player).parl.next) : '—'}</b></div>
+    <div class="btns"><button onclick="G.radaInitiative();radaT=Date.now();renderTab(true)">📜 ${t_('Нова ініціатива депутатів')}</button></div></div>`;
+  const q = R.bills.filter(b => b.st === 'vote' || b.st === 'voting' || b.st === 'sign');
+  if (q.length) { h += `<div class="grp">${t_('Законопроєкти')}</div>` + q.map(b => `<div class="card small"><div class="row"><b>${b.ic || '📜'} ${esc(t_(b.what))}</b><span class="mut">${b.st === 'voting' ? '🟣 ' + t_('голосування') : b.st === 'sign' ? '✍ ' + t_('на підписі') : t_('у черзі')}</span></div>
+      ${b.st === 'vote' && !R.live ? `<div class="btns"><button onclick="radaManual(${b.id},true)">✔ ${t_('Ухвалити вручну')}</button><button onclick="radaManual(${b.id},false)">✖ ${t_('Відхилити')}</button></div>` : ''}${b.st === 'sign' ? `<div class="btns"><button class="pri" onclick="radaSign(${b.id},true)">✍ ${t_('Підписати')}</button><button onclick="radaSign(${b.id},false)">✋ ${t_('Ветувати')}</button></div>` : ''}</div>`).join(''); }
+  if (R.log.length) h += `<div class="grp">${t_('Історія голосувань')}</div>` + R.log.slice(0, full ? 15 : 8).map(l => `<div class="row small"><span>${l.ok ? '✅' : '❌'} ${esc(t_(l.what))}${l.sign === false ? ' <span class="r">(' + t_('вето') + ')</span>' : ''}</span><span class="mut">${l.yes}/${l.no}</span></div>`).join('');
+  h += `<div class="mut small">${t_('Ваші великі рішення (податки, бюджет, мобілізація, оголошення війни) автоматично стають законопроєктами. ШІ-парламент у цьому режимі вимкнено.')}</div>`;
   return h;
 }
+function radaManual(id, ok) { const r = G.radaResolve(id, ok ? 1 : 0, ok ? 0 : 1); if (r && r.sign) radaSignModal(G.rada.bills.find(x => x.id === id) || { id }); renderTab(true); renderTop(); }
 // оверлеї для глядачів і джерела OBS: голосування Ради й «Чат вирішує долю світу»
 function overlayState() { const o = {}; ['radaBox', 'chaosBox'].forEach(id => { const b = document.getElementById(id); if (b && b.style.display === 'block') o[id] = b.innerHTML; }); return o; }
 function applyOverlays(o) { if (!o) return; ['radaBox', 'chaosBox'].forEach(id => { let b = document.getElementById(id); if (!o[id]) { if (b) b.style.display = 'none'; return; } if (!b) { b = document.createElement('div'); b.id = id; document.body.appendChild(b); } b.innerHTML = o[id]; b.style.display = 'block'; }); }
