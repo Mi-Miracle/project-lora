@@ -107,7 +107,7 @@ LORA.sim.register('leader', 92, function (G) {
   }
   // вибори (кличе парламент): чи переміг персонаж
   G.charElection = function (nid) {
-    const L = G.leader; if (!L || L.role !== 'char' || L.cand !== nid || G.player >= 0) return false;
+    const L = G.leader; if (!L || L.role !== 'char' || L.cand !== nid || (G.player >= 0 && G._lk == null)) return false;
     const p = (L.popu[nid] || 0), c = (L.cont[nid] || 0), chance = clamp((p - 35) / 45 * 0.7 + (c - 40) / 60 * 0.3 + (L.fame / 400), 0.03, 0.92);
     L.cand = null;
     if (G.rnd() < chance) { const key = Object.keys(G.leaders).find(k => G.leaders[k] === L); delete G.leaders[key]; G.leaders[nid] = L; G.humans.add(nid); L.role = 'president'; L.home = nid; G.armies.forEach(a => { if (a.n === nid) a.auto = true; });

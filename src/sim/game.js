@@ -25,7 +25,7 @@ LORA.sim.register('game', 100, function (G) {
       list.forEach(([cc, name, share]) => {
         const r = findRegion(cc, name); if (r < 0) return; let k = total * share, got = 0;
         for (const src of pool.sort((x, y) => y.k - x.k)) { if (got >= k) break; const take = Math.min(src.k - 1, k - got); if (take <= 0) continue; src.k -= take; got += take; }
-        if (got < 1) return; const a = G.newArmy(nid, r, got, `Угруповання «${name.replace(' обл.', '').replace(' (місто)', '')}»`); a.org = 0.75; a.auto = nid !== G.player;
+        if (got < 1) return; const nm = T[r].n || name; const a = G.newArmy(nid, r, got, LORA.lang === 'en' ? `Group “${nm.replace(' Oblast', '').replace(' (city)', '')}”` : `Угруповання «${nm.replace(' обл.', '').replace(' (місто)', '')}»`); a.org = 0.75; a.auto = nid !== G.player;
       });
       G.armies = G.armies.filter(a => a.k >= 1);
     });
