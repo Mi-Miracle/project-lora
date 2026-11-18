@@ -85,15 +85,15 @@ LORA.sim.register('corp', 99.6, function (G) {
   };
   function scoreBid(c, t, mul) { const q = 1 + fx(c, 'qual') + (c.rep - 50) / 200; const infl = 1 + (c.infl[t.buyer] || 0) / 120; const home = c.home === t.buyer ? 1.25 : G.allied(c.home, t.buyer) ? 1.1 : 1; return q * infl * home / mul; }
   function closeTenders() {
-    G.tenders.filter(t => t.close <= G.day && !t.done).forEach(t => {
+    G.tenders.filter(t => t.close <= G.day && !t.done && t.kind !== 'res').forEach(t => {
       t.done = true;
       // ШІ-конкуренти
-      G.companies.forEach(c => { if (!c.alive || c.id === G.pc || c.sector !== t.sector) return; G.corpInit(c); const e = G.corpCanBid(c, t); if (e && !/офіс|лінії|потужност/.test(e)) return; if (t.kind === 'good' && !c.assets.some(a => GOODS[t.good].from.includes(a.type))) return; if (G.rnd() < 0.55) t.bids.push({ co: c.id, mul: 0.85 + G.rnd() * 0.3 }); });
+      G.companies.forEach(c => { if (!c.alive || !c.ai || c.sector !== t.sector) return; G.corpInit(c); const e = G.corpCanBid(c, t); if (e && !/офіс|лінії|потужност/.test(e)) return; if (t.kind === 'good' && !c.assets.some(a => GOODS[t.good].from.includes(a.type))) return; if (G.rnd() < 0.55) t.bids.push({ co: c.id, mul: 0.85 + G.rnd() * 0.3 }); });
       if (!t.bids.length) return;
       const best = t.bids.map(b => ({ b, s: scoreBid(G.companies[b.co], t, b.mul) * (0.85 + G.rnd() * 0.3) })).sort((a, b) => b.s - a.s)[0].b; const c = G.companies[best.co];
       G.corpInit(c); const k = t.kind === 'good' ? { id: t.id, kind: 'good', buyer: t.buyer, good: t.good, qty: t.qty, left: t.qty, price: t.price * best.mul, due: t.due } : { id: t.id, kind: 'proj', buyer: t.buyer, name: t.name, need: t.need, value: t.value * best.mul, done: G.day + t.days, start: G.day };
       c.contracts.push(k);
-      if (c.id === G.pc) G.say(`📑 Контракт виграно: ${t.kind === 'good' ? `${GOODS[t.good].n} ×${t.qty.toLocaleString()}` : t.name} для ${N[t.buyer].name} (${(k.kind === 'good' ? k.qty * k.price : k.value).toFixed(2)} млрд)`, 'good', [c.home]);
+      if (!c.ai) G.say(`📑 Контракт виграно: ${t.kind === 'good' ? `${GOODS[t.good].n} ×${t.qty.toLocaleString()}` : t.name} для ${N[t.buyer].name} (${(k.kind === 'good' ? k.qty * k.price : k.value).toFixed(2)} млрд)`, 'good', [c.home]);
       else if (t.bids.some(b => b.co === G.pc)) G.say(`📑 Тендер ${N[t.buyer].name} програно — переміг «${c.name}»`, 'bad', [G.myCo().home]);
     });
     G.tenders = G.tenders.filter(t => !t.done || t.close > G.day - 1);
@@ -102,7 +102,7 @@ LORA.sim.register('corp', 99.6, function (G) {
   G.corpMonthly = function () {
     genTenders(); closeTenders();
     G.companies.forEach(c => {
-      if (!c.alive) return; G.corpInit(c); const human = c.id === G.pc;
+      if (!c.alive) return; G.corpInit(c); const human = !c.ai;
       // R&D: бюджет = частка прибутку (мін. $5 млн/міс), очки: $1 млрд ≈ 1000 очок; лабораторії (університети, дата-центри) +20% кожна
       const labs = c.assets.filter(a => a.type === 'university' || a.type === 'datacenter' || a.type === 'ai_datacenter').reduce((s, a) => s + a.lvl, 0);
       if (c.rd.budget < 0.05 || c.rd.budget > 3) c.rd.budget = 0.15; const spend = c.rd.budget / 12; c.rd.pts += 8 * (1 + labs * 0.2); if (c.cash > spend) { c.cash -= spend; c.rd.pts += spend * 3500 * (1 + labs * 0.2); }
@@ -131,7 +131,7 @@ LORA.sim.register('corp', 99.6, function (G) {
     });
   };
   // прибуток активів зростає від R&D
-  const GOODF = new Set(Object.values(GOODS).flatMap(g => g.from)); const baseProfit = G.assetProfit; G.assetProfit = function (c, a) { let p = baseProfit(c, a); if (c.sector === 'military' && GOODF.has(a.type) && c.id === G.pc) p *= 0.35; return c.rd ? p * (1 + fx(c, 'profit')) : p; };
+  const GOODF = new Set(Object.values(GOODS).flatMap(g => g.from)); const baseProfit = G.assetProfit; G.assetProfit = function (c, a) { let p = baseProfit(c, a); if (c.sector === 'military' && GOODF.has(a.type) && !c.ai) p *= 0.35; return c.rd ? p * (1 + fx(c, 'profit')) : p; };
   // ---- прямий продаж зі складу державі (поза тендером): 85% ціни
   G.corpSellTo = function (c, nid, k) {
     const b = N[nid], g = GOODS[k]; if (!b || !b.alive || !g) return { ok: false, err: 'Недоступно' }; const q = Math.floor(c.inv[k] || 0) - c.contracts.filter(x => x.good === k).reduce((s, x) => s + x.left, 0); if (q < 1) return { ok: false, err: 'Склад порожній (або все під контракти)' };

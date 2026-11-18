@@ -75,13 +75,13 @@ LORA.sim.register('parliament', 93, function (G) {
   G.act.parlAct = k => G.player >= 0 ? G.parlAct(G.player, k) : { ok: false, err: 'Лише для глави держави' };
   // вибори
   function election(n) {
-    const p = n.parl; p.next = G.day + p.cyc;
+    const p = n.parl; p.next = G.day + p.cyc; if (G.careerParlElection) G.careerParlElection(n.id);
     if (G.radaOn && G.radaOn() && n.id === G.player) { G.radaElection(n); return; }
     if (p.regime === 'autocracy') { if (G.charElection && G.leader && G.leader.cand === n.id && (G.leader.cont[n.id] || 0) >= 80) G.charElection(n.id); return; }
     const before = p.gov + p.coal; const mood = (n.stab - 50) / 100 + (n.growth - 0.02) * 4 - (n.warExh || 0) * 0.15;
     p.gov = clamp(p.gov + mood * 0.35 + (G.rnd() - 0.5) * 0.12, 0.15, p.regime === 'hybrid' ? 0.75 : 0.6); p.coal = clamp(0.08 + G.rnd() * 0.12, 0, 0.25);
     const won = p.gov + p.coal > 0.5; p.lastElection = { d: G.day, gov: p.gov, won };
-    if (G.leader && G.leader.role === 'char' && G.leader.cand === n.id) { if (G.charElection(n.id)) { p.gov = 0.45; p.coal = 0.1; } return; }
+    { const ks = Object.keys(G.leaders || {}).filter(k => G.leaders[k] && G.leaders[k].role === 'char' && G.leaders[k].cand === n.id); if (ks.length) { const pl = G._lk; let won = false; for (const k of ks) { G._lk = k === 'me' ? undefined : k; if (!won && G.charElection(n.id)) won = true; } G._lk = pl; if (won) { p.gov = 0.45; p.coal = 0.1; } return; } }
     if (n.id === G.player) { if (!won) { n.stab = Math.max(0, n.stab - 4); G.say(`🗳 Вибори до ${p.name}: опозиція отримала більшість (${((1 - p.gov - p.coal) * 100).toFixed(0)}%). Ухвалювати рішення стане важче`, 'bad', [n.id]); }
       else G.say(`🗳 Вибори до ${p.name}: ваша коаліція зберегла більшість (${((p.gov + p.coal) * 100).toFixed(0)}%)`, 'good', [n.id]); }
     else if (won !== before > 0.5 && n.agg && n.agg.gdp > 300) G.say(`🗳 ${n.name}: ${won ? 'уряд зберіг владу' : 'опозиція перемогла на виборах'}`, 'info', [n.id]);
@@ -89,7 +89,7 @@ LORA.sim.register('parliament', 93, function (G) {
   // ---- рада директорів компаній
   const BS = c => { c.board = c.board || { sat: 60, fired: false }; return c.board; };
   G.boardCheck = function (c, cost, what) {
-    if (!c || c.id !== G.pc) return { ok: true }; const b = BS(c); const share = cost / Math.max(0.5, G.coValue(c));
+    if (!c || c.id !== G.pc || c.owner === 'me') return { ok: true }; const b = BS(c); const share = cost / Math.max(0.5, G.coValue(c));
     if (share < 0.25 || b.sat >= 55) return { ok: true };
     const ok = G.rnd() < clamp(b.sat / 70 + 0.15 - share * 0.4, 0.05, 0.95);
     G.say(`👔 Рада директорів «${c.name}»: «${what}» — ${ok ? 'схвалено' : 'відхилено (задоволеність ' + b.sat.toFixed(0) + ')'}`, ok ? 'good' : 'bad', [c.home]);
@@ -102,7 +102,7 @@ LORA.sim.register('parliament', 93, function (G) {
     const b = BS(c); const v = G.coValue(c), h = c.hist; const g = h.length > 6 ? v / Math.max(0.1, h[h.length - 7]) - 1 : 0.02;
     b.sat = clamp(b.sat + (g * 120 - 1) * 0.8 + (c.cash < 0 ? -3 : 0), 0, 100); b.g = g;
     if (b.sat < 12 && G.player < 0 && !b.warned) { b.warned = G.day; G.say(`👔 Рада директорів «${c.name}» загрожує звільнити CEO: компанія дешевшає`, 'bad', [c.home]); }
-    else if (b.sat < 8 && b.warned && G.day - b.warned > 90 && G.player < 0) { b.fired = true; G.gameOver = { text: `Рада директорів «${c.name}» звільнила вас з посади CEO.` }; G.say('👔 ' + G.gameOver.text, 'big', [c.home]); }
+    else if (b.sat < 8 && b.warned && G.day - b.warned > 90 && G.player < 0 && c.owner !== 'me') { b.fired = true; G.gameOver = { text: `Рада директорів «${c.name}» звільнила вас з посади CEO.` }; G.say('👔 ' + G.gameOver.text, 'big', [c.home]); }
     else if (b.sat > 20) b.warned = 0;
   }
   G.parliamentDaily = function () {

@@ -57,7 +57,7 @@ LORA.sim.register('game', 100, function (G) {
     if (G.player >= 0) G.say(`🏛 Ви очолили уряд: ${N[G.player].name}. ${G.dateStr()}`, 'big', [G.player]);
     if (opts.company) G.startCompany(opts.company);
     // лідер гравця на мапі
-    if (opts.char) { G.initLeader({ name: opts.char.name, role: 'char', type: opts.char.type, home: G.nIdx[opts.char.home] }); }
+    if (opts.char) { G.initLeader({ name: opts.char.name, role: 'char', type: opts.char.type, home: G.nIdx[opts.char.home] }); if (opts.char.stage) G.initCareer(opts.char); }
     else if (opts.company) { const c = G.myCo(); G.initLeader({ name: (LORA.lang === 'en' ? 'CEO ' : 'CEO ') + c.name, role: 'ceo', home: c.home, at: c.offices[0].t, ic: '💼' }); }
     else if (G.player >= 0) G.initLeader({ name: opts.leaderName || (LORA.lang === 'en' ? 'President of ' : 'Президент: ') + N[G.player].name, role: 'president', home: G.player });
     (opts.humans || []).forEach(h => { const prev = G.player; G.player = h.nid != null ? h.nid : h; G.initLeader({ name: h.name || (LORA.lang === 'en' ? 'President of ' : 'Президент: ') + N[G.player].name, role: 'president', home: G.player }); G.armies.forEach(a => { if (a.n === G.player) a.auto = true; }); G.player = prev; });
@@ -87,7 +87,7 @@ LORA.sim.register('game', 100, function (G) {
     // поповнення армій гравця в межах ліміту мобілізації
     const pn = N[G.player];
     if (pn && pn.alive) { const pool = pn.agg.pop * 1000 * pn.pol.mob, tr = G.troopsOf(pn.id); if (tr < pool) { const add = Math.min(pool - tr, pool * 0.002); const arm = G.armies.filter(a => a.n === pn.id && G.friendlyTo(pn.id, ter[a.t].ctrl)).sort((a, b) => a.k - b.k)[0]; if (arm) { arm.k += add; pn.cash -= add * 0.02 * (0.5 + pn.pc / 20000); if (pn.cash < 0) { pn.debt -= pn.cash; pn.cash = 0; } } } }
-    if (G.day % 30 === 0) { G.foreignAid(); G.balanceMonthly(); G.alertsMonthly(); G.pressureMonthly(); G.decisionsMonthly(); G.spaceMonthly(); G.projectsMonthly(); G.monthlyExtra(); G.nukesMonthly(); G.radaMonthly(); G.stockMonthly(); G.recoveryMonthly(); G.reparMonthly(); G.chronMonthly(); G.corpMonthly(); G.corpEventsMonthly(); G.depletionMonthly(); G.ecologyMonthly(); G.climateMonthly(); G.tariffMonthly(); G.wevMonthly(); G.impeachMonthly(); }
+    if (G.day % 30 === 0) { G.foreignAid(); G.balanceMonthly(); G.alertsMonthly(); G.pressureMonthly(); G.decisionsMonthly(); G.spaceMonthly(); G.projectsMonthly(); G.monthlyExtra(); G.nukesMonthly(); G.radaMonthly(); G.stockMonthly(); G.recoveryMonthly(); G.reparMonthly(); G.chronMonthly(); G.corpMonthly(); G.corp2Tenders(); G.corp2Close(); G.corp2Monthly(); G.coDipMonthly(); G.careerMonthly(); G.corpEventsMonthly(); G.depletionMonthly(); G.ecologyMonthly(); G.climateMonthly(); G.tariffMonthly(); G.wevMonthly(); G.impeachMonthly(); }
     G.researchDaily();
     G.leaderDaily(); G.agentsDaily();
     G.parliamentDaily();

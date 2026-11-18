@@ -2196,3 +2196,167 @@ $0.5 млрд особистих коштів	$0.5 bn in personal funds
 Ваш сектор заробляє на активах (видобуток, станції, ферми, дата-центри) і на проєктних контрактах для урядів. Більше профільних активів — більше потужностей для проєктів.	Your sector earns from assets (extraction, plants, farms, data centers) and from project contracts for governments. More core assets mean more project capacity.
 Продавати надлишок своїй державі (70% ціни), коли вона воює	Sell surplus to your state (70% of price) when it is at war
 Нижче — що можна збудувати й де це найвигідніше. Щоб будувати в конкретному регіоні — оберіть свій регіон на мапі.	Below is what you can build and where it pays off most. To build in a specific region, select your region on the map.
+Ви вже депутат парламенту зі своєю партією: голосуйте, вносьте закони, набирайте вплив для президентських виборів.	You are already an MP with your own party: vote, introduce laws, build influence for the presidential election.
+Почніть із нуля: робота, звʼязки, популярність. Далі — партія, депутатство, власна компанія і президентство.	Start from scratch: job, connections, popularity. Then — a party, a seat in parliament, your own company and the presidency.
+Продаж — 95% ринкової ціни, купівля — 106%. Сировина, якої бракує на складі, докуповується автоматично.	Selling — 95% of market price, buying — 106%. Missing raw materials are bought automatically.
+Компанія засновується в країні, де ви зараз перебуваєте. Далі ви керуєте і персонажем, і компанією.	The company is founded in the country where you are now. Then you manage both the character and the company.
+Посада в державі іншого гравця: оберіть його державу в списку. Ви керуватимете лише своїм сектором.	A post in another player's state: pick their state in the list. You'll manage only your sector.
+Лише корпорація: виробництво, тендери, R&D, торгівля й вплив на уряди. Можна перебрати владу.	Corporation only: production, tenders, R&D, trade and influence on governments. You can seize power.
+Можна продавати продукцію в цю країну навіть без дружніх відносин зі штабом	You can sell products to this country even without friendly relations with your HQ
+потрібно ≥ $200 млн: ви стаєте власником, компанія платить вам дивіденди	requires ≥ $200M: you become the owner, the company pays you dividends
+Позов за націоналізовані активи: шанс 45% отримати компенсацію	A claim for nationalized assets: 45% chance of compensation
+до чергових виборів далеко — ви йдете на довибори в окрузі	the regular election is far off — you run in a district by-election
+Класична гра за державу: економіка, армія, дипломатія.	Classic state play: economy, army, diplomacy.
+шанс ухвалення залежить від вашого впливу й партії	the chance of passing depends on your influence and party
+Потрібен рейтинг партії ≥ 3% або популярність ≥ 25	Requires party rating ≥ 3% or popularity ≥ 25
+Закон про скасування депутатської недоторканності	Law abolishing parliamentary immunity
+персонаж, депутат, компанія чи президент проти ШІ	character, MP, company or president vs AI
+Посада — лише в державі, яку обрав інший гравець	A post — only in a state chosen by another player
+Вплив +3, репутація +2, стабільність країни +0.5	Influence +3, reputation +2, country stability +0.5
+популярність +, запити й розслідування сильніші	popularity +, inquiries and investigations are stronger
+запит викрив корупційну схему! популярність +4	the inquiry exposed a corruption scheme! popularity +4
+Ви перемогли на виборах і стали президентом!	You won the election and became president!
+повага військових: у війну популярність ×1.5	respect of the military: popularity ×1.5 in wartime
+найбільша зарплата, легше заснувати компанію	highest salary, easier to found a company
+Будівництво в цій країні на 30% дешевше рік	Construction in this country 30% cheaper for a year
+Немає націоналізованих активів у цій країні	No nationalized assets in this country
+рейтинг росте разом із вашою популярністю	the rating grows with your popularity
+Закон про підвищення податків на оборону	Law raising taxes for defense
+Оберіть країну, де починає ваш персонаж.	Choose the country where your character starts.
+Оберіть країну штаб-квартири компанії.	Choose the company's headquarters country.
+Державне співфінансування будівництва	State co-financing of construction
+Закон про продовження воєнного стану	Law extending martial law
+недопоставка — штраф 25% і репутація	short delivery — 25% penalty and reputation
+Податки в цій країні −50% на 2 роки	Taxes in this country −50% for 2 years
+Оберіть державу, якою керуватимете.	Choose the state you'll govern.
+популярність +, звʼязки з урядом −	popularity +, connections with the government −
+» не виконала інвестиційну угоду з	» failed the investment agreement with
+вплив вашої компанії в цій країні	your company's influence in this country
+запит направлено, популярність +4	inquiry sent, popularity +4
+Торгівля із замовником заборонена	Trade with the buyer is forbidden
+Створити міжфракційне обʼєднання	Create a cross-faction group
+звʼязки +, корисно для депутата	connections +, useful for an MP
+» виконала інвестиційну угоду з	» fulfilled the investment agreement with
+Чистий дохід від ресурсів / рік	Net resource income / year
+Знизити податки малому бізнесу	Cut taxes for small business
+ви кандидат у депутати. Вибори	you're an MP candidate. Election
+📑 Контракт постачання виграно	📑 Supply contract won
+Це поза вашими повноваженнями	This is outside your authority
+🌐 Міністр закордонних справ	🌐 Foreign minister
+». Як голосуєте ви, депутате	». How do you vote, MP
+експортна ліцензія на 3 роки	export license for 3 years
+Виступ з трибуни парламенту	Speech in parliament
+популярність і вплив у Раді	popularity and influence in parliament
+втрачає депутатський мандат	loses the parliamentary seat
+Ви не виробляєте цей ресурс	You don't produce this resource
+Потрібна популярність ≥ 15	Requires popularity ≥ 15
+гість-глядач без керування	guest spectator without control
+Закон про цифрові послуги	Digital services law
+Партія діє в іншій країні	The party operates in another country
+Тут немає вільних виборів	No free elections here
+роздати посилання гравцям	share links with players
+» ухвалено! популярність	» passed! popularity
+хост, гравець або глядач	host, player or spectator
+Балотуватися в депутати	Run for parliament
+Лобіювати свою компанію	Lobby for your company
+Обʼєднань уже достатньо	Enough groups already
+Бюджет на наступний рік	Next year's budget
+Ратифікація угоди з МВФ	Ratification of the IMF agreement
+Закон про мову й освіту	Law on language and education
+будівництво −30% на рік	construction −30% for a year
+перемога! компенсація $	victory! compensation $
+Влаштуватися на роботу	Get a job
+Потрібен офіс у країні	An office in the country is required
+вплив +3, репутація +2	influence +3, reputation +2
+податки −50% на 2 роки	taxes −50% for 2 years
+зобовʼязання вкласти $	commitment to invest $
+Ви кандидат у депутати	You're an MP candidate
+Антикорупційний закон	Anti-corruption law
+✅ Контракт постачання	✅ Supply contract
+Контрактів постачання	Supply contracts
+💰 Міністр економіки	💰 Economy minister
+У вас немає компанії	You have no company
+У вас уже є компанія	You already have a company
+Міжнародний арбітраж	International arbitration
+Контракти постачання	Supply contracts
+Внести законопроєкт	Introduce a bill
+Ви вже тут працюєте	You already work here
+звʼязки з урядом +2	connections with the government +2
+звʼязки з урядом −2	connections with the government −2
+Зустріч з міністром	Meeting with a minister
+🛡 Міністр оборони	🛡 Defense minister
+Заснувати компанію	Found a company
+Лише для персонажа	Character only
+У вас уже є партія	You already have a party
+депутат парламенту	member of parliament
+Податкові канікули	Tax holiday
+Інвестиційна угода	Investment agreement
+вплив −25, штраф $	influence −25, fine $
+щомісяця зі складу	monthly from stock
+податкові канікули	tax holiday
+експортна ліцензія	export license
+Партійна кампанія	Party campaign
+став президентом	became president
+Заснувати партію	Found a party
+вплив у Раді +10	influence in parliament +10
+Підвищити пенсії	Raise pensions
+Посилити оборону	Strengthen defense
+Оберіть професію	Choose a profession
+Невідомий ресурс	Unknown resource
+Потрібен вплив ≥	Requires influence ≥
+міс. виробництва	mo. of production
+лишилось місяців	months left
+співфінансування	co-financing
+інвест. угода до	investment deal until
+Власник компанії	Company owner
+Одиночна гра	Single player
+Мультиплеєр	Multiplayer
+Створити гру (хост)	Create game (host)
+Приєднатися гравцем	Join as a player
+Дивитися гру	Watch the game
+Почати як	Start as
+Ви (хост) граєте як	You (host) play as
+Персонаж	Character
+Депутат	MP
+Компанія	Company
+Президент (держава)	President (state)
+Ваша роль	Your role
+👑 Держава	👑 State
+🏢 Компанія	🏢 Company
+🧑 Персонаж	🧑 Character
+🎖 Генерал	🎖 General
+🎩 Дипломат	🎩 Diplomat
+🕵 Шпигун	🕵 Spy
+Робота	Job
+Партія	Party
+Парламент	Parliament
+Власна компанія	Own company
+Кар'єра	Career
+🎓 Кар'єра	🎓 Career
+🏭 Виробництво	🏭 Production
+📦 Ресурси	📦 Resources
+📑 Тендери	📑 Tenders
+🔬 R&D	🔬 R&D
+🏗 Будівництво	🏗 Construction
+🤝 Дипломатія	🤝 Diplomacy
+🏦 Фінанси	🏦 Finance
+Ресурс	Resource
+Склад	Stock
+Ціна	Price
+Авто	Auto
+Купити	Buy
+Продати	Sell
+Обсяг угоди	Deal size
+Постачання	Supply
+Внести	Submit
+Вкласти	Invest
+Сектор	Sector
+Назва	Name
+Стартовий капітал	Starting capital
+Дивіденди власнику (частка прибутку)	Dividends to owner (share of profit)
+Ви депутат	You are an MP
+вплив у Раді	influence in parliament
+Законопроєкт	Bill
+Ваші гроші	Your money
+ваші гроші	your money
+рівень	level

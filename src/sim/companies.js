@@ -49,7 +49,8 @@ LORA.sim.register('companies', 57, function (G) {
     if (t.pol.sez) p *= 1.15;
     return p * a.lvl;
   };
-  const taxRate = (c, nid) => clamp(N[nid].pol.tax * 0.7 * ((ter.find(t => t.owner === nid) || {}).pol ? 1 : 1) - (c.infl[nid] || 0) * 0.002, 0.05, 0.45);
+  const taxRate = (c, nid) => clamp(N[nid].pol.tax * 0.7 - (c.infl[nid] || 0) * 0.002, 0.05, 0.45) * (c.dip && c.dip[nid] && c.dip[nid].tax > G.day ? 0.5 : 1);
+  G.coCostMul = (c, nid) => (c.dip && c.dip[nid] && c.dip[nid].sub > G.day ? 0.7 : 1);
 
   // ---- дії компанії
   G.coCanBuild = function (c, i, type) {
@@ -58,12 +59,12 @@ LORA.sim.register('companies', 57, function (G) {
     if (!G.coHasOffice(c, host)) return 'Потрібен офіс у цій країні';
     if (t.ctrl !== host) return 'Регіон окупований';
     const err = G.canBuild(host, i, type); if (err && !/Лише на власній/.test(err)) return err;
-    const cost = G.buildCost(host, i, type) * 1.1; if (c.cash < cost) return `Потрібно $${cost.toFixed(2)} млрд`;
+    const cost = G.buildCost(host, i, type) * 1.1 * G.coCostMul(c, host); if (c.cash < cost) return `Потрібно $${cost.toFixed(2)} млрд`;
     return '';
   };
   G.coBuild = function (c, i, type, quiet) {
     const err = G.coCanBuild(c, i, type); if (err) return { ok: false, err };
-    const host = ter[i].owner, cost = G.buildCost(host, i, type) * 1.1; c.cash -= cost;
+    const host = ter[i].owner, cost = G.buildCost(host, i, type) * 1.1 * G.coCostMul(c, host); c.cash -= cost;
     const days = Math.round(BD[type].days / (0.7 + 0.3 * N[host].infraLvl));
     const k = { id: G.nextId++, n: host, t: i, type, done: G.day + days, start: G.day, cost, co: c.id };
     G.constructions.push(k); c.pend.push({ cid: k.id, t: i, type, cost, done: k.done });
@@ -128,7 +129,7 @@ LORA.sim.register('companies', 57, function (G) {
       // націоналізація: війна чи ворожнеча між країною активу та штабом
       c.offices = c.offices.filter(o => { if (o.hq) return true; const nid = o.n; if (!N[nid].alive || ter[o.t].owner !== nid) return false;
         const hostile = G.atWar(nid, c.home) || G.rel[nid][c.home] < -45; if (!hostile || (c.infl[nid] || 0) > 50) return true;
-        if (G.rnd() < 0.5) { c.assets = c.assets.filter(a => ter[a.t].owner !== nid); c.infl[nid] = 0; G.say(`🚩 ${N[nid].name} націоналізує активи компанії «${c.name}»`, c.id === G.pc ? 'bad' : 'info', [nid]); return false; } return true; });
+        if (G.rnd() < 0.5) { c.lost = c.lost || {}; c.lost[nid] = (c.lost[nid] || 0) + c.assets.filter(a => ter[a.t].owner === nid).reduce((v, a) => v + BD[a.type].cost * a.lvl, 0); c.assets = c.assets.filter(a => ter[a.t].owner !== nid); c.infl[nid] = 0; G.say(`🚩 ${N[nid].name} націоналізує активи компанії «${c.name}»`, c.id === G.pc ? 'bad' : 'info', [nid]); return false; } return true; });
       if (c.cash < -2) { c.base *= 0.9; c.cash += 1; }
       c.hist.push(+G.coValue(c).toFixed(2)); if (c.hist.length > 60) c.hist.shift();
       if (c.ai) coAI(c);

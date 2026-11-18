@@ -85,7 +85,7 @@ async function watchJoin(code, clean, view, obs) {
 // ---------- дилеми
 let decOpen = null;
 function checkDecision() {
-  if (!G || modalOpen || NET.S.spectator) return; const d = (G.decisions || []).find(x => x.co ? G.pc >= 0 && G.player < 0 : x.nid === G.player); if (!d || decOpen === d.id) return;
+  if (!G || modalOpen || NET.S.spectator) return; const d = (G.decisions || []).find(x => x.co ? G.pc >= 0 && G.player < 0 : x.mp ? G.player < 0 && G.leader && G.leader.mp != null : x.nid === G.player); if (!d || decOpen === d.id) return;
   const e = G.decEvents ? G.decEvents.find(x => x.id === d.ev) : null; if (!e) return; decOpen = d.id; const row = ADV_ROW[e.adv] || 0;
   const chat = TW.S.connected && AUD.S.chatVotes !== false;
   openModal(`<div class="dec"><div class="dec-a"><canvas id="decA" width="32" height="32"></canvas></div><div><h2>${d.ctx.big ? '⚡ ' + t_('Розвилка історії') : '📜 ' + t_('Рішення')}</h2><p>${esc(t_(d.ctx.text))}</p>

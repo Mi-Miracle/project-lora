@@ -9,4 +9,4 @@ function applyTheme(a3, fallback) {
   window._theme = t;
 }
 const TAB_ICON = { state: 'state', econ: 'econ', logi: 'logi', army: 'army', dipl: 'dipl', build: 'build', tech: 'tech', intel: 'sat', world: 'world', co: 'co', lead: 'star', char: 'star' };
-const tabLabel = (k, v) => (TAB_ICON[k] ? (PX_ICONS[TAB_ICON[k]] ? pxi(TAB_ICON[k], 1) : ico(v.split(' ')[0], 1)) : '') + `<span>${t_(v).replace(/^[^\p{L}]+/u, '')}</span>`;
+const tabLabel = (k, v) => (TAB_ICON[k] ? (PX_ICONS[TAB_ICON[k]] ? pxi(TAB_ICON[k], 1) : ico(v.split(' ')[0], 1)) : ico(v.split(' ')[0], 1)) + `<span>${t_(v).replace(/^[^\p{L}]+/u, '')}</span>`;

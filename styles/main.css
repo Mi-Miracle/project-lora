@@ -378,3 +378,5 @@ table.compedit td{vertical-align:top;padding:4px 3px}table.compedit input[type=r
 .chron h2{margin-bottom:2px}.chron-ch{margin:6px 0;background:#0b121a;border:1px solid #1d2b3a;padding:4px 6px}.chron-e{font-size:13px;padding:3px 0;border-bottom:1px solid #ffffff10}
 #mbox.wide{width:min(1100px,94vw)!important;max-width:94vw!important}.chron-full{font-size:15px}.chron-full .chron-e{font-size:15px}
 .modeSel button.rada-m{border-color:#7a5cff;background:linear-gradient(#2a1f5a,#151033)}.modeSel button.rada-m.on{box-shadow:0 0 0 2px #a48bff inset}
+.career-path{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:4px 0 8px;font-size:12px}.career-path span{padding:3px 6px;border:1px solid #2a3a4a;border-radius:3px;opacity:.55}.career-path span.on{opacity:1;border-color:#ffd34d;color:#ffd34d}.career-path i{opacity:.5;font-style:normal}
+.modeSel.main3{grid-template-columns:repeat(3,1fr)!important}.modeSel.sub3{grid-template-columns:repeat(3,1fr)!important;margin-top:-2px}.modeSel.sub3 button{padding:7px;font-size:12px}

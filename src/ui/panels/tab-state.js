@@ -1,6 +1,15 @@
 // ВКЛАДКА «ДЕРЖАВА»: огляд, бюджет, політика, запаси. Підвкладки — щоб не перевантажувати.
 const TABS = [['state', '🏛 Держава'], ['econ', '📦 Економіка'], ['logi', '🚢 Логістика'], ['army', '🪖 Армія'], ['dipl', '🌐 Дипломатія'], ['build', '🏗 Будівництво'], ['tech', '🔬 Дослідження'], ['intel', '🛰 Розвідка й космос'], ['world', '📊 Світ']];
-function curTabs() { const ld = G && G.leader ? [['lead', '⭐ Лідер']] : []; if (G && G.player < 0) return G.pc >= 0 ? CO_TABS.concat(ld) : CHAR_TABS; return (G && G.pc >= 0 ? TABS.concat([['co', '🏢 Компанія']]) : TABS).concat(ld); }
+const ROLE_TABS = { general: ['army', 'world'], min_econ: ['state', 'econ', 'build', 'logi', 'tech', 'world'], min_def: ['army', 'state', 'build', 'world'], min_for: ['dipl', 'intel', 'world'], diplomat: ['intel', 'dipl', 'world'], spy: ['intel', 'world'] };
+function roleTabs(r) { const all = TABS.concat([['world', '📊 Світ']]); return ROLE_TABS[r].map(k => all.find(x => x[0] === k)).filter(Boolean); }
+const CO_RAIL = [['co', '🏢 Компанія'], ['coprod', '🏭 Виробництво'], ['cotrade', '📦 Ресурси'], ['cotend', '📑 Тендери'], ['cord', '🔬 R&D'], ['cobuild', '🏗 Будівництво'], ['codipl', '🤝 Дипломатія'], ['cofin', '🏦 Фінанси']];
+function curTabs() {
+  if (G && G.mpRole && ROLE_TABS[G.mpRole]) return roleTabs(G.mpRole);
+  const isChar = G && G.leader && G.leader.role === 'char'; const ld = G && G.leader && !isChar ? [['lead', '⭐ Лідер']] : []; const ch = isChar ? [['char', '🧑 Персонаж'], ['career', '🎓 Кар\'єра']] : [];
+  const co = G && G.pc >= 0 ? CO_RAIL : [];
+  if (G && G.player < 0) return ch.concat(co, [['world', '📊 Світ']], ld);
+  return TABS.concat(co, ld);
+}
 function railClick(k) { const L = $('#left'); if (tab === k && !L.classList.contains('hide')) { L.classList.add('hide'); renderTabs(); return; } tab = k; L.classList.remove('hide'); renderTabs(); renderTab(true); }
 function renderTabs() { { const t = curTabs().find(x => x[0] === tab); const pt = document.getElementById('ptitle'); if (pt && t) pt.innerHTML = (TAB_ICON[tab] ? pxi(TAB_ICON[tab], 1) : '') + `<span>${t_(t[1]).replace(/^[^\p{L}]+/u, '')}</span><button class="pt-x" data-tip="${t_('Згорнути панель (клік по активній іконці теж згортає)')}" onclick="$('#left').classList.add('hide');renderTabs()">✕</button>`; document.body.classList.toggle('lhide', $('#left').classList.contains('hide')); } $('#tabs').innerHTML = curTabs().map(([k, v]) => `<button class="${tab === k ? 'on' : ''}" data-k="${k}" onclick="railClick('${k}')">${tabLabel(k, v)}</button>`).join(''); }
 const TAB_FN = {};
@@ -16,7 +25,7 @@ const curSub = (t, def) => subtab[t] || def;
 function slider(key, label, min, max, step, val, fmt, note) {
   return `<div class="sl"><div class="lab"><span>${label}</span><b id="v_${key}">${fmt(val)}</b></div><input type="range" min="${min}" max="${max}" step="${step}" value="${val}" oninput="document.getElementById('v_${key}').textContent=(${fmt.toString()})(+this.value);" onchange="setPol('${key}',+this.value)">${note ? `<div class="mut small">${note}</div>` : ''}</div>`;
 }
-function setPol(k, v) { if (k === 'coRD') { G.myCo().rd.budget = v; renderTab(true); return; } if (k === 'devInv') { nat(G.player).dev.invest = v; renderTab(true); return; } if (k === 'recK') { window._recK = v; renderTab(true); return; } if (k === 'shipK') { window._shipK = v; renderTab(true); return; } if (k === 'stkCnt') { window._stk.cnt = v; renderTab(true); return; } if (k === 'airK') { window._air.k = v; renderTab(true); return; } if (k === 'satK') { window._sat.k = v; renderTab(true); return; } const r = G.act.setPolicy(k, v); if (r && r.ok === false) { hint('⚠ ' + r.err, 4000); AUD.sfx('bad'); } renderTab(true); renderTop(); }
+function setPol(k, v) { if (k === 'coRD') { G.act.coSet('rd', null, v); if (!NET.isGuest()) G.myCo().rd.budget = v; renderTab(true); return; } if (k === 'devInv') { nat(G.player).dev.invest = v; renderTab(true); return; } if (k === 'recK') { window._recK = v; renderTab(true); return; } if (k === 'shipK') { window._shipK = v; renderTab(true); return; } if (k === 'stkCnt') { window._stk.cnt = v; renderTab(true); return; } if (k === 'airK') { window._air.k = v; renderTab(true); return; } if (k === 'satK') { window._sat.k = v; renderTab(true); return; } const r = G.act.setPolicy(k, v); if (r && r.ok === false) { hint('⚠ ' + r.err, 4000); AUD.sfx('bad'); } renderTab(true); renderTop(); }
 TAB_FN.state = function () {
   const n = nat(G.player), A = n.agg, s = n.stats; const debtR = n.debt / Math.max(1, A.gdp); const bal = s.rev - s.spend; const pool = A.pop * 1000 * n.pol.mob;
   const sub = curSub('state', 'over');

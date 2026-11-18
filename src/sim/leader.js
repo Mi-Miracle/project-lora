@@ -11,7 +11,7 @@ LORA.sim.register('leader', 92, function (G) {
     general:  { n: 'Генерал у відставці', ic: '🎖', d: 'Повага у країнах, що воюють: звʼязки й популярність там ×2', cash: 0.06, k: { contacts: 1.2, pop: 1.2, money: 0.8 } }
   };
   // кожен гравець-людина має свого лідера; G.leader — лідер «поточного» гравця (G.player або 'me' для персонажа/CEO)
-  G.leaders = {}; const lkey = () => G.player >= 0 ? G.player : 'me';
+  G.leaders = {}; const lkey = () => G._lk != null ? G._lk : G.player >= 0 ? G.player : 'me';
   Object.defineProperty(G, 'leader', { get: () => G.leaders[lkey()] || null, set: v => { if (v) G.leaders[lkey()] = v; else delete G.leaders[lkey()]; }, configurable: true });
   G.initLeader = function (o) {
     const home = o.home; const at = o.at != null ? o.at : (N[home].home != null ? N[home].home : ter.findIndex(t => t.owner === home));
@@ -110,7 +110,8 @@ LORA.sim.register('leader', 92, function (G) {
     const L = G.leader; if (!L || L.role !== 'char' || L.cand !== nid || G.player >= 0) return false;
     const p = (L.popu[nid] || 0), c = (L.cont[nid] || 0), chance = clamp((p - 35) / 45 * 0.7 + (c - 40) / 60 * 0.3 + (L.fame / 400), 0.03, 0.92);
     L.cand = null;
-    if (G.rnd() < chance) { delete G.leaders.me; G.leaders[nid] = L; G.player = nid; G.humans.add(nid); L.role = 'president'; L.home = nid; G.armies.forEach(a => { if (a.n === nid) a.auto = true; });
+    if (G.rnd() < chance) { const key = Object.keys(G.leaders).find(k => G.leaders[k] === L); delete G.leaders[key]; G.leaders[nid] = L; G.humans.add(nid); L.role = 'president'; L.home = nid; G.armies.forEach(a => { if (a.n === nid) a.auto = true; });
+      if (key !== 'me') { G.say(`🗳 Сенсація! ${L.name} перемагає на виборах і стає главою держави: ${N[nid].name}`, 'big', [nid]); LORA.bus.emit('guestPresident', { lk: key, n: nid }); return true; } G.player = nid;
       G.say(`🗳 Сенсація! ${L.name} перемагає на виборах і стає главою держави: ${N[nid].name}`, 'big', [nid]); LORA.bus.emit('takeover', { n: nid, char: true }); return true; }
     G.say(`🗳 ${L.name} програє вибори в ${N[nid].name} (шанс був ${(chance * 100).toFixed(0)}%)`, 'bad', [nid]); L.popu[nid] *= 0.7; return false;
   };

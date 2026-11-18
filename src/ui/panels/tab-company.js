@@ -5,7 +5,7 @@ function coSec(c) { return D.companySectors[c.sector]; }
 function coAct(fn) { const r = fn(); hint(r && r.ok === false ? '⚠ ' + r.err : (r && r.msg) || 'Готово', 3000); renderTab(true); renderTop(); if (sel) renderRight(); }
 TAB_FN.co = function () {
   const c = G.myCo(); if (!c) return '<div class="mut">Компанії немає.</div>';
-  G.corpInit(c); const s = coSec(c), cur = curSub('co', 'over'); let h = subnav('co', [['over', 'Огляд'], ['prod', '🏭 Виробництво'], ['tend', `📑 Тендери (${coOpenTenders(c).length})`], ['rd', '🔬 R&D'], ['build', '🏗 Будувати'], ['assets', 'Активи'], ['fin', '🏦 Фінанси'], ['offices', 'Офіси'], ['infl', 'Вплив'], ['rank', 'Конкуренти']]);
+  G.corpInit(c); G.corpRes(c); const s = coSec(c), cur = curSub('co', 'over'); let h = subnav('co', [['over', 'Огляд'], ['assets', 'Активи'], ['offices', 'Офіси'], ['infl', 'Вплив'], ['rank', 'Конкуренти']]);
   if (cur === 'prod') return h + coProdTab(c);
   if (cur === 'tend') return h + coTendTab(c);
   if (cur === 'rd') return h + coRDTab(c);
@@ -35,7 +35,7 @@ TAB_FN.co = function () {
     h += list.map(nid => { const v = c.infl[nid] || 0, n = nat(nid), err = G.coCanTakeover(c, nid);
       return `<div class="card"><div class="row"><b>${ndot(nid)}${esc(n.name)}</b><b class="${v >= 70 ? 'g' : v >= 30 ? 'y' : ''}">${v.toFixed(0)}</b></div><div class="bar"><i style="width:${v}%;background:${v >= 70 ? '#4cd28a' : '#4fb3ff'}"></i></div>
       <div class="small mut">ВВП ${money(n.agg.gdp)} · стабільність ${n.stab.toFixed(0)} · ваші активи ${money(G.coAssetsIn(c, nid))}</div>
-      <div class="btns"><span class="small mut" style="align-self:center">Лобізм:</span>${[0.1, 0.5, 2].map(v => `<button onclick="coAct(()=>G.coLobby(G.myCo(),${nid},${v}))" ${c.cash < v ? 'disabled' : ''}>${money(v)}</button>`).join('')}
+      <div class="btns"><span class="small mut" style="align-self:center">Лобізм:</span>${[0.1, 0.5, 2].map(v => `<button onclick="coAct(()=>G.act.coLobby(${nid},${v}))" ${c.cash < v ? 'disabled' : ''}>${money(v)}</button>`).join('')}
       ${nid !== G.player ? `<button class="${err ? '' : 'pri'}" onclick="coTakeover(${nid})" title="${esc(err || 'Профінансувати зміну влади')}" ${err ? 'disabled' : ''}>👑 Перебрати владу (${money(G.takeoverCost(c, nid))})</button>` : ''}</div>${err && nid !== G.player ? `<div class="small mut">${esc(err)}</div>` : ''}</div>`; }).join('');
   } else {
     const L = G.companies.filter(x => x.alive).sort((a, b) => G.coValue(b) - G.coValue(a));
@@ -48,7 +48,7 @@ function spark(arr) { const mx = Math.max(...arr), mn = Math.min(...arr), w = 30
 function focusReg(i) { const c = D.regions[i].c; sel = { type: 't', id: i }; focusLonLat(c[0], c[1], Math.max(view.s, 8)); renderRight(); }
 function coTakeover(nid) {
   const c = G.myCo(); openModal(`<h2>👑 Перебрати владу: ${esc(nat(nid).name)}?</h2><p>Компанія профінансує політичну кампанію (${money(G.takeoverCost(c, nid))}). Ви станете урядом цієї держави: керуватимете економікою, армією й дипломатією. 30% вільних коштів компанії піде до державних резервів. Стабільність тимчасово впаде.</p>
-  <div class="btns"><button class="pri" onclick="closeModal();coAct(()=>G.coTakeover(G.myCo(),${nid}))">Так, перебрати владу</button><button onclick="closeModal()">Скасувати</button></div>`);
+  <div class="btns"><button class="pri" onclick="closeModal();coAct(()=>G.act.coTakeover(${nid}))">Так, перебрати владу</button><button onclick="closeModal()">Скасувати</button></div>`);
 }
 LORA.bus.on('takeover', () => { if (!G || G.player < 0) return; applyTheme(nat(G.player).a3, nat(G.player).color); tab = 'state'; renderTabs(); renderTab(true); renderTop(); G._blkP = G.seaBlockedFor(G.player); mapDirty = true; });
 // ---- дії компанії в регіоні (права панель)
@@ -56,12 +56,12 @@ function coRegionActions(i) {
   const c = G.myCo(); if (!c) return ''; const t = G.ter[i], nid = t.owner, s = coSec(c); let h = `<div class="grp">🏢 ${esc(c.name)}</div>`;
   const has = G.coHasOffice(c, nid), inf = c.infl[nid] || 0;
   h += `<div class="row small"><span>Вплив у країні</span><b>${inf.toFixed(0)}</b></div>`;
-  if (!has) { const cost = G.officeCost(c, i); h += `<div class="btns"><button class="pri" onclick="coAct(()=>G.coOpenOffice(G.myCo(),${i}))" ${c.cash < cost ? 'disabled' : ''}>🏢 Купити офіс тут (${money(cost)})</button></div>`; }
+  if (!has) { const cost = G.officeCost(c, i); h += `<div class="btns"><button class="pri" onclick="coAct(()=>G.act.coOffice(${i}))" ${c.cash < cost ? 'disabled' : ''}>🏢 Купити офіс тут (${money(cost)})</button></div>`; }
   else {
     const o = c.offices.find(x => x.n === nid); h += `<div class="small mut">${o.hq ? '⭐ Тут ваш штаб-офіс' : '🏢 У країні є ваш офіс'} (${esc(G.T[o.t].n)})</div>`;
-    if (!o.hq) h += `<div class="btns"><button onclick="coAct(()=>G.coMoveHQ(G.myCo(),${i}))">⭐ Перенести штаб сюди</button></div>`;
+    if (!o.hq) h += `<div class="btns"><button onclick="coAct(()=>G.act.coHQ(${i}))">⭐ Перенести штаб сюди</button></div>`;
     h += `<div class="grp">Збудувати актив</div>` + s.assets.map(k => { const err = G.coCanBuild(c, i, k), b = D.buildings[k], cost = G.buildCost(nid, i, k) * 1.1, roi = G.assetProfit(c, { t: i, type: k, lvl: 1 }) / cost;
-      return `<div class="row small"><span>${ico(b.ic)} ${esc(b.n)}<br><span class="mut">${money(cost)} · ${b.days} дн. · дохідність ${pct(roi, 0)}/р</span></span><button onclick="coAct(()=>G.coBuild(G.myCo(),${i},'${k}'))" ${err ? `disabled title="${esc(err)}"` : ''}>🏗</button></div>`; }).join('');
+      return `<div class="row small"><span>${ico(b.ic)} ${esc(b.n)}<br><span class="mut">${money(cost)} · ${b.days} дн. · дохідність ${pct(roi, 0)}/р</span></span><button onclick="coAct(()=>G.act.coBuild(${i},'${k}'))" ${err ? `disabled title="${esc(err)}"` : ''}>🏗</button></div>`; }).join('');
   }
   const mine = c.assets.filter(a => a.t === i); if (mine.length) h += `<div class="small">Ваші активи тут: ${mine.map(a => D.buildings[a.type].ic + ' ' + esc(D.buildings[a.type].n) + ' ×' + a.lvl).join(', ')}</div>`;
   const others = G.companies.filter(x => x.id !== G.pc && x.offices.some(o => o.n === nid)); if (others.length) h += `<div class="small mut">Конкуренти в країні: ${others.slice(0, 6).map(x => esc(x.name)).join(', ')}</div>`;
@@ -81,11 +81,11 @@ function renderTopCompany(sp) {
     <div class="st"><b>${G.dateStr()}</b><span>день ${G.day}</span></div><div id="speed">${sp}</div>
     <div class="st"><b>${money(G.coValue(c))}</b><span>вартість</span></div><div class="st"><b class="${c.cash < 0 ? 'r' : ''}">${money(c.cash)}</b><span>кошти</span></div>
     <div class="st"><b class="g">${money(c.profitY)}</b><span>прибуток / рік</span></div><div class="st"><b>${c.offices.length}</b><span>офісів</span></div>
-    <div class="st"><b>${(c.infl[c.home] || 0).toFixed(0)}</b><span>вплив удома</span></div>`;
+    <div class="st"><b>${(c.infl[c.home] || 0).toFixed(0)}</b><span>вплив удома</span></div>${G.leader && G.leader.role === 'char' ? `<div class="st"><b>${money(G.leader.money)}</b><span>${t_('ваші гроші')}</span></div>` : ''}`;
 }
 
 // ---- КОРПОРАЦІЯ: виробництво, тендери, R&D, будівництво, фінанси
-const coOpenTenders = c => (G.tenders || []).filter(t => !t.done && t.sector === c.sector);
+const coOpenTenders = c => (G.tenders || []).filter(t => !t.done && (t.sector === c.sector || (t.kind === 'res' && G.corpProduces(c, t.r))));
 function coProdTab(c) {
   let h = `<div class="kpi"><div><span>${t_('Репутація')}</span><b class="${c.rep >= 50 ? 'g' : 'r'}">${Math.round(c.rep)}</b></div><div><span>${t_('Контрактів')}</span><b>${c.contracts.length}</b></div><div><span>${t_('Потужності проєктів')}</span><b>${G.corpCapUsed(c)} / ${G.corpCap(c)}</b></div></div>`;
   if (c.sector === 'military') {
@@ -96,9 +96,9 @@ function coProdTab(c) {
       const free = Math.floor(c.inv[k] || 0) - c.contracts.filter(x => x.good === k).reduce((s, x) => s + x.left, 0);
       h += `<div class="card small ${has ? '' : 'soon'}"><div class="row"><b>${ico(g.ic)} ${esc(t_(g.n))}</b><span>${t_('склад')}: <b>${Math.floor(c.inv[k] || 0).toLocaleString()}</b> ${esc(g.u || '')}</span></div>
         ${free >= 1 ? `<div class="row"><span>${t_('Продати вільне')} (${free.toLocaleString()}, ≈${money(free * g.price * 0.85)})</span><select onchange="if(this.value!=='')coAct(()=>G.act.corpSell(+this.value,'${k}'))"><option value="">${t_('кому…')}</option>${G.corpBuyers(c).map(id => `<option value="${id}">${esc(nat(id).name)}${G.enemiesOf(id).length ? ' ⚔' : ''}</option>`).join('')}</select></div>` : ''}
-        ${has ? `<div class="row"><span>${Math.floor(rate).toLocaleString()} ${t_('на міс.')} · ${t_('собівартість')} ${money(G.corpUnitCost(c, k) * 1000)}/1000 · ${t_('ціна')} ${money(g.price * 1000)}/1000</span><label><input type="checkbox" ${c.lines[k] !== false ? 'checked' : ''} onchange="G.myCo().lines['${k}']=this.checked"> ${t_('виробляти')}</label></div>` : `<div class="r">${lock}</div>`}</div>`;
+        ${has ? `<div class="row"><span>${Math.floor(rate).toLocaleString()} ${t_('на міс.')} · ${t_('собівартість')} ${money(G.corpUnitCost(c, k) * 1000)}/1000 · ${t_('ціна')} ${money(g.price * 1000)}/1000</span><label><input type="checkbox" ${c.lines[k] !== false ? 'checked' : ''} onchange="G.act.coSet('line','${k}',this.checked)"> ${t_('виробляти')}</label></div>` : `<div class="r">${lock}</div>`}</div>`;
     });
-    h += `<label class="row small"><span>${t_('Продавати надлишок своїй державі (70% ціни), коли вона воює')}</span><input type="checkbox" ${c.autoSell ? 'checked' : ''} onchange="G.myCo().autoSell=this.checked"></label>`;
+    h += `<label class="row small"><span>${t_('Продавати надлишок своїй державі (70% ціни), коли вона воює')}</span><input type="checkbox" ${c.autoSell ? 'checked' : ''} onchange="G.act.coSet('autoSell',null,this.checked)"></label>`;
   } else h += `<div class="card small">${t_('Ваш сектор заробляє на активах (видобуток, станції, ферми, дата-центри) і на проєктних контрактах для урядів. Більше профільних активів — більше потужностей для проєктів.')}</div>`;
   if (c.contracts.length) h += `<div class="grp">${t_('Активні контракти')}</div>` + c.contracts.map(k => k.kind === 'good' ? `<div class="card small"><div class="row"><b>${ico(G.CORP_GOODS[k.good].ic)} ${esc(t_(G.CORP_GOODS[k.good].n))} → ${esc(nat(k.buyer).name)}</b><span>${money(k.qty * k.price)}</span></div><div class="bar"><i style="width:${(1 - k.left / k.qty) * 100}%"></i></div><div class="row"><span>${t_('лишилось')} ${Math.ceil(k.left).toLocaleString()}</span><span class="${k.due - G.day < 30 ? 'r' : 'mut'}">${t_('термін')}: ${k.due - G.day} ${t_('дн.')}</span></div></div>`
     : `<div class="card small"><div class="row"><b>🏗 ${esc(t_(k.name))} → ${esc(nat(k.buyer).name)}</b><span>${money(k.value)}</span></div><div class="bar"><i style="width:${Math.min(100, (G.day - k.start) / Math.max(1, k.done - k.start) * 100)}%"></i></div><div class="mut">${t_('до завершення')} ${Math.max(0, k.done - G.day)} ${t_('дн.')} · ${t_('потужність')} ${k.need}</div></div>`).join('');
@@ -110,9 +110,9 @@ function coTendTab(c) {
   let h = `<div class="mut small">${t_('Уряди оголошують тендери. Подайте заявку з ціною: дешевше — більше шансів, але менше прибутку. На перемогу також впливають якість (R&D), репутація, ваш вплив у країні та союзи. Результат — у день закриття.')}</div>`;
   h += `<div class="row small"><span>${t_('Ваша ціна від стартової')}: <b>${Math.round(bidMul * 100)}%</b></span><input type="range" min="70" max="125" value="${Math.round(bidMul * 100)}" onchange="bidMul=this.value/100;renderTab(true)"></div>`;
   if (!L.length) return h + `<div class="card small">${t_('Зараз немає відкритих тендерів у вашому секторі. Нові з’являються щомісяця.')}</div>`;
-  h += L.slice(0, 30).map(t => { const e = G.corpCanBid(c, t), mine = t.bids.some(b => b.co === c.id); const g = t.kind === 'good' ? G.CORP_GOODS[t.good] : null; const val = t.kind === 'good' ? t.qty * t.price : t.value;
-    return `<div class="card small ${e && !mine ? 'soon' : ''}"><div class="row"><b>${t.kind === 'good' ? ico(g.ic) + ' ' + esc(t_(g.n)) + ' ×' + t.qty.toLocaleString() : '🏗 ' + esc(t_(t.name))}</b><b>${money(val * bidMul)}</b></div>
-      <div class="row"><span>${ndot(t.buyer)}${esc(nat(t.buyer).name)} · ${t.kind === 'good' ? t_('поставити до') + ' ' + G.dateStr(t.due) : t_('потужність') + ' ' + t.need + ' · ' + t.days + ' ' + t_('дн.')}</span><span class="mut">${t_('заявки до')} ${G.dateStr(t.close)} · ${t.bids.length} ${t_('заявок')}</span></div>
+  h += L.slice(0, 30).map(t => { const e = G.corpCanBid(c, t), mine = t.bids.some(b => b.co === c.id); const g = t.kind === 'good' ? G.CORP_GOODS[t.good] : null; const val = t.kind === 'good' ? t.qty * t.price : t.kind === 'res' ? t.q * t.price * t.months : t.value;
+    return `<div class="card small ${e && !mine ? 'soon' : ''}"><div class="row"><b>${t.kind === 'good' ? ico(g.ic) + ' ' + esc(t_(g.n)) + ' ×' + t.qty.toLocaleString() : t.kind === 'res' ? ico(RI[t.r].ic) + ' ' + t_('Постачання') + ': ' + esc(t_(RI[t.r].n)) + ' ' + t.q.toFixed(3) + '/' + t_('міс.') + ' × ' + t.months : '🏗 ' + esc(t_(t.name))}</b><b>${money(val * bidMul)}</b></div>
+      <div class="row"><span>${ndot(t.buyer)}${esc(nat(t.buyer).name)} · ${t.kind === 'good' ? t_('поставити до') + ' ' + G.dateStr(t.due) : t.kind === 'res' ? t_('щомісяця зі складу') : t_('потужність') + ' ' + t.need + ' · ' + t.days + ' ' + t_('дн.')}</span><span class="mut">${t_('заявки до')} ${G.dateStr(t.close)} · ${t.bids.length} ${t_('заявок')}</span></div>
       ${mine ? `<div class="g">✔ ${t_('Заявку подано')}</div>` : e ? `<div class="r">${esc(t_(e))}</div>` : `<div class="btns"><button class="pri" onclick="coAct(()=>G.act.corpBid(${t.id},bidMul))">📑 ${t_('Подати заявку')}</button></div>`}</div>`; }).join('');
   return h;
 }
@@ -130,7 +130,7 @@ function coBuildTab(c) {
   const s = coSec(c); let h = `<div class="mut small">${t_('Профільні активи вашого сектору й найвигідніше місце серед країн, де є ваші офіси. Будівництво триває місяцями — як у реальності.')}</div>`;
   h += s.assets.map(k => { const b = D.buildings[k]; if (!b) return ''; const sp = G.coBestSpot(c, k); const ok = sp.i != null; const cost = ok ? G.buildCost(G.ter[sp.i].owner, sp.i, k) * 1.1 : 0;
     return `<div class="card small ${ok ? '' : 'soon'}"><div class="row"><b>${ico(b.ic)} ${esc(t_(b.n))}</b><span>${ok ? money(cost) : ''}</span></div><div>${fmtIO ? fmtIO(b) : ''}</div>
-      <div class="row"><span class="mut">${b.days} ${t_('дн.')}${ok ? ' · 📍 ' + esc(regName(sp.i)) + ' (' + esc(nat(G.ter[sp.i].owner).name) + ') · ' + t_('дохідність') + ' ' + pct(sp.roi, 0) + '/' + t_('р') : ''}</span>${ok ? `<span style="white-space:nowrap"><button onclick="focusReg(${sp.i})">🗺</button><button class="pri" onclick="coAct(()=>G.coBuild(G.myCo(),${sp.i},'${k}'))" ${c.cash < cost ? 'disabled' : ''}>🏗 ${t_('Будувати')}</button></span>` : `<span class="r">${esc(t_(sp.err))}</span>`}</div></div>`; }).join('');
+      <div class="row"><span class="mut">${b.days} ${t_('дн.')}${ok ? ' · 📍 ' + esc(regName(sp.i)) + ' (' + esc(nat(G.ter[sp.i].owner).name) + ') · ' + t_('дохідність') + ' ' + pct(sp.roi, 0) + '/' + t_('р') : ''}</span>${ok ? `<span style="white-space:nowrap"><button onclick="focusReg(${sp.i})">🗺</button><button class="pri" onclick="coAct(()=>G.act.coBuild(${sp.i},'${k}'))" ${c.cash < cost ? 'disabled' : ''}>🏗 ${t_('Будувати')}</button></span>` : `<span class="r">${esc(t_(sp.err))}</span>`}</div></div>`; }).join('');
   if (c.pend.length) h += `<div class="grp">${t_('Будується')}</div>` + c.pend.map(p => `<div class="row small"><span>🏗 ${esc(t_(D.buildings[p.type].n))} · ${esc(G.T[p.t].n)}</span><span>${Math.max(0, p.done - G.day)} ${t_('дн.')}</span></div>`).join('');
   return h;
 }
@@ -141,3 +141,35 @@ function coFinTab(c) {
   if (G.stock && G.stock.px[c.id] != null) h += `<div class="row small"><span>📈 ${t_('Ціна 1% акцій на біржі')}</span><b>${money(G.stock.px[c.id])}</b></div>`;
   return h;
 }
+
+// ---- окремі вкладки компанії
+const coWrap = fn => () => { const c = G.myCo(); if (!c) return '<div class="mut">' + t_('Компанії немає.') + '</div>'; G.corpInit(c); G.corpRes(c); return fn(c); };
+TAB_FN.coprod = coWrap(c => coProdTab(c));
+TAB_FN.cotend = coWrap(c => coTendTab(c));
+TAB_FN.cord = coWrap(c => coRDTab(c));
+TAB_FN.cobuild = coWrap(c => coBuildTab(c));
+TAB_FN.cofin = coWrap(c => coFinTab(c));
+let tradeQ = 0.25;
+TAB_FN.cotrade = coWrap(c => {
+  const f = G.corpResFlow(c), R = new Set([...Object.keys(f.out), ...Object.keys(f.inn), ...Object.keys(c.res).filter(r => c.res[r] > 1e-6)]);
+  let h = `<div class="mut small">${t_('Ваші активи виробляють ресурси на склад, а сировину для них компанія купує на світовому ринку. Продавайте вручну чи автоматично, або укладайте контракти постачання з урядами (вкладка «Тендери»).')}</div>`;
+  h += `<div class="kpi"><div><span>${t_('Чистий дохід від ресурсів / рік')}</span><b class="${(c.resNetY || 0) >= 0 ? 'g' : 'r'}">${money(c.resNetY || 0)}</b></div><div><span>${t_('Контрактів постачання')}</span><b>${(c.supply || []).length}</b></div></div>`;
+  if (!R.size) h += `<div class="card small">${t_('Поки що ви нічого не виробляєте. Збудуйте профільні активи (вкладка «Будівництво») — видобуток, станції, заводи, ферми.')}</div>`;
+  h += `<div class="btns small"><span class="mut" style="align-self:center">${t_('Обсяг угоди')}:</span>${[0.1, 0.25, 1].map(v => `<button class="${tradeQ === v ? 'on' : ''}" onclick="tradeQ=${v};renderTab(true)">${Math.round(v * 100)}% ${t_('міс. виробництва')}</button>`).join('')}</div>`;
+  h += `<table class="small"><tr><th>${t_('Ресурс')}</th><th>${t_('Склад')}</th><th>+/${t_('міс.')}</th><th>${t_('Ціна')}</th><th>${t_('Авто')}</th><th></th></tr>`;
+  [...R].forEach(r => { const RIr = RI[r]; const pm = (f.out[r] || 0) - (f.inn[r] || 0); const q = Math.max(Math.abs(pm), (c.res[r] || 0), 0.0001) * tradeQ * (Math.abs(pm) > 0 ? 1 : 1);
+    h += `<tr><td>${ico(RIr.ic)} ${esc(t_(RIr.n))}</td><td>${(c.res[r] || 0).toFixed(3)}</td><td class="${pm >= 0 ? 'g' : 'r'}">${pm.toFixed(3)}</td><td>${money(G.prices[r])}</td><td><input type="checkbox" ${c.sell[r] !== false ? 'checked' : ''} onchange="G.act.coSet('sell','${r}',this.checked)"></td>
+      <td style="white-space:nowrap"><button class="small" onclick="coAct(()=>G.act.corpTrade('${r}',${q}))">${t_('Купити')}</button><button class="small" onclick="coAct(()=>G.act.corpTrade('${r}',-${q}))">${t_('Продати')}</button></td></tr>`; });
+  h += `</table><div class="mut small">${t_('Продаж — 95% ринкової ціни, купівля — 106%. Сировина, якої бракує на складі, докуповується автоматично.')}</div>`;
+  if ((c.supply || []).length) h += `<div class="grp">${t_('Контракти постачання')}</div>` + c.supply.map(k => `<div class="card small"><div class="row"><b>${ico(RI[k.r].ic)} ${esc(t_(RI[k.r].n))} → ${esc(nat(k.buyer).name)}</b><span>${k.q.toFixed(3)}/${t_('міс.')} · ${money(k.p)}</span></div><div class="mut">${t_('лишилось місяців')}: ${k.left} · ${t_('недопоставка — штраф 25% і репутація')}</div></div>`).join('');
+  return h;
+});
+TAB_FN.codipl = coWrap(c => {
+  const ids = [...new Set([c.home, ...c.offices.map(o => o.n), ...Object.keys(c.lost || {}).map(Number)])];
+  let h = `<div class="mut small">${t_('Відносини компанії з урядами: вплив дає податкові пільги, захист від націоналізації й доступ до тендерів. Нові країни — купіть офіс (клік по регіону на мапі).')}</div>`;
+  ids.forEach(nid => { const n = nat(nid), v = c.infl[nid] || 0, d = (c.dip && c.dip[nid]) || {};
+    const st = [d.tax > G.day ? '🧾 ' + t_('податкові канікули') : '', d.sub > G.day ? '🏗 ' + t_('співфінансування') : '', d.lic > G.day ? '📜 ' + t_('експортна ліцензія') : '', d.deal && d.deal.until > G.day && !d.deal.done ? '📈 ' + t_('інвест. угода до') + ' ' + G.dateStr(d.deal.until) : ''].filter(Boolean).join(' · ');
+    h += `<div class="card small"><div class="row"><b>${ndot(nid)}${esc(n.name)}${nid === c.home ? ' ⭐' : ''}</b><b class="${v >= 50 ? 'g' : v >= 25 ? 'y' : ''}">${t_('вплив')} ${v.toFixed(0)}</b></div><div class="bar"><i style="width:${v}%"></i></div>${st ? `<div class="g">${st}</div>` : ''}
+      <div class="btns">${Object.entries(G.CO_DIP).map(([k, A]) => { const e = G.coDipCan(c, nid, k); if (k === 'court' && e && /Немає/.test(e)) return ''; return `<button class="small" ${e ? 'disabled' : ''} data-tip="${esc(t_(A.d))}${e ? ' — ' + esc(t_(e)) : ''}" onclick="coAct(()=>G.act.coDip(${nid},'${k}'))">${A.ic} ${esc(t_(A.n))}${A.cost ? ' · ' + money(A.cost) : ''}</button>`; }).join('')}</div></div>`; });
+  return h;
+});

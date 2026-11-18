@@ -24,7 +24,7 @@ function charActionsBlock() {
     if (k === 'broker' && partners.length) h += `<div class="small"><select onchange="_brk=+this.value;renderRight()"><option value="">— ${t_('друга країна')} —</option>${partners.map(x => `<option value="${x}" ${window._brk === x ? 'selected' : ''}>${esc(nat(x).name)}</option>`).join('')}</select></div>`; });
   return h;
 }
-function charDo(k) { const r = G.charDo(k, k === 'broker' ? window._brk : null); hint(r.ok ? '✅ ' + r.msg : '⚠ ' + r.err, 3500); AUD.sfx(r.ok ? 'good' : 'bad'); renderTab(true); renderRight(); renderTop(); }
+function charDo(k) { const r = G.act.charDo(k, k === 'broker' ? window._brk : null); hint(r.ok ? '✅ ' + r.msg : '⚠ ' + r.err, 3500); AUD.sfx(r.ok ? 'good' : 'bad'); renderTab(true); renderRight(); renderTop(); }
 // вкладка
 TAB_FN.lead = function () {
   const L = G.leader; if (!L) return '<div class="mut">—</div>';
@@ -68,3 +68,36 @@ function drawLeader(sh) {
   ctx.font = '600 11px Pixelify, system-ui'; ctx.textAlign = 'center'; const w = ctx.measureText(L.name).width + 10;
   ctx.fillStyle = 'rgba(10,16,24,0.85)'; ctx.fillRect(x - w / 2, y + 4, w, 15); ctx.fillStyle = '#ffd34d'; ctx.fillText(L.name, x, y + 15);
 }
+// ---- КАР'ЄРА: робота, партія, депутат, власна компанія, шлях до президентства
+let foundName = '', foundSector = 'tech', foundCash = 0.3;
+function carDo(k, a, b) { const r = k === 'found' ? G.act.careerFound(foundName || null, foundSector, foundCash) : G.act.careerDo(k, a, b); hint(r && r.ok ? '✅ ' + t_(r.msg || 'Готово') : '⚠ ' + t_((r && r.err) || 'Помилка'), 3500); AUD.sfx(r && r.ok ? 'good' : 'bad'); if (r && r.ok && k === 'found') { tab = 'co'; renderTabs(); } renderTab(true); renderTop(); }
+TAB_FN.career = function () {
+  const L = G.leader; if (!L || L.role !== 'char') return '';
+  const nid = G.leaderNation(), here = nid >= 0 ? nat(nid) : null; const stage = G.player >= 0 ? 4 : L.mp != null ? 2 : G.pc >= 0 ? 3 : L.party ? 1 : 0;
+  const steps = [['🧑', 'Персонаж'], ['🎗', 'Партія'], ['🏛', 'Депутат'], ['🏢', 'Власник компанії'], ['👑', 'Президент']];
+  let h = `<div class="career-path">${steps.map(([ic, n], k) => `<span class="${k <= stage || (k === 3 && G.pc >= 0) || (k === 2 && L.mp != null) ? 'on' : ''}">${ico(ic)} ${t_(n)}</span>`).join('<i>›</i>')}</div>`;
+  h += `<div class="mut small">${t_('Етапи можна проходити в будь-якому порядку: заробіть гроші й вплив, станьте депутатом або засновником компанії — і балотуйтеся в президенти (вкладка «Персонаж» → «Балотуватися»).')}</div>`;
+  const btn = (k, a, label) => { const e = G.careerCan(k, a); const A = G.CAREER[k]; return `<button class="${e ? '' : 'pri'}" ${e ? 'disabled' : ''} data-tip="${esc(t_(A.d))}${e ? ' — ' + esc(t_(e)) : ''}" onclick="carDo('${k}',${a == null ? 'null' : `'${a}'`})">${A.ic} ${esc(t_(label || A.n))}${A.cost ? ' · ' + money(A.cost) : ''}</button>`; };
+  // робота
+  h += `<div class="grp">🧳 ${t_('Робота')}</div>`;
+  if (L.job) { const J = G.JOBS[L.job.k]; h += `<div class="card small"><div class="row"><b>${J.ic} ${esc(t_(J.n))} · ${t_('рівень')} ${L.job.lvl}</b><span>${money(J.pay * (1 + (L.job.lvl - 1) * 0.6) * 12)}/${t_('рік')}</span></div><div class="mut">${esc(t_(J.d))} · ${esc(nat(L.job.nid).name)}</div></div>`; }
+  h += `<div class="btns">${Object.entries(G.JOBS).map(([k, J]) => { const e = G.careerCan('job', k); return `<button class="small" ${e ? 'disabled' : ''} data-tip="${esc(t_(J.d))}${e ? ' — ' + esc(t_(e)) : ''}" onclick="carDo('job','${k}')">${J.ic} ${esc(t_(J.n))}</button>`; }).join('')}</div>`;
+  // партія
+  h += `<div class="grp">🎗 ${t_('Партія')}</div>`;
+  if (L.party) h += `<div class="card small"><div class="row"><b>${esc(L.party.name)}</b><b>${L.party.r.toFixed(1)}%</b></div><div class="bar"><i style="width:${Math.min(100, L.party.r * 2)}%"></i></div><div class="mut">${esc(nat(L.party.nid).name)} · ${t_('рейтинг росте разом із вашою популярністю')}</div></div>`;
+  h += `<div class="btns">${btn('party')}${btn('campaign')}</div>`;
+  // парламент
+  h += `<div class="grp">🏛 ${t_('Парламент')}</div>`;
+  if (L.mp != null) h += `<div class="card small g">🏛 ${t_('Ви депутат')}: ${esc(nat(L.mp).name)} · ${t_('вплив у Раді')} <b>${(L.mpInfl || 0).toFixed(0)}</b> · ${t_('зарплата')} ${money(0.0072)}/${t_('рік')}</div>`;
+  else if (L.mpCand != null) h += `<div class="card small">🗳 ${t_('Ви кандидат у депутати')}: ${esc(nat(L.mpCand).name)} · ${t_('вибори')} ${G.dateStr(L.mpBy || nat(L.mpCand).parl.next)}</div>`;
+  h += `<div class="btns">${btn('mp_run')}${btn('mp_speech')}${btn('mp_inquiry')}${btn('mp_faction')}${G.pc >= 0 ? btn('mp_lobby') : ''}</div>`;
+  if (L.mp != null) h += `<div class="row small"><span>📜 ${t_('Законопроєкт')}</span><select id="billSel">${G.MP_BILLS.map((b, k) => `<option value="${k}">${esc(t_(b[0]))}</option>`).join('')}</select><button ${G.careerCan('mp_bill') ? 'disabled' : ''} onclick="carDo('mp_bill',document.getElementById('billSel').value)">${t_('Внести')}</button></div>`;
+  // компанія
+  h += `<div class="grp">🏢 ${t_('Власна компанія')}</div>`;
+  if (G.pc >= 0) { const c = G.myCo(); h += `<div class="card small"><div class="row"><b>${esc(c.name)}</b><span>${money(G.coValue(c))}</span></div>${c.owner === 'me' ? `<div class="row"><span>${t_('Дивіденди власнику (частка прибутку)')}</span><select onchange="G.act.coSet('divs',null,+this.value)">${[0, 0.1, 0.2, 0.4].map(v => `<option value="${v}" ${c.divs === v ? 'selected' : ''}>${v * 100}%</option>`).join('')}</select></div><div class="btns">${[0.05, 0.2].map(v => `<button class="small" onclick="coAct(()=>G.act.coSet('invest',null,${v}))">💸 ${t_('Вкласти')} ${money(v)}</button>`).join('')}</div>` : ''}</div>`; }
+  else h += `<div class="card small"><div class="row"><span>${t_('Назва')}</span><input type="text" value="${esc(foundName)}" oninput="foundName=this.value" placeholder="${t_('Моя компанія')}" style="width:55%"></div>
+    <div class="row"><span>${t_('Сектор')}</span><select onchange="foundSector=this.value">${Object.entries(D.companySectors).map(([k, s]) => `<option value="${k}" ${foundSector === k ? 'selected' : ''}>${s.ic} ${esc(t_(s.n))}</option>`).join('')}</select></div>
+    <div class="row"><span>${t_('Стартовий капітал')}: <b>${money(foundCash)}</b></span><input type="range" min="0.2" max="${Math.max(0.21, L.money).toFixed(2)}" step="0.05" value="${foundCash}" onchange="foundCash=+this.value;renderTab(true)"></div>
+    <div class="btns">${(() => { const e = G.careerCan('found_co'); return `<button class="pri" ${e || L.money < 0.2 ? 'disabled' : ''} onclick="carDo('found')">🏗 ${t_('Заснувати компанію')}</button>${e ? `<span class="r small">${esc(t_(e))}</span>` : ''}`; })()}</div><div class="mut">${t_('Компанія засновується в країні, де ви зараз перебуваєте. Далі ви керуєте і персонажем, і компанією.')}</div></div>`;
+  return h;
+};
