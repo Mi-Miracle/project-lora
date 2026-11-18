@@ -3,10 +3,9 @@ $root = Split-Path -Parent $PSScriptRoot
 $desk = [Environment]::GetFolderPath('Desktop')
 $w = New-Object -ComObject WScript.Shell
 $s = $w.CreateShortcut((Join-Path $desk 'Project LORA.lnk'))
-$s.TargetPath = Join-Path $root 'Запустити LORA.bat'
-$s.WorkingDirectory = $root
+$exe = Join-Path $root 'Project LORA-win32-x64\Project LORA.exe'
+if (Test-Path $exe) { $s.TargetPath = $exe; $s.WorkingDirectory = Split-Path -Parent $exe } else { $s.TargetPath = Join-Path $root 'Запустити LORA.bat'; $s.WorkingDirectory = $root }
 $s.IconLocation = (Join-Path $root 'assets\lora.ico') + ',0'
-$s.WindowStyle = 7
 $s.Description = 'Project LORA — геополітична стратегія'
 $s.Save()
 Write-Host "Ярлик створено: $desk\Project LORA.lnk"
