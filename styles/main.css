@@ -385,7 +385,7 @@ table.compedit td{vertical-align:top;padding:4px 3px}table.compedit input[type=r
 #intro { position: fixed; inset: 0; z-index: 99999; background: #05080d; transition: opacity .65s ease; cursor: pointer; }
 #intro.out { opacity: 0; pointer-events: none; }
 #intro canvas { display: block; }
-#intro .intro-skip { position: absolute; right: 18px; bottom: 14px; color: rgba(180,200,220,.45); font: 12px system-ui, sans-serif; letter-spacing: .04em; }
+#intro .intro-skip { position: absolute; right: 18px; top: 14px; color: rgba(180,200,220,.45); font: 12px system-ui, sans-serif; letter-spacing: .04em; }
 .goals { display: flex; flex-wrap: wrap; gap: 4px; }
 .goal { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,.04); color: #6c7a8a; border: 1px solid rgba(255,255,255,.06); }
 .goal.on { color: #ffd34d; background: rgba(255,211,77,.1); border-color: rgba(255,211,77,.35); }
@@ -434,3 +434,46 @@ input[type=password] { background: #0e1a26; color: #dfe9f5; border: 1px solid #2
 .mincard .min-tog { color: #7f93a8; }
 .mincard .min-acts { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .qbtn { position: relative; } .qdot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border-radius: 50%; background: #ffd34d; box-shadow: 0 0 6px #ffd34d; }
+/* стрічка кумедних новин у грі */
+#funTk { position: absolute; left: 452px; right: 0; bottom: 0; height: 24px; z-index: 3; display: flex; align-items: center; background: linear-gradient(90deg, #0b111aee, #0b111ad8); border-top: 2px solid #ffd34d55; font: 13px system-ui, sans-serif; color: #e8f0f8; cursor: pointer; }
+#left.hide~#funTk { left: 72px; }
+#funTk > b { flex: none; background: #aa1419; color: #fff; padding: 0 10px; height: 100%; display: flex; align-items: center; font: 700 11px system-ui; letter-spacing: .08em; }
+#funTk .tk-w { flex: 1; overflow: hidden; height: 100%; position: relative; }
+#funTk .tk-w span { position: absolute; left: 0; top: 0; line-height: 22px; white-space: nowrap; will-change: transform; }
+#funTk .tk-w span::before { content: '◆ '; color: #ffd34d; }
+body.tk-on #news { bottom: 32px; }
+body.tk-on #legend { bottom: 32px; }
+body.stream #funTk { display: none !important; }
+/* меню: модальні вікна й підказки поверх головного меню, налаштувань і нової гри */
+#modal { z-index: 9700; }
+#tip, #tip2 { z-index: 9800; }
+#hint { z-index: 9800; }
+/* екрани «Нова гра» / «Мультиплеєр» / «Рада» у стилі головного меню */
+#mm.behind .mm-left, #mm.behind .mm-right, #mm.behind .mm-foot { display: none; }
+#mm.behind .mm-shade { background: radial-gradient(ellipse at 40% 50%, rgba(5,8,13,.55), rgba(5,8,13,.9)); }
+#start.modern { z-index: 9100; background: transparent; }
+#start.modern::before { display: none; }
+#start.modern .box { width: min(1180px, 94vw); max-height: 92vh; background: rgba(9,14,22,.84); backdrop-filter: blur(8px); border: 1px solid #1d3550; border-top: 0; border-left: 3px solid #4fb3ff; border-radius: 12px; padding: 22px 28px; box-shadow: 0 30px 90px #000c; animation: nsIn .35s ease; }
+@keyframes nsIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+#start.modern .ns-head { display: flex; align-items: center; gap: 22px; margin-bottom: 14px; }
+#start.modern .ns-back { all: unset; cursor: pointer; color: #9fb6cc; font: 600 14px system-ui; padding: 8px 12px; border-radius: 8px; border: 1px solid #1d3550; }
+#start.modern .ns-back:hover { color: #fff; border-color: #4fb3ff; background: #4fb3ff1a; }
+#start.modern .ns-t { flex: 1; }
+#start.modern .ns-t .mm-dev { color: #ffd34d; font: 600 11px system-ui; letter-spacing: .25em; opacity: .8; }
+#start.modern .ns-t h1 { font: 700 clamp(26px, 3vw, 40px) Pixelify, system-ui; color: #e8f3ff; text-shadow: 0 0 20px rgba(79,179,255,.4); margin: 2px 0; }
+#start.modern .ns-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 4px 0 10px; }
+#start.modern .ns-cards button { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; padding: 14px 16px; border-radius: 10px; background: #0f1a28; border: 1px solid #1d3550; text-align: left; transition: border-color .15s, background .15s, transform .15s; }
+#start.modern .ns-cards button:hover { border-color: #4fb3ff; transform: translateY(-2px); }
+#start.modern .ns-cards button.on { border-color: #ffd34d; background: linear-gradient(#1a2738, #121c2a); box-shadow: 0 0 0 1px #ffd34d55 inset; }
+#start.modern .ns-cards i { font-style: normal; font-size: 22px; }
+#start.modern .ns-cards b { font: 700 16px system-ui; color: #fff; }
+#start.modern .ns-cards small { color: #8aa0b8; font-size: 12px; }
+#start.modern .st-tabs { border-bottom-color: #1d3550; }
+#start.modern h3 { color: #ffd34d; letter-spacing: .06em; text-transform: uppercase; font: 700 12px system-ui; margin: 14px 0 6px; }
+#start.modern .btns button.on { border-color: #4fb3ff; box-shadow: 0 0 0 1px #4fb3ff inset; }
+#start.modern .card { background: #0f1a28cc; border-color: #1d3550; border-radius: 10px; }
+#start.modern .st-foot { position: sticky; bottom: -22px; margin: 14px -28px -22px; padding: 12px 28px; background: linear-gradient(#0000, #090e16 30%); border-top: 1px solid #1d3550; }
+#start.modern .st-foot .pri.big { padding: 12px 28px; font-size: 16px; border-radius: 10px; }
+/* автори */
+.cr { text-align: center; } .cr .card { text-align: left; } .cr a { color: #4fb3ff; }
+.cr-logo { font: 700 44px Pixelify, system-ui; color: #ffd34d; text-shadow: 0 0 22px #ffb02088; margin-top: 4px; }

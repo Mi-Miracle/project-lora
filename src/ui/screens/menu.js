@@ -6,7 +6,7 @@ const MM_NEWS = () => LORA.lang === 'en'
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }
-  $('#start').style.display = 'none'; el.style.display = 'block';
+  $('#start').style.display = 'none'; $('#start').classList.remove('modern'); el.classList.remove('behind'); el.style.display = 'block';
   const B = [hasSaveGame() ? ['cont', '▶', 'Продовжити', 'останнє збереження'] : null, ['single', '🎮', 'Нова гра', 'персонаж, партія, компанія чи президент'], ['multi', '🌐', 'Мультиплеєр', 'хост, гравець або глядач'],
     ['rada', '🏛', 'Президент і Рада', 'ви — президент, чат Twitch — парламент'], ['load', '📂', 'Завантажити', 'збереження з цього компʼютера'], ['set', '⚙', 'Налаштування', 'звук, озвучка, гра, Twitch, стрім'],
     ['help', '❓', 'Як грати', 'основи й гарячі клавіші'], ['credits', '✨', 'Автори', 'Mi_Miracle і бібліотеки'], ['quit', '⏻', 'Вихід', '']].filter(Boolean);
@@ -26,9 +26,31 @@ function mmGo(k) {
   if (k === 'multi') { netMode = 'host'; if (startMode === 'rada') startMode = 'nation'; startTab = 'game'; }
   if (k === 'rada') { netMode = 'solo'; startMode = 'rada'; startTab = 'game'; }
   if (k === 'set') { settingsScreen(); return; } if (k === 'help') { help(); return; }
-  if (k === 'credits') { openModal(`<h2>✨ ${t_('Автори')}</h2><div class="card"><b>Mi_Miracle</b><div class="small mut">${t_('Ідея, геймдизайн, стрім')} · twitch.tv/mi_miracle</div></div><div class="small mut" style="line-height:1.6">${t_('Бібліотеки')}: onnxruntime-web (MIT, Microsoft), seek-bzip (MIT), PeerJS (MIT), Pixelify Sans (OFL). ${t_('Голосова модель')} ukrainian_tts (${t_('датасет')} CC0). eSpeak NG (GPL-3, ${t_('завантажується окремо за бажанням')}). ${t_('Географія')}: Natural Earth (public domain).</div><div class="btns"><button onclick="closeModal()">${t_('Закрити')}</button></div>`); return; }
+  if (k === 'credits') { credits(); return; }
   if (k === 'quit') { try { window.close(); } catch (e) { } setTimeout(() => hint(t_('Закрийте вкладку браузера'), 2500), 200); return; }
-  mmHide(); $('#start').style.display = 'flex'; startScreen();
+  // нова гра / мультиплеєр / Рада — сучасний екран поверх анімованого фону меню
+  const el = document.getElementById('mm'); if (el) el.classList.add('behind');
+  $('#start').classList.add('modern'); $('#start').style.display = 'flex'; startScreen();
+}
+function modHead() {
+  const solo = netMode === 'solo', rada = startMode === 'rada';
+  const T = rada ? ['🏛', 'Президент і Рада', 'Ви — президент, чат Twitch — Верховна Рада'] : solo ? ['🎮', 'Нова гра', 'Оберіть сценарій, складність, ким почати і країну'] : ['🌐', 'Мультиплеєр', 'Створіть кімнату або приєднайтеся до друзів'];
+  const MULTI = [['host', '📡', 'Створити гру', 'ви — хост, роздаєте посилання'], ['guest', '🔗', 'Приєднатися', 'за кодом або посиланням'], ['watch', '👁', 'Дивитися', 'глядач без керування']];
+  return `<div class="ns-head"><button id="st-back" class="ns-back" onclick="mainMenu()">← ${t_('Головне меню')}</button><div class="ns-t"><div class="mm-dev">Mi_Miracle · PROJECT LORA</div><h1>${T[0]} ${t_(T[1])}</h1><div class="mut">${t_(T[2])}</div></div><div class="ns-r">${typeof twBadge === 'function' ? twBadge() : ''}</div></div>
+  ${solo ? '' : `<div class="ns-cards">${MULTI.map(([k, ic, n, d]) => `<button class="${netMode === k ? 'on' : ''}" onclick="netMode='${k}';startScreen()"><i>${ic}</i><b>${t_(n)}</b><small>${t_(d)}</small></button>`).join('')}</div>`}`;
+}
+// ---- автори
+function credits() {
+  const en = LORA.lang === 'en';
+  openModal(`<div class="cr"><div class="cr-logo">Mi_Miracle</div><div class="mut" style="letter-spacing:.2em;font-size:12px">${t_('представляє')} · PROJECT LORA v${LORA.version}</div>
+  <div class="card"><b>👤 Mi_Miracle</b><div class="small" style="line-height:1.6">${t_('Автор і розробник гри: ідея, геймдизайн, баланс, тестування, стріми')}.<br>🟣 <a href="https://twitch.tv/mi_miracle" target="_blank">twitch.tv/mi_miracle</a> · 💻 <a href="https://github.com/Mi-Miracle/project-lora" target="_blank">github.com/Mi-Miracle/project-lora</a></div></div>
+  <div class="card"><b>🗣 ${t_('Озвучка (синтез мовлення)')}</b><div class="small" style="line-height:1.6">
+  <b>Piper TTS</b> — ${t_('нейронний синтез мовлення від проєкту Rhasspy, автор Michael Hansen')} (<a href="https://github.com/rhasspy/piper" target="_blank">github.com/rhasspy/piper</a>).<br>
+  ${t_('Голосова модель')} <b>ukrainian_tts (medium)</b>, ${t_('голоси Лада, Микита, Тетяна')}: ${t_('збірка')} rhasspy/piper-voices (MIT), ${t_('датасет')} NabuCasa voice-datasets (CC0). ${t_('Модель завантажується один раз і працює офлайн на вашому компʼютері.')}<br>
+  <b>ONNX Runtime Web</b> — Microsoft (MIT), ${t_('запускає модель у браузері')}. <b>seek-bzip</b> (MIT) — ${t_('розпакування моделі')}.<br>
+  <b>eSpeak NG</b> (GPL-3) — ${t_('необовʼязковий, завантажується окремо за бажанням')}. ${t_('Системні голоси — Windows / браузер. Azure і ElevenLabs — лише з вашим власним ключем.')}</div></div>
+  <div class="card"><b>📚 ${t_('Інше')}</b><div class="small mut" style="line-height:1.6">PeerJS (MIT) — ${t_('мультиплеєр')} · Pixelify Sans (OFL) — ${t_('шрифт')} · Natural Earth (public domain) — ${t_('географія')} · ${t_('Музика генерується процедурно самою грою.')} ${t_('Усі генерали, міністри й персонажі — вигадані.')}</div></div>
+  <div class="btns"><button class="pri" onclick="closeModal()">${t_('Закрити')}</button></div></div>`);
 }
 // фон меню: обертовий глобус
 function mmBg() {
@@ -60,7 +82,8 @@ function settingsScreen() {
   else if (setTab === 'voice') body = chk('tts', 'Озвучка увімкнена') + `<div id="voiceBox">${voiceSettings()}</div>`;
   else if (setTab === 'game') body = `<label class="row"><span>🌫 ${t_('Туман війни')}</span><input type="checkbox" ${LORA.config.fog !== false ? 'checked' : ''} onchange="LORA.config.fog=this.checked;try{localStorage.setItem('lora_fog',this.checked?'1':'0')}catch(e){};if(window.mapDirty!==undefined)mapDirty=true"></label>
     <label class="row"><span>${t_('Заставка при запуску')}</span><input type="checkbox" ${localStorage.getItem('lora_intro') === 'off' ? '' : 'checked'} onchange="localStorage.setItem('lora_intro',this.checked?'on':'off')"></label>
-    <label class="row"><span>${t_('Гумористичні новини й події')}</span><input type="checkbox" ${S.humor !== false ? 'checked' : ''} onchange="AUD.set('humor',this.checked)"></label>
+    <label class="row"><span>${t_('Гумористичні новини й події')}</span><input type="checkbox" ${S.humor !== false ? 'checked' : ''} onchange="AUD.set('humor',this.checked);LORA.tickerRefresh&&LORA.tickerRefresh()"></label>
+    <label class="row"><span>${t_('Стрічка кумедних новин унизу екрана')}</span><input type="checkbox" ${S.ticker !== false ? 'checked' : ''} onchange="AUD.set('ticker',this.checked);LORA.tickerRefresh&&LORA.tickerRefresh()"></label>
     <div class="row"><span>${t_('Мова')}</span>${typeof langSwitch === 'function' ? langSwitch() : ''}</div>
     <div class="card small"><b>${t_('Гарячі клавіші')}</b><div class="mut" style="line-height:1.7">Esc — ${t_('пауза / меню')} · ${t_('Пробіл — стоп/старт часу')} · 1–4 — ${t_('швидкість')} · Alt+1–8 — ${t_('вкладки')} · L — ${t_('до лідера')} · F9 — ${t_('режим стріму')} · F11 — ${t_('повний екран')}</div></div>`;
   else if (setTab === 'twitch') body = typeof twitchBlock === 'function' ? twitchBlock() : '';
@@ -93,3 +116,5 @@ document.addEventListener('keydown', e => {
 setTimeout(() => { if (!G && !/[?&](room|join|watch)=/.test(location.search) && (typeof netMode === 'undefined' || netMode === 'solo')) mainMenu(); }, 0);
 // будь-який старт гри ховає головне меню
 ['startGame', 'loadGame', 'hostOpen'].forEach(f => { const b = window[f]; if (typeof b === 'function') window[f] = function () { const r = b.apply(this, arguments); if ((f === 'startGame') || (f === 'loadGame' && r) || (f === 'hostOpen' && G)) mmHide(); return r; }; });
+// будь-який вхід у гру (одиночна, хост, гравець, глядач, завантаження) ховає фон меню
+{ const b = window.startUI; if (typeof b === 'function') window.startUI = function () { mmHide(); $('#start').classList.remove('modern'); const r = b.apply(this, arguments); try { LORA.tickerStart && LORA.tickerStart(); } catch (e) { } return r; }; }

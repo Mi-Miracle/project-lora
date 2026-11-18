@@ -18,8 +18,7 @@
   function finish() { if (done) return; done = true; ['pointerdown', 'keydown'].forEach(e => removeEventListener(e, onKey)); ov.classList.add('out'); setTimeout(() => { cancelAnimationFrame(raf); ov.remove(); removeEventListener('resize', fit); }, 700); }
   let jumped = 0; const onKey = () => { const t = (performance.now() - T0s) / 1000; if (t < 7.4 && !jumped) { jumped = 1; T0s = performance.now() - 7400; return; } finish(); };
   ['pointerdown', 'keydown'].forEach(e => addEventListener(e, onKey));
-  const HEAD = LORA.lang === 'en' ? ['BREAKING: world leaders argue about who pressed the red button first', 'Markets react nervously to markets reacting nervously', 'General staff asks for more drones and coffee', 'Parliament passes law on passing laws faster', 'Oil price rises after analyst sneezes', 'Satellites spot suspiciously large tractor convoy']
-    : ['ТЕРМІНОВО: лідери світу сперечаються, хто перший натиснув червону кнопку', 'Біржі нервово реагують на те, що біржі нервово реагують', 'Генштаб просить більше дронів і кави', 'Парламент ухвалив закон про швидше ухвалення законів', 'Нафта дорожчає після того, як аналітик чхнув', 'Супутники помітили підозріло велику колону тракторів', 'Курс гривні стабільний: стабільно непередбачуваний', 'Міністр фінансів знайшов у кишені $2 млрд — бюджет виконано'];
+  const tk = []; let tkLast = 0; const TK_SPEED = 55, TK_GAP = 260; // стрічка: повільно, з проміжками між новинами
   try { if (window.AUD && AUD.S.sfx) setTimeout(() => { try { AUD.sfx('news'); } catch (e) { } }, 2600); } catch (e) { }
   function frame(now) {
     if (done && ov.classList.contains('gone')) return; const t = (now - T0s) / 1000; const S = Math.min(W, H);
@@ -35,7 +34,7 @@
         cx.fillStyle = 'rgba(200,220,240,0.8)'; cx.font = `400 ${Math.round(sc * 0.045)}px system-ui, sans-serif`; cx.fillText(LORA.lang === 'en' ? 'presents' : 'представляє', 0, sc * 0.2); }
       cx.restore();
     } else { // ---- глобус, радар, назва
-      const u = t - 3.1, R = S * 0.3 * (0.6 + 0.4 * ease(u / 1.2)), cxm = W / 2, cym = H * 0.46, rot = u * 0.35 + 0.5, tilt = 0.35; const a = Math.min(1, u / 0.8);
+      const u = t - 3.1, R = Math.min(S * 0.26, H * 0.27) * (0.6 + 0.4 * ease(u / 1.2)), cxm = W / 2, cym = H * 0.555, rot = u * 0.35 + 0.5, tilt = 0.35; const a = Math.min(1, u / 0.8);
       cx.save(); cx.globalAlpha = a;
       const gr = cx.createRadialGradient(cxm - R * 0.3, cym - R * 0.3, R * 0.1, cxm, cym, R * 1.1); gr.addColorStop(0, 'rgba(40,110,200,0.35)'); gr.addColorStop(1, 'rgba(5,15,30,0.05)'); cx.fillStyle = gr; cx.beginPath(); cx.arc(cxm, cym, R, 0, 7); cx.fill();
       cx.strokeStyle = 'rgba(100,180,255,0.5)'; cx.lineWidth = 1.5; cx.beginPath(); cx.arc(cxm, cym, R, 0, 7); cx.stroke();
@@ -53,19 +52,24 @@
       for (let k = 0; k < 4; k++) { const ph = (u * 0.5 + k * 0.27) % 1; const A = pts[(k * 97) % pts.length], B = pts[(k * 211 + 50) % pts.length]; if (!A || !B) continue; const pa = proj(A[0], A[1]), pb = proj(B[0], B[1]); if (pa[2] < 0 || pb[2] < 0) continue;
         const mx = (pa[0] + pb[0]) / 2, my = (pa[1] + pb[1]) / 2 - R * 0.35; cx.strokeStyle = `rgba(255,90,70,${0.6 * (1 - ph)})`; cx.lineWidth = 1.5; cx.beginPath(); cx.moveTo(pa[0], pa[1]); cx.quadraticCurveTo(mx, my, pa[0] + (pb[0] - pa[0]) * ph, pa[1] + (pb[1] - pa[1]) * ph - Math.sin(ph * Math.PI) * R * 0.18); cx.stroke(); }
       cx.restore();
-      // назва
-      const ta = ease((u - 0.9) / 0.9); if (ta > 0) { const title = 'PROJECT LORA', n = Math.floor(title.length * Math.min(1, (u - 0.9) / 1.0)); cx.save(); cx.globalAlpha = ta; cx.textAlign = 'center';
-        const gl = Math.random() < 0.04 ? (Math.random() - 0.5) * 12 : 0; if (gl) { cx.fillStyle = 'rgba(255,60,80,0.6)'; cx.font = `700 ${Math.round(S * 0.085)}px Pixelify, system-ui, sans-serif`; cx.fillText(title.slice(0, n), W / 2 + gl, cym + R + S * 0.11 + 2); } cx.shadowColor = '#4fb3ff'; cx.shadowBlur = 18; cx.fillStyle = '#e8f3ff'; cx.font = `700 ${Math.round(S * 0.085)}px Pixelify, system-ui, sans-serif`; cx.fillText(title.slice(0, n) + (n < title.length && Math.floor(u * 6) % 2 ? '▌' : ''), W / 2, cym + R + S * 0.11); cx.shadowBlur = 0;
-        const sa = ease((u - 2.0) / 0.7); cx.globalAlpha = sa; cx.fillStyle = '#ffd34d'; cx.font = `400 ${Math.round(S * 0.026)}px system-ui, sans-serif`; cx.fillText(LORA.lang === 'en' ? 'Grand strategy on the real world map' : 'Глобальна стратегія на реальній мапі світу', W / 2, cym + R + S * 0.16);
-        cx.fillStyle = 'rgba(180,200,220,0.6)'; cx.font = `400 ${Math.round(S * 0.018)}px system-ui, sans-serif`; cx.fillText('© Mi_Miracle · v' + (LORA.version || ''), W / 2, H - S * 0.04); cx.restore(); }
+      // назва й увесь текст — угорі
+      const ta = ease((u - 0.9) / 0.9); if (ta > 0) { const title = 'PROJECT LORA', n = Math.floor(title.length * Math.min(1, (u - 0.9) / 1.0)), ty = H * 0.1 + S * 0.04, fs = Math.round(Math.min(S * 0.085, W * 0.07)); cx.save(); cx.globalAlpha = ta; cx.textAlign = 'center'; cx.textBaseline = 'alphabetic';
+        cx.fillStyle = 'rgba(255,211,77,0.85)'; cx.font = `600 ${Math.round(S * 0.018)}px system-ui, sans-serif`; cx.fillText((LORA.lang === 'en' ? 'MI_MIRACLE PRESENTS' : 'MI_MIRACLE ПРЕДСТАВЛЯЄ').split('').join(String.fromCharCode(8202)), W / 2, ty - fs * 0.95);
+        const gl = Math.random() < 0.04 ? (Math.random() - 0.5) * 12 : 0; cx.font = `700 ${fs}px Pixelify, system-ui, sans-serif`; if (gl) { cx.fillStyle = 'rgba(255,60,80,0.6)'; cx.fillText(title.slice(0, n), W / 2 + gl, ty + 2); } cx.shadowColor = '#4fb3ff'; cx.shadowBlur = 18; cx.fillStyle = '#e8f3ff'; cx.fillText(title.slice(0, n) + (n < title.length && Math.floor(u * 6) % 2 ? '▌' : ''), W / 2, ty); cx.shadowBlur = 0;
+        const sa = ease((u - 2.0) / 0.7); cx.globalAlpha = sa; cx.fillStyle = '#ffd34d'; cx.font = `400 ${Math.round(S * 0.026)}px system-ui, sans-serif`; cx.fillText(LORA.lang === 'en' ? 'Grand strategy on the real world map' : 'Глобальна стратегія на реальній мапі світу', W / 2, ty + S * 0.05);
+        cx.fillStyle = 'rgba(180,200,220,0.6)'; cx.font = `400 ${Math.round(S * 0.017)}px system-ui, sans-serif`; cx.fillText('© Mi_Miracle · v' + (LORA.version || ''), W / 2, ty + S * 0.085); cx.restore(); }
       // супутники на орбіті
       for (let k = 0; k < 3; k++) { const ang = u * (0.6 + k * 0.25) + k * 2.1, rx = R * (1.25 + k * 0.08), ry = R * (0.32 + k * 0.1); const x = cxm + Math.cos(ang) * rx, y = cym + Math.sin(ang) * ry * (k % 2 ? -1 : 1);
         cx.strokeStyle = 'rgba(120,190,255,0.12)'; cx.beginPath(); cx.ellipse(cxm, cym, rx, ry, 0, 0, 7); cx.stroke(); cx.fillStyle = '#cfe8ff'; cx.fillRect(x - 3, y - 1, 6, 2); cx.fillStyle = '#4fb3ff'; cx.fillRect(x - 7, y - 1, 3, 2); cx.fillRect(x + 4, y - 1, 3, 2); }
-      // стрічка новин
-      if (u > 1.5) { const hh = Math.max(22, S * 0.035); cx.fillStyle = 'rgba(160,20,20,0.85)'; cx.fillRect(0, H - hh * 2.2, W, hh); cx.fillStyle = '#fff'; cx.font = `700 ${Math.round(hh * 0.55)}px system-ui, sans-serif`; cx.textAlign = 'left'; cx.textBaseline = 'middle';
-        cx.fillText(LORA.lang === 'en' ? 'LIVE' : 'НАЖИВО', 10, H - hh * 1.7); const line = HEAD.join('   •   '); const tw = cx.measureText(line).width; const off = W - ((u - 1.5) * 90) % (tw + W); cx.font = `400 ${Math.round(hh * 0.52)}px system-ui, sans-serif`; cx.save(); cx.beginPath(); cx.rect(80, H - hh * 2.2, W, hh); cx.clip(); cx.fillText(line, off, H - hh * 1.7); cx.restore(); }
+      // стрічка новин (кумедні заголовки по одному, повільно, з проміжками)
+      if (u > 1.5) { const hh = Math.max(24, S * 0.036), y0 = H - hh * 1.35, L0 = 110; cx.fillStyle = 'rgba(12,18,28,0.92)'; cx.fillRect(0, y0, W, hh); cx.fillStyle = 'rgba(170,20,25,0.95)'; cx.fillRect(0, y0, L0 - 10, hh); cx.fillStyle = 'rgba(255,211,77,0.7)'; cx.fillRect(0, y0, W, 2);
+        cx.fillStyle = '#fff'; cx.font = `700 ${Math.round(hh * 0.5)}px system-ui, sans-serif`; cx.textAlign = 'left'; cx.textBaseline = 'middle'; cx.fillText((Math.floor(u * 2) % 2 ? '● ' : '○ ') + (LORA.lang === 'en' ? 'LIVE' : 'НАЖИВО'), 12, y0 + hh / 2);
+        const dt = Math.min(0.1, (now - (tkLast || now)) / 1000); tkLast = now; cx.font = `400 ${Math.round(hh * 0.5)}px system-ui, sans-serif`;
+        const lastE = tk.length ? tk[tk.length - 1].x + tk[tk.length - 1].w : -1e9; if (lastE + TK_GAP < W) { const txt = LORA.funNext ? LORA.funNext(LORA.lang) : ''; if (txt) tk.push({ txt, x: Math.max(W, lastE + TK_GAP), w: cx.measureText(txt).width }); }
+        cx.save(); cx.beginPath(); cx.rect(L0, y0, W - L0, hh); cx.clip(); for (const it of tk) { it.x -= TK_SPEED * dt; cx.fillStyle = '#ffd34d'; cx.fillText('◆', it.x - 22, y0 + hh / 2); cx.fillStyle = '#e8f0f8'; cx.fillText(it.txt, it.x, y0 + hh / 2); } cx.restore();
+        while (tk.length && tk[0].x + tk[0].w < L0 - 30) tk.shift(); }
       // «натисніть будь-яку клавішу»
-      if (u > 4.0) { cx.save(); cx.globalAlpha = 0.45 + 0.45 * Math.sin(u * 3.2); cx.fillStyle = '#ffd34d'; cx.textAlign = 'center'; cx.font = `700 ${Math.round(S * 0.028)}px Pixelify, system-ui, sans-serif`; cx.fillText(LORA.lang === 'en' ? 'PRESS ANY KEY' : 'НАТИСНІТЬ БУДЬ-ЯКУ КЛАВІШУ', W / 2, H - S * 0.11); cx.restore(); }
+      if (u > 4.0) { cx.save(); cx.globalAlpha = 0.45 + 0.45 * Math.sin(u * 3.2); cx.fillStyle = '#ffd34d'; cx.textAlign = 'center'; cx.font = `700 ${Math.round(S * 0.028)}px Pixelify, system-ui, sans-serif`; cx.fillText(LORA.lang === 'en' ? 'PRESS ANY KEY' : 'НАТИСНІТЬ БУДЬ-ЯКУ КЛАВІШУ', W / 2, H - Math.max(24, S * 0.036) * 1.35 - S * 0.045); cx.restore(); }
     }
     raf = requestAnimationFrame(frame);
   }

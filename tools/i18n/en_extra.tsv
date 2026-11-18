@@ -3483,3 +3483,47 @@ Piper — живий офлайн-голос (укр)	Piper — natural offline 
 оформила	registered
 найняв	hired
 найняла	hired
+Колесо — масштаб, ліва кнопка — вибір регіону, міста чи армії, права — наказ армії рухатися (Shift+ПКМ — морем). Пробіл — стоп/старт, 1–4 — швидкість, Esc — пауза й меню. Туман війни ховає чужі війська поза розвідкою.	Wheel — zoom, left click — select a region, city or army, right click — order an army to move (Shift+RMB — by sea). Space — stop/start, 1–4 — speed, Esc — pause and menu. Fog of war hides foreign troops outside your intelligence.
+Оберіть армію: склад військ, командувач, досвід. Типи: піхота, танки, артилерія, ППО, дрони, інженери. Удари ракетами й дронами — по ворожих військах і постачанню, також на вашій окупованій землі.	Select an army: composition, commander, experience. Types: infantry, tanks, artillery, air defence, drones, engineers. Missile and drone strikes hit enemy troops and supply, including on your own occupied land.
+Персонаж (робота, навички, підробітки, розкіш, інвестиції) → партія і депутатство → власна компанія → президент. Почати можна з будь-якого етапу на екрані «Нова гра». Кар’єра — зверху екрана.	Character (job, skills, gigs, luxury, investments) → party and MP → your own company → president. You can start from any stage on the "New game" screen. Your career is shown at the top of the screen.
+Світовий ринок замкнений: продаєте лише тим, хто купує, а все, чого бракує, треба видобути або купити. Логістика (залізниці, траси, трубопроводи, морські лінії) здешевлює торгівлю.	The world market is closed-loop: you only sell to those who buy, and whatever you lack must be produced or bought. Logistics (railways, highways, pipelines, sea lanes) make trade cheaper.
+Ліва панель: на кожній вкладці держави — картка міністра галузі. Дії: нарада, премія, перевірка, звільнення, а також свої дії галузі. Галочка «🤖 Авто» передає галузь ШІ-міністру.	Left panel: each state tab has a card for the sector minister. Actions: meeting, bonus, audit, dismissal, plus sector-specific actions. The "🤖 Auto" checkbox hands the sector to an AI minister.
+Вкладайте гроші у сфери науки — отримуєте бали цієї сфери, за які досліджуєте технології й грейди. Технології відкривають будівлі, моделі техніки й нові можливості компаній.	Invest money in science fields to earn that field's points, then spend them on technologies and grades. Technologies unlock buildings, equipment models and new company options.
+Компанія: активи, R&D, контракти з державами, тендери за кордоном, охорона, стратегія. Біржа: акції, емісія, викуп, контроль від 50%, дивіденди, бульбашки й паніки.	Company: assets, R&D, state contracts, foreign tenders, security, strategy. Stock exchange: shares, issues, buybacks, control from 50%, dividends, bubbles and panics.
+Esc — пауза · Пробіл — час · 1–4 — швидкість · Alt+1–8 — вкладки · L — до лідера · F9 — стрім · F11 — повний екран · Ctrl+F5 — перезапуск.	Esc — pause · Space — time · 1–4 — speed · Alt+1–8 — tabs · L — go to leader · F9 — stream · F11 — fullscreen · Ctrl+F5 — restart.
+Кнопка 📜 вгорі: завжди три завдання з терміном і нагородою — для держави, компанії й персонажа. Невдале можна замінити.	The 📜 button at the top: always three tasks with a deadline and a reward — for the state, the company and the character. You can swap one you don't like.
+Закони через фракції й коаліції. У режимі «Президент і Рада» парламентом є чат Twitch: !1 — за, !2 — проти.	Laws pass through factions and coalitions. In "President and Parliament" mode, Twitch chat is the parliament: !1 — for, !2 — against.
+Відносини, угоди, союзи, блоки, санкції, мир. Візити лідера, шпигуни, супутники, космос.	Relations, treaties, alliances, blocs, sanctions, peace. Leader visits, spies, satellites, space.
+Системні голоси — Windows / браузер. Azure і ElevenLabs — лише з вашим власним ключем.	System voices come from Windows or the browser. Azure and ElevenLabs work only with your own key.
+Модель завантажується один раз і працює офлайн на вашому компʼютері.	The model downloads once and then runs offline on your computer.
+Автор і розробник гри: ідея, геймдизайн, баланс, тестування, стріми	Author and developer of the game: idea, game design, balance, testing, streams
+нейронний синтез мовлення від проєкту Rhasspy, автор Michael Hansen	neural text-to-speech from the Rhasspy project by Michael Hansen
+Оберіть сценарій, складність, ким почати і країну	Choose a scenario, difficulty, who to start as and a country
+необовʼязковий, завантажується окремо за бажанням	optional, downloaded separately on request
+Усі генерали, міністри й персонажі — вигадані.	All generals, ministers and characters are fictional.
+Створіть кімнату або приєднайтеся до друзів	Create a room or join your friends
+Ви — президент, чат Twitch — Верховна Рада	You are the president, Twitch chat is the parliament
+Музика генерується процедурно самою грою.	Music is generated procedurally by the game itself.
+Стрічка кумедних новин унизу екрана	Funny news ticker at the bottom of the screen
+ви — хост, роздаєте посилання	you are the host and share the links
+голоси Лада, Микита, Тетяна	voices Lada, Mykyta, Tetiana
+запускає модель у браузері	runs the model in the browser
+Озвучка (синтез мовлення)	Voice (speech synthesis)
+Дипломатія й розвідка	Diplomacy and intelligence
+глядач без керування	spectator without control
+розпакування моделі	unpacking the model
+Економіка й ринок	Economy and market
+Компанії й біржа	Companies and stock exchange
+Онлайн і стрім	Online and streaming
+Створити гру	Create game
+Приєднатися	Join
+мультиплеєр	multiplayer
+Мапа й час	Map and time
+Ким грати	Who to play
+географія	geography
+Будівель	Buildings
+компаній	companies
+Міністри	Ministers
+збірка	collection
+шрифт	font
+Інше	Other
