@@ -88,7 +88,7 @@ function checkDecision() {
   if (!G || modalOpen || NET.S.spectator) return; const d = (G.decisions || []).find(x => x.nid === G.player); if (!d || decOpen === d.id) return;
   const e = G.decEvents ? G.decEvents.find(x => x.id === d.ev) : null; if (!e) return; decOpen = d.id; const row = ADV_ROW[e.adv] || 0;
   const chat = TW.S.connected && AUD.S.chatVotes !== false;
-  openModal(`<div class="dec"><div class="dec-a"><canvas id="decA" width="32" height="32"></canvas></div><div><h2>📜 ${t_('Рішення')}</h2><p>${esc(t_(d.ctx.text))}</p>
+  openModal(`<div class="dec"><div class="dec-a"><canvas id="decA" width="32" height="32"></canvas></div><div><h2>${d.ctx.big ? '⚡ ' + t_('Розвилка історії') : '📜 ' + t_('Рішення')}</h2><p>${esc(t_(d.ctx.text))}</p>
     <div id="decOpts">${e.o.map((o, i) => `<button class="dec-o" onclick="pickDecision(${d.id},${i})"><b>${i + 1}</b> ${esc(t_(o[0]))}<span class="dec-v" id="decV${i}"></span></button>`).join('')}</div>
     ${chat ? `<div class="btns"><button class="pri" onclick="chatDecide(${d.id},${e.o.length})">🟣 ${t_('Нехай вирішить чат (30 с)')}</button></div><div class="small mut">${t_('Глядачі пишуть у чат')} !1, !2${e.o.length > 2 ? ', !3' : ''}</div>` : ''}</div></div>`);
   const img = new Image(); img.src = 'assets/ui/advisors.png'; img.onload = () => { const c = document.getElementById('decA'); if (!c) return; const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(img, 0, row * 32, 32, 32, 0, 0, 32, 32); };

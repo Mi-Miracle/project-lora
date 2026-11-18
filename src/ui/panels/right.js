@@ -11,12 +11,13 @@ function renderRight(soft) {
 function terrPanel(i) {
   const P = G.player, t = G.ter[i], R = D.regions[i], o = nat(t.owner), c = nat(t.ctrl); const isMe = t.owner === P; const rel = P >= 0 ? G.rel[P][t.owner] : 0;
   const tags = [];
-  if (G.atWar(P, t.ctrl)) tags.push('<span class="tag war">⚔ війна з вами</span>'); if (G.allied(P, t.owner) && !isMe) tags.push('<span class="tag al">🛡 союзник</span>'); if (o.nuke) tags.push('<span class="tag nk">☢ ядерна</span>');
+  if (t.rad > G.day) tags.push(`<span class="tag war">☢ радіація ще ${t.rad - G.day} дн.</span>`); if (G.atWar(P, t.ctrl)) tags.push('<span class="tag war">⚔ війна з вами</span>'); if (G.allied(P, t.owner) && !isMe) tags.push('<span class="tag al">🛡 союзник</span>'); if (o.nuke) tags.push('<span class="tag nk">☢ ядерна</span>');
   Object.values(G.blocs || {}).forEach(b => { if (b.m.includes(t.owner)) tags.push(`<span class="tag" data-tip="${esc(b.n)}">${ico(b.ic)} ${esc(b.n.length > 12 ? b.n.split(' ').map(w => w[0]).join('') : b.n)}</span>`); });
   if (G.sanctions.has(P + '>' + t.owner)) tags.push('<span class="tag war">ваші санкції</span>'); if (G.sanctions.has(t.owner + '>' + P)) tags.push('<span class="tag war">санкції проти вас</span>');
   const _fv = window.fogVis ? fogVis() : null; const armiesHere = G.armies.filter(a => a.t === i && !(a.mv && a.mv.sea) && (!_fv || _fv[i] || a.n === G.player)); const cities = D.cities.filter(x => x.reg === i).sort((a, b) => b.pop - a.pop);
   const topRes = RES.filter(r => t.prod[r] > 0).map(r => ({ r, v: t.prod[r] / Math.max(1e-9, G.W_prod0[r]) })).sort((a, b) => b.v - a.v).slice(0, 5);
   let h = `<h2>${esc(regName(i))}</h2><div class="mut">${ndot(t.owner)}${esc(o.name)}${t.ctrl !== t.owner ? ` · <span class="r">контроль: ${esc(c.name)}</span>` : ''}</div><div>${tags.join('')}</div>`;
+  if ((t.mine > 0.02 || t.dmg > 0.05 || t.rebuild > 0 || t.part > 0.05) && (isMe || t.ctrl === P)) h += recoveryBlock(i);
   if (t.occ) h += `<div class="card"><div class="row"><span>Наступ: ${esc(nat(t.occ.by).name)}</span><b class="r">${t.occ.p.toFixed(0)}%</b></div><div class="bar"><i style="width:${t.occ.p}%;background:#ff5d5d"></i></div></div>`;
   h += `<div class="grp">Регіон</div><div class="row"><span>Рельєф</span><span>${G.TERRAIN[R.t].n}</span></div><div class="row"><span>Площа</span><span>${(t.area / 1000).toFixed(1)} тис. км²</span></div><div class="row"><span>Населення</span><span>${popM(t.pop)}</span></div><div class="row"><span>Економіка</span><span>${money(t.gdp)}</span></div>
   ${t.dmg > 0.01 ? `<div class="row"><span>Руйнування</span><span class="r">${pct(t.dmg, 0)}</span></div>` : ''}${t.fort > 0.03 ? `<div class="row"><span>Укріплення</span><span class="y">${pct(t.fort, 0)}</span></div>` : ''}${t.integ < 0.99 ? `<div class="row"><span>Інтеграція</span><span class="y">${pct(t.integ, 0)}</span></div>` : ''}
@@ -153,3 +154,18 @@ function renderCompEditor(focusK) {
   openModal(h);
 }
 function applyComp() { const d = compDraft; if (!d) return; const r = G.setArmyComp(d.aid, d.c); if (r && r.ok === false) { hint('⚠ ' + t_(r.err), 3000); return; } closeModal(); hint('🪖 ' + t_('Переформування почалось') + (r && r.days ? ' (' + r.days + ' ' + t_('дн.') + ')' : ''), 2500); renderRight(); }
+
+// розмінування, відбудова, партизани
+function recoveryBlock(i) {
+  const t = G.ter[i], P = G.player, n = nat(P); let h = `<div class="card small">`;
+  if (t.owner === P && t.ctrl === P) {
+    if (t.mine > 0.02) h += `<div class="row"><span>🧨 ${t_('Заміновано')}</span><b class="r">${pct(t.mine, 0)}</b></div><div class="btns"><button onclick="recAct('demine',${i})">🧹 ${t_('Розмінувати')} · ${money(G.demineCost(i))}</button></div>`;
+    if (t.rebuild > 0) h += `<div class="row"><span>🏗 ${t_('Відбудова триває')}</span><b>${t.rebuild} ${t_('міс.')}</b></div>`;
+    else if (t.dmg > 0.05) h += `<div class="btns"><button onclick="recAct('rebuild',${i})">🏗 ${t_('Відбудувати')} · ${money(G.rebuildCost(i))}</button></div>`;
+    if (n.recFund > 0.01) h += `<div class="mut">🌍 ${t_('Міжнародний фонд відбудови')}: ${money(n.recFund)} ${t_('(витрачається першим)')}</div>`;
+    h += `<div class="mut">${t_('Чим нижча стабільність, тим вищий ризик розкрадання коштів на відбудові.')}</div>`;
+  }
+  if (t.part > 0.05 && t.ctrl !== t.owner) h += `<div class="row"><span>✊ ${t_('Партизанський рух')}</span><b class="y">${pct(t.part, 0)}</b></div><div class="mut">${t.ctrl === P ? t_('Тримайте гарнізон — без нього партизани можуть підняти повстання.') : t_('Понад 35% і без гарнізону окупанта — шанс повстання щомісяця.')}</div>`;
+  return h + `</div>`;
+}
+function recAct(k, i) { const r = G.act[k](i); hint(r && r.ok ? (k === 'demine' ? '🧹 ' + t_('Розмінування проведено') : '🏗 ' + t_('Відбудову розпочато')) : '⚠ ' + t_((r && r.err) || 'Помилка'), 3000); renderRight(); renderTop(); }

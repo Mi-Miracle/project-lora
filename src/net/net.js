@@ -34,7 +34,7 @@ const NET = (() => {
     const me = S.players[0]; if (!me.a3) return t_('Оберіть свою державу');
     const guests = S.players.filter(p => !p.host && p.a3); const humans = guests.map(p => ({ nid: LORA.createGame ? null : null, a3: p.a3, name: p.name }));
     G = LORA.createGame({ seed: (Date.now() % 1e9) | 0 });
-    G.init(me.a3, S.scen, { difficulty: S.diff, humans: guests.map(p => ({ nid: G.nIdx[p.a3], name: `${p.name} (${p.a3})` })), leaderName: S.name });
+    G.init(me.a3, S.scen, { difficulty: S.diff, humans: guests.map(p => ({ nid: G.nIdx[p.a3], name: `${p.name} (${p.a3})` })), leaderName: S.name }); G.online = true; if (AUD.S.chatRada) G.radaEnable(true);
     guests.forEach(p => p.nid = G.nIdx[p.a3]); S.started = true;
     const save = G.save(); S.conns.forEach(c => { const p = S.players.find(x => x.id === cid(c)); if (p && p.nid != null) send(c, { t: 'start', save, nid: p.nid }); else if (p && p.spect) send(c, { t: 'start', save, nid: -1, view: G.player }); });
     $('#start').style.display = 'none'; closeModal(); startUI(); chatUI(true); return '';
@@ -59,14 +59,14 @@ const NET = (() => {
     const c = S.conns.find(x => cid(x) === pl.id); if (c && m.rid) send(c, { t: 'res', rid: m.rid, r: r && typeof r === 'object' ? { ok: r.ok, err: r.err, days: r.days } : r });
   }
   // знімок стану для гостя (повні дані — лише його держави)
-  const LIGHT = ['alive', 'stab', 'cash', 'debt', 'tech', 'q', 'navQ', 'warExh', 'growth', 'press', 'milStock', 'casualties', 'nuke', 'infraLvl', 'troopsBase'];
+  const LIGHT = ['alive', 'stab', 'cash', 'debt', 'tech', 'q', 'navQ', 'warExh', 'growth', 'press', 'milStock', 'casualties', 'nuke', 'infraLvl', 'troopsBase', 'nw', 'nk'];
   function snapFor(nid) {
-    const full = ['agg', 'stats', 'ratio', 'pol', 'ars', 'arsF', 'arsM', 'res', 'parl', 'rx', 'dev', 'imp', 'exp', 'mods', 'autoTrade', 'fpvD', 'strikeAuto'];
+    const full = ['agg', 'stats', 'ratio', 'pol', 'ars', 'arsF', 'arsM', 'res', 'parl', 'rx', 'dev', 'imp', 'exp', 'mods', 'autoTrade', 'fpvD', 'strikeAuto', 'recFund'];
     return { t: 'snap', day: G.day, speed: speedIdx,
       N: G.N.map(n => { const o = {}; LIGHT.forEach(k => o[k] = n[k]); if (n.id === nid) full.forEach(k => o[k] = n[k]); else { o.agg = n.agg ? { gdp: n.agg.gdp, gdpPot: n.agg.gdp, pop: n.agg.pop, nT: n.agg.nT, pc: n.agg.pc, occLost: n.agg.occLost } : null; o.parl = n.parl ? { regime: n.parl.regime, name: n.parl.name, gov: n.parl.gov, coal: n.parl.coal, next: n.parl.next, seats: n.parl.seats, votes: [] } : null; } return o; }),
-      ter: G.ter.map(t => [t.owner, t.ctrl, t.occ, +t.dmg.toFixed(3), +(t.fort || 0).toFixed(3), +t.gdp.toFixed(3), t.bld, +t.shield.toFixed(2), t.base, t.bfort || 0, t.pol, +(t.part || 0).toFixed(2)]),
+      ter: G.ter.map(t => [t.owner, t.ctrl, t.occ, +t.dmg.toFixed(3), +(t.fort || 0).toFixed(3), +t.gdp.toFixed(3), t.bld, +t.shield.toFixed(2), t.base, t.bfort || 0, t.pol, +(t.part || 0).toFixed(2), t.rad || 0]),
       armies: G.armies, fleets: G.fleets, wars: [...G.wars.values()], alliances: G.alliances.map(a => ({ name: a.name, m: [...a.m] })), sanctions: [...G.sanctions], access: [...G.access], treaties: [...G.treaties],
-      news: G.news.slice(0, 40), strikes: G.strikes || [], pending: G.pendingPeace.filter(p => p.to === nid), decisions: (G.decisions || []).filter(d => d.nid === nid), constructions: G.constructions.filter(c => c.n === nid), links: G.links, leaders: G.leaders, agents: G.agents.filter(a => a.n === nid), generals: G.generals.filter(g => g.n === nid || nid < 0), blocs: G.blocs, prices: G.prices, gameOver: G.gameOver || null, battles: G.battles, battleHot: G.battleHot };
+      news: G.news.slice(0, 40), strikes: G.strikes || [], pending: G.pendingPeace.filter(p => p.to === nid), decisions: (G.decisions || []).filter(d => d.nid === nid), constructions: G.constructions.filter(c => c.n === nid), links: G.links, ovl: overlayState(), stock: G.stock ? { px: G.stock.px, idx: G.stock.idx, hold: G.stock.hold, hist: G.stock.hist, idx0: G.stock.idx0, mood: G.stock.mood } : null, repar: G.repar, leaders: G.leaders, agents: G.agents.filter(a => a.n === nid), generals: G.generals.filter(g => g.n === nid || nid < 0), blocs: G.blocs, prices: G.prices, gameOver: G.gameOver || null, battles: G.battles, battleHot: G.battleHot };
   }
   async function pack(obj) { const js = JSON.stringify(obj); if (!window.CompressionStream) return { t: 'snapj', js }; const st = new Blob([js]).stream().pipeThrough(new CompressionStream('gzip')); return { t: 'snapz', z: new Uint8Array(await new Response(st).arrayBuffer()) }; }
   async function unpack(m) { if (m.t === 'snapj') return JSON.parse(m.js); const st = new Blob([m.z]).stream().pipeThrough(new DecompressionStream('gzip')); return JSON.parse(await new Response(st).text()); }
@@ -97,7 +97,7 @@ const NET = (() => {
   function applySnap(m) {
     const prevNews = G.news[0]; G.day = m.day; speedIdx = m.speed;
     m.N.forEach((o, i) => Object.assign(G.N[i], o));
-    m.ter.forEach((a, i) => { const t = G.ter[i]; [t.owner, t.ctrl, t.occ, t.dmg, t.fort, t.gdp, t.bld, t.shield, t.base, t.bfort, t.pol, t.part] = a; });
+    m.ter.forEach((a, i) => { const t = G.ter[i]; [t.owner, t.ctrl, t.occ, t.dmg, t.fort, t.gdp, t.bld, t.shield, t.base, t.bfort, t.pol, t.part, t.rad] = a; }); applyOverlays(m.ovl); if (m.stock) G.stock = m.stock; if (m.repar) G.repar = m.repar;
     G.armies = m.armies; G.fleets = m.fleets; G.wars = new Map(m.wars.map(w => [G.warKey(w.a, w.b), w])); G.alliances = m.alliances.map(a => ({ name: a.name, m: new Set(a.m) }));
     G.sanctions = new Set(m.sanctions); G.access = new Set(m.access); G.treaties = new Set(m.treaties);
     G.news.length = 0; m.news.forEach(x => G.news.push(x)); G.strikes = m.strikes; G.pendingPeace = m.pending; G.constructions = m.constructions; G.links = m.links;

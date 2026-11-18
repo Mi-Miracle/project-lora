@@ -53,7 +53,7 @@ LORA.sim.register('game', 100, function (G) {
     G.applyDifficulty(opts.difficulty || 'normal');
     G.humans = new Set((opts.humans || []).map(h => h.nid != null ? h.nid : h)); if (G.player >= 0) G.humans.add(G.player);
     G.aggregate(); G.allocateTrade(); G.applyTradeDaily(); G.economyDaily();
-    G.seedCompanies(); G.initGenerals(); G.initSpace();
+    G.seedCompanies(); G.initGenerals(); G.initSpace(); G.initNukes();
     if (G.player >= 0) G.say(`🏛 Ви очолили уряд: ${N[G.player].name}. ${G.dateStr()}`, 'big', [G.player]);
     if (opts.company) G.startCompany(opts.company);
     // лідер гравця на мапі
@@ -75,7 +75,7 @@ LORA.sim.register('game', 100, function (G) {
     G.arsenalDaily(); G.unitsDaily(); G.generalsDaily(); G.intelDaily();
     G.supplyAndAttrition();
     G.occupation();
-    G.buildingsDaily(); G.linksDaily(); if (G.day % 7 === 0) { G.nationLogistics(); G.victoryWeekly(); }
+    G.buildingsDaily(); G.linksDaily(); G.stockDaily(); if (G.day % 7 === 0) { G.nationLogistics(); G.victoryWeekly(); G.nukesWeekly(); }
     G.building = G.building.filter(b => { if (b.done <= G.day) { if (N[b.n].alive) G.newFleet(b.n, b.node, b.s, 'Новий флот'); G.say(`⚓ Нові кораблі (${b.s}) введено до строю`, 'good', [b.n]); return false; } return true; });
     N.forEach(n => {
       if (!n.alive) return;
@@ -87,7 +87,7 @@ LORA.sim.register('game', 100, function (G) {
     // поповнення армій гравця в межах ліміту мобілізації
     const pn = N[G.player];
     if (pn && pn.alive) { const pool = pn.agg.pop * 1000 * pn.pol.mob, tr = G.troopsOf(pn.id); if (tr < pool) { const add = Math.min(pool - tr, pool * 0.002); const arm = G.armies.filter(a => a.n === pn.id && G.friendlyTo(pn.id, ter[a.t].ctrl)).sort((a, b) => a.k - b.k)[0]; if (arm) { arm.k += add; pn.cash -= add * 0.02 * (0.5 + pn.pc / 20000); if (pn.cash < 0) { pn.debt -= pn.cash; pn.cash = 0; } } } }
-    if (G.day % 30 === 0) { G.foreignAid(); G.balanceMonthly(); G.alertsMonthly(); G.pressureMonthly(); G.decisionsMonthly(); G.spaceMonthly(); G.projectsMonthly(); G.monthlyExtra(); }
+    if (G.day % 30 === 0) { G.foreignAid(); G.balanceMonthly(); G.alertsMonthly(); G.pressureMonthly(); G.decisionsMonthly(); G.spaceMonthly(); G.projectsMonthly(); G.monthlyExtra(); G.nukesMonthly(); G.radaMonthly(); G.stockMonthly(); G.recoveryMonthly(); G.reparMonthly(); G.chronMonthly(); }
     G.researchDaily();
     G.leaderDaily(); G.agentsDaily();
     G.parliamentDaily();
@@ -102,10 +102,10 @@ LORA.sim.register('game', 100, function (G) {
   // ---------- збереження ----------
   G.save = function () {
     return JSON.stringify({ v: 2, day: G.day, player: G.player, N: N.map(n => { const o = Object.assign({}, n); delete o.agg; return o; }),
-      ter: ter.map(t => ({ owner: t.owner, ctrl: t.ctrl, gdp: t.gdp, pop: t.pop, dmg: t.dmg, integ: t.integ, occ: t.occ, prod: t.prod, fort: t.fort || 0, part: t.part || 0, bld: t.bld, base: t.base, pol: t.pol })),
+      ter: ter.map(t => ({ owner: t.owner, ctrl: t.ctrl, gdp: t.gdp, pop: t.pop, dmg: t.dmg, integ: t.integ, occ: t.occ, prod: t.prod, fort: t.fort || 0, part: t.part || 0, bld: t.bld, base: t.base, pol: t.pol, rad: t.rad || 0, mine: t.mine || 0, rebuild: t.rebuild || 0, wasOcc: t.wasOcc || 0, dmz: t.dmz || 0 })),
       rel: G.rel.map(r => Array.from(r, v => Math.round(v))), relBase: G.relBase.map(r => Array.from(r, v => Math.round(v))), wars: [...G.wars.values()], conflicts: G.conflicts,
       alliances: G.alliances.map(a => ({ name: a.name, m: [...a.m] })), sanctions: [...G.sanctions], access: [...G.access], treaties: [...G.treaties], contracts: G.contracts,
-      armies: G.armies, fleets: G.fleets, nextId: G.nextId, diff: G.diff, B: G.B, balanceLog: G.balanceLog, metrics: G.metrics, constructions: G.constructions, victory: G.victory, priceShock: G.priceShock, links: G.links, decisions: G.decisions, leaders: G.leaders, agents: G.agents, generals: G.generals, goals: G.goals, humans: [...G.humans], blocs: G.blocs, companies: G.companies, pc: G.pc, seaClosed: G.seaClosed, prices: G.prices, news: G.news.slice(0, 60), worldMod: G.worldMod, building: G.building });
+      armies: G.armies, fleets: G.fleets, nextId: G.nextId, diff: G.diff, B: G.B, balanceLog: G.balanceLog, metrics: G.metrics, constructions: G.constructions, victory: G.victory, priceShock: G.priceShock, online: G.online, rada: G.rada, stock: G.stock, repar: G.repar, truce: G.truce, nukeUsed: G.nukeUsed, chron: G.chron, links: G.links, decisions: G.decisions, leaders: G.leaders, agents: G.agents, generals: G.generals, goals: G.goals, humans: [...G.humans], blocs: G.blocs, companies: G.companies, pc: G.pc, seaClosed: G.seaClosed, prices: G.prices, news: G.news.slice(0, 60), worldMod: G.worldMod, building: G.building });
   };
   G.load = function (s) {
     const o = JSON.parse(s); if (o.v !== 2) throw new Error('Несумісне збереження');
@@ -114,7 +114,7 @@ LORA.sim.register('game', 100, function (G) {
     o.rel.forEach((r, i) => r.forEach((v, j) => G.rel[i][j] = v)); o.relBase.forEach((r, i) => r.forEach((v, j) => G.relBase[i][j] = v));
     G.wars = new Map(o.wars.map(w => [G.warKey(w.a, w.b), w])); G.conflicts = o.conflicts; G.alliances = o.alliances.map(a => ({ name: a.name, m: new Set(a.m) }));
     G.sanctions = new Set(o.sanctions); G.access = new Set(o.access); G.treaties = new Set(o.treaties); G.contracts = o.contracts; G.armies = o.armies; G.fleets = o.fleets; G.nextId = o.nextId;
-    G.seaClosed = o.seaClosed; G.prices = o.prices; G.news.length = 0; o.news.forEach(x => G.news.push(x)); G.worldMod = o.worldMod; G.building = o.building || []; if (o.B) Object.assign(G.B, o.B); if (o.diff) G.diff = o.diff; G.balanceLog = o.balanceLog || []; if (o.metrics) G.metrics = o.metrics; G.constructions = o.constructions || []; G.links = o.links || []; G.agents = o.agents || []; G.goals = o.goals || null; G.victory = o.victory || null; G.priceShock = o.priceShock || null; if (o.generals) G.generals = o.generals; else G.initGenerals(); if (!N[0].sats) G.initSpace(); G.leaders = o.leaders || (o.leader ? { [o.player >= 0 ? o.player : 'me']: o.leader } : {}); G.humans = new Set(o.humans || []); if (G.player >= 0) G.humans.add(G.player); if (o.blocs) G.blocs = o.blocs; G.decisions = o.decisions || []; if (o.companies) { G.companies = o.companies; G.pc = o.pc != null ? o.pc : -1; } ter.forEach(t => G.recalcRegionEffects(t)); G.rebuildLinkGraph();
+    G.seaClosed = o.seaClosed; G.prices = o.prices; G.news.length = 0; o.news.forEach(x => G.news.push(x)); G.worldMod = o.worldMod; G.building = o.building || []; if (o.B) Object.assign(G.B, o.B); if (o.diff) G.diff = o.diff; G.balanceLog = o.balanceLog || []; if (o.metrics) G.metrics = o.metrics; G.constructions = o.constructions || []; G.links = o.links || []; G.agents = o.agents || []; G.goals = o.goals || null; G.victory = o.victory || null; G.priceShock = o.priceShock || null; G.online = !!o.online; G.rada = o.rada || null; G.stock = o.stock || null; G.repar = o.repar || []; G.truce = o.truce || {}; G.nukeUsed = o.nukeUsed || 0; G.chron = o.chron || null; if (o.generals) G.generals = o.generals; else G.initGenerals(); if (!N[0].sats) G.initSpace(); G.leaders = o.leaders || (o.leader ? { [o.player >= 0 ? o.player : 'me']: o.leader } : {}); G.humans = new Set(o.humans || []); if (G.player >= 0) G.humans.add(G.player); if (o.blocs) G.blocs = o.blocs; G.decisions = o.decisions || []; if (o.companies) { G.companies = o.companies; G.pc = o.pc != null ? o.pc : -1; } ter.forEach(t => G.recalcRegionEffects(t)); G.rebuildLinkGraph();
     G.aggregate(); G.allocateTrade(); G.applyTradeDaily(); G.economyDaily();
   };
 });

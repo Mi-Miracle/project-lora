@@ -37,7 +37,9 @@ const TW = (() => {
   // ---- голосування чату: !1, !2, !3
   function vote(user, text) { const m = text.trim().match(/^!?([1-9])\b/); if (!m) return; const k = +m[1] - 1; if (k >= S.votes.n) return; S.votes.by[user.toLowerCase()] = k; S.votes.onUpdate && S.votes.onUpdate(tally()); }
   function tally() { const t = Array(S.votes.n).fill(0); Object.values(S.votes.by).forEach(k => t[k]++); return t; }
-  function poll(n, seconds, onUpdate) { return new Promise(res => { S.votes = { n, by: {}, onUpdate }; setTimeout(() => { const t = tally(); S.votes = null; const best = t.indexOf(Math.max(...t)); res({ t, best: Math.max(...t) > 0 ? best : -1 }); }, seconds * 1000); }); }
+  let chain = Promise.resolve(); // одне голосування за раз: решта стає в чергу
+  function poll(n, seconds, onUpdate) { const p = chain.then(() => poll1(n, seconds, onUpdate)); chain = p.catch(() => {}); return p; }
+  function poll1(n, seconds, onUpdate) { return new Promise(res => { S.votes = { n, by: {}, onUpdate }; setTimeout(() => { const t = tally(); S.votes = null; const best = t.indexOf(Math.max(...t)); res({ t, best: Math.max(...t) > 0 ? best : -1 }); }, seconds * 1000); }); }
   setTimeout(finish, 0);
   return { S, login, logout, connectChat, disconnectChat, poll, cfg, setClient: (id, redirect) => { localStorage.setItem('lora_tw_client', id.trim()); if (redirect) localStorage.setItem('lora_tw_redirect', redirect.trim()); } };
 })();

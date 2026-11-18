@@ -4,7 +4,7 @@ TAB_FN.dipl = function () {
   const wars = en.map(e => { const w = G.wars.get(G.warKey(P, e)); const sc = G.warScore(P, e); const occ = G.ter.filter(t => t.owner === e && t.ctrl === P).length, lost = G.ter.filter(t => t.owner === P && t.ctrl === e).length;
     return `<div class="card"><div class="row"><b>${nlink(e)}</b><span>${Math.max(0, G.day - w.start)} дн.</span></div><div class="row small"><span>Оцінка війни</span><span class="${sc > 0 ? 'g' : 'r'}">${(sc * 100).toFixed(0)}</span></div><div class="bar"><i style="width:${50 + sc * 50}%;background:${sc > 0 ? '#4cd28a' : '#ff5d5d'}"></i></div>
     <div class="row small"><span>Ви контролюєте їхніх регіонів: ${occ}</span><span>Втрачено: ${lost}</span></div>
-    <div class="btns"><button onclick="peace(${e},'white')">🕊 Білий мир</button>${occ ? `<button onclick="peace(${e},'cede')">📜 Вимагати регіони</button>` : ''}<button onclick="peace(${e},'mutual')">⚖ Статус-кво</button></div></div>`; }).join('');
+    <div class="btns"><button class="pri" onclick="openConf(${e})">🏛 ${t_('Мирна конференція')}</button><button onclick="peace(${e},'white')">🕊 Білий мир</button>${occ ? `<button onclick="peace(${e},'cede')">📜 Вимагати регіони</button>` : ''}<button onclick="peace(${e},'mutual')">⚖ Статус-кво</button></div></div>`; }).join('');
   const als = G.alliances.filter(a => a.m.has(P)).map(a => `<div class="card"><b>${esc(a.name)}</b><div class="small mut">${[...a.m].filter(x => x !== P && nat(x).alive).map(x => esc(nat(x).name)).join(', ')}</div></div>`).join('');
   const list = G.N.filter(x => x.alive && x.id !== P).map(x => ({ id: x.id, r: G.rel[P][x.id] }));
   const fr = list.slice().sort((a, b) => b.r - a.r).slice(0, 10), fo = list.slice().sort((a, b) => a.r - b.r).slice(0, 10);
@@ -44,3 +44,26 @@ function blocsTab() {
   if (b.hist.length) h += `<div class="grp">${t_('Ухвалені й відхилені рішення')}</div>` + b.hist.slice(0, 8).map(x => `<div class="row small"><span>${x.ok ? '✅' : '❌'} ${esc(t_(G.blocKinds[x.kind].n))}${x.target != null ? ': ' + esc(nat(x.target).name) : ''}</span><span>${G.dateStr(x.d)}</span></div>`).join('');
   return h;
 }
+
+// ---- МИРНА КОНФЕРЕНЦІЯ
+let conf = null;
+function openConf(e) {
+  const P = G.confPrepare(G.player, e); conf = { e, P, terms: { regs: P.regs, give: {}, repar: { from: e, amt: 0, years: 3 }, dmz: false, guar: null, med: null, _budget: P.budget } };
+  P.regs.forEach(r => conf.terms.give[r.i] = r.ctrl); renderConf();
+}
+function confSet(k, v) { const T = conf.terms; if (k === 'give') T.give[v[0]] = v[1]; else if (k === 'reparAmt') T.repar.amt = +v; else if (k === 'reparYears') T.repar.years = +v; else if (k === 'reparFrom') T.repar.from = +v; else T[k] = v; renderConf(); }
+function renderConf() {
+  const { e, P, terms } = conf, me = G.player; const ev = G.confCost(me, e, terms); const pctv = Math.min(100, Math.max(0, ev.cost / Math.max(1, ev.budget) * 100));
+  let h = `<h2>🏛 ${t_('Мирна конференція')}: ${esc(nat(me).name)} — ${esc(nat(e).name)}</h2><div class="mut small">${t_('Складіть пакет умов. Ворог погодиться, якщо поступки вкладаються в межу, що залежить від ходу війни, виснаження й тиску на нього. Ваші власні поступки розширюють межу.')}</div>`;
+  h += `<div class="card"><div class="row"><span>${t_('Поступки, яких ви вимагаєте')}</span><b class="${ev.ok ? 'g' : 'r'}">${ev.cost} / ${ev.budget}</b></div><div class="bar"><i style="width:${pctv}%;background:${ev.ok ? '#3c3' : '#d33'}"></i></div><div class="small mut">${t_('Оцінка війни')}: ${(P.score * 100).toFixed(0)} · ${t_('виснаження ворога')}: ${Math.round((nat(e).warExh || 0) * 100)}%</div></div>`;
+  h += `<div class="grp">${t_('Спірні регіони')}</div>` + (P.regs.length ? `<table class="small">${P.regs.map(r => { const to = terms.give[r.i]; return `<tr><td>${esc(regName(r.i))}<div class="mut">${t_('належить')}: ${esc(nat(r.owner).name)} · ${t_('контроль')}: ${esc(nat(r.ctrl).name)}</div></td><td style="white-space:nowrap"><button class="small ${to === me ? 'on' : ''}" onclick="confSet('give',[${r.i},${me}])">${esc(nat(me).a3)}</button><button class="small ${to === e ? 'on' : ''}" onclick="confSet('give',[${r.i},${e}])">${esc(nat(e).a3)}</button></td></tr>`; }).join('')}</table>` : `<div class="mut small">${t_('Немає')}</div>`);
+  h += `<div class="grp">${t_('Репарації')}</div><div class="row small"><span>${t_('Хто платить')}</span><span><button class="small ${terms.repar.from === e ? 'on' : ''}" onclick="confSet('reparFrom',${e})">${esc(nat(e).name)}</button><button class="small ${terms.repar.from === me ? 'on' : ''}" onclick="confSet('reparFrom',${me})">${t_('ми')}</button></span></div>
+    <div class="row small"><span>${t_('Сума на рік')}: <b>${money(terms.repar.amt)}</b></span><input type="range" min="0" max="${Math.max(1, Math.round(nat(terms.repar.from).agg.gdp * 0.03))}" step="0.5" value="${terms.repar.amt}" onchange="confSet('reparAmt',this.value)"></div>
+    <div class="row small"><span>${t_('Років')}: <b>${terms.repar.years}</b></span><input type="range" min="1" max="10" value="${terms.repar.years}" onchange="confSet('reparYears',this.value)"></div>`;
+  h += `<div class="grp">${t_('Безпека')}</div><label class="row small"><span>🚧 ${t_('Демілітаризована зона в спірних регіонах і перемир\'я на 5 років')}</span><input type="checkbox" ${terms.dmz ? 'checked' : ''} onchange="confSet('dmz',this.checked)"></label>`;
+  h += `<div class="row small"><span>🛡 ${t_('Гарант безпеки (оборонний союз)')}</span><select onchange="confSet('guar',this.value===''?null:+this.value)"><option value="">${t_('немає')}</option>${P.guarantors.map(g => `<option value="${g}" ${terms.guar === g ? 'selected' : ''}>${esc(nat(g).name)}</option>`).join('')}</select></div>`;
+  h += `<div class="row small"><span>🤝 ${t_('Посередник (+15 до межі, гонорар 0.4% ВВП)')}</span><select onchange="confSet('med',this.value===''?null:+this.value)"><option value="">${t_('немає')}</option>${P.mediators.map(g => `<option value="${g}" ${terms.med === g ? 'selected' : ''}>${esc(nat(g).name)}</option>`).join('')}</select></div>`;
+  h += `<div class="btns"><button class="pri" ${ev.ok ? '' : 'disabled'} onclick="signConf()">✍ ${t_('Підписати мир')}</button><button onclick="closeModal();conf=null">${t_('Закрити')}</button></div>`;
+  openModal(h); $('#mbox').classList.add('wide');
+}
+function signConf() { const r = G.act.confSign(conf.e, conf.terms); hint(r.ok ? '🕊 ' + t_('Мир підписано') : '⚠ ' + t_(r.err), 4000); if (r.ok) { closeModal(); conf = null; } renderTab(true); renderRight(); renderTop(); }

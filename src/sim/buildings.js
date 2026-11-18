@@ -16,6 +16,7 @@ LORA.sim.register('buildings', 55, function (G) {
   G.canBuild = function (nid, i, type) {
     const b = BD[type], t = ter[i], R = T[i], n = N[nid]; const q = b.req || {};
     if (t.ctrl !== nid || t.owner !== nid) return 'Лише на власній підконтрольній території';
+    if (t.rad > G.day) return 'Зона радіаційного забруднення: будівництво неможливе ще ' + (t.rad - G.day) + ' дн.';
     if (q.geo && !(t.prod[q.geo] > G.W_prod0[q.geo] * 0.003 || (R.sh[q.geo] || 0) > 0.15)) return 'У регіоні немає покладів: ' + RI[q.geo].n.toLowerCase();
     if (q.fert && R.f < q.fert) return 'Замало родючих земель';
     if (q.coast && !R.p.length) return 'Потрібен вихід до моря';

@@ -1,6 +1,6 @@
 // ВІКНА: меню, довідка, пропозиції миру, кінець гри, збереження.
 function openModal(h) { $('#mbox').innerHTML = h; $('#modal').style.display = 'flex'; modalOpen = true; }
-function closeModal() { $('#modal').style.display = 'none'; modalOpen = false; }
+function closeModal() { $('#modal').style.display = 'none'; modalOpen = false; $('#mbox').classList.remove('wide'); }
 function checkPopups() {
   if (modalOpen) return;
   if (G.gameOver) { openModal(`<h2>${G.gameOver.win ? '🏆 ' + t_('Перемога') : '☠ ' + t_('Кінець гри')}</h2><p>${esc(t_(G.gameOver.text))}</p><p class="mut">${G.dateStr()} · ${t_('день')} ${G.day}</p><div class="btns">${G.gameOver.cont ? `<button class="pri" onclick="G.gameOver=null;closeModal()">▶ ${t_('Продовжити гру')}</button>` : ''}<button class="${G.gameOver.cont ? '' : 'pri'}" onclick="location.reload()">${t_('Нова гра')}</button></div>`); return; }

@@ -12,7 +12,7 @@ LORA.sim.register('victory', 98, function (G) {
   };
   G.victoryInit = function () {
     if (G.victory || G.player < 0) return; const n = N[G.player];
-    G.victory = { won: {}, st: { reg: own(G.player), gdp: Math.max(1, n.agg.gdp || 1), wars: G.enemiesOf(G.player).length > 0, origin: ter.filter(t => t.owner === G.player).map(t => t.i) } };
+    G.victory = { won: {}, st: { reg: own(G.player), gdp: Math.max(1, n.agg.gdp || 1), wars: G.enemiesOf(G.player).length > 0, att: [...G.wars.values()].some(w => w.att === G.player), origin: ter.filter(t => t.owner === G.player).map(t => t.i) } };
   };
   // прогрес 0..1 і підпис
   G.victoryProgress = function (k) {
@@ -21,11 +21,14 @@ LORA.sim.register('victory', 98, function (G) {
     if (k === 'econ') { const need = st.gdp * 2.5, dr = n.debt / Math.max(1, n.agg.gdp); return { p: Math.min(1, n.agg.gdp / need) * (dr < 0.8 ? 1 : 0.95), t: `ВВП ${Math.round(n.agg.gdp)}/${Math.round(need)} · борг ${Math.round(dr * 100)}%` }; }
     if (k === 'diplo') { let f = 0; N.forEach(m => { if (m.alive && m.id !== n.id && G.rel[n.id][m.id] >= 60) f++; }); const b = G.blocsOf ? G.blocsOf(n.id).length : 0; return { p: Math.min(1, f / 50) * 0.8 + Math.min(1, b / 2) * 0.2, t: `${f}/50 · блоків ${b}/2` }; }
     if (k === 'space') { const P = n.space && n.space.prog && n.space.prog.mars; if (!P) return { p: 0, t: 'програму не розпочато' }; if (P.ok) return { p: 1, t: 'завершено' }; return { p: Math.min(0.99, (G.day - P.start) / Math.max(1, P.done - P.start)), t: `до ${G.dateStr(P.done)}` }; }
+    if (k === 'scen' && st.att) { const c = own(G.player), war = G.enemiesOf(G.player).length, need = st.reg + Math.max(2, Math.round(st.reg * 0.05)); return { p: Math.min(1, c / need) * (war ? 0.9 : 1), t: `${c}/${need} регіонів${war ? ' · війна триває' : ''}` }; }
     if (k === 'scen') { if (!st.wars) return { p: 0, t: 'на старті немає війни' }; const back = st.origin.filter(i => ter[i].ctrl === G.player).length, war = G.enemiesOf(G.player).length; return { p: (back / st.origin.length) * (war ? 0.9 : 1), t: `${back}/${st.origin.length} регіонів${war ? ' · війна триває' : ''}` }; }
     return { p: 0, t: '' };
   };
   G.victoryWeekly = function () {
-    if (G.player < 0 || !N[G.player] || !N[G.player].alive) return; G.victoryInit(); const v = G.victory; if (G.day < 60) return;
+    if (G.player < 0 || !N[G.player] || !N[G.player].alive) return;
+    if (G.online || (G.humans && G.humans.size > 1)) return; // онлайн-гра безкінечна
+    G.victoryInit(); const v = G.victory; if (G.day < 60) return;
     for (const k in G.VICTORY) {
       if (v.won[k] != null) continue; const pr = G.victoryProgress(k);
       if (pr.p >= 1 || (k === 'scen' && v.st.wars && pr.p >= 1 && !G.enemiesOf(G.player).length)) {

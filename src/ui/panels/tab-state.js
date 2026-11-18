@@ -68,6 +68,7 @@ function parlTab(n) {
   <div class="row"><span data-tip="${t_('Частка голосів, на яку можна розраховувати: залежить від фракцій і стабільності')}">${t_('Підтримка рішень')}</span><b class="${sup > 0.55 ? 'g' : sup > 0.48 ? 'y' : 'r'}">${pct(sup, 0)}</b></div>
   <div class="row"><span>${t_('Наступні вибори')}</span><b>${G.dateStr(p.next)}</b></div>`;
   h += `<div class="card small">${p.regime === 'autocracy' ? t_('В автократії парламент не заважає: рішення ухвалюються без голосувань.') : t_('Великі зміни податків, мобілізації, оборонного й соціального бюджету та оголошення війни виносяться на голосування. Провалене рішення можна повторити через 30 днів. Підтримка росте зі стабільністю й економікою.')}</div>`;
+  if (n.id === G.player && G.rada && G.rada.on) h += radaPanel();
   if (p.regime !== 'autocracy' && n.id === G.player) {
     h += `<div class="grp">${t_('Вплив на парламент')}</div>` + (p.decree > G.day ? `<div class="card small y">⚖ ${t_('Діють надзвичайні повноваження ще')} ${p.decree - G.day} ${t_('дн.')}</div>` : '');
     for (const [k, A] of Object.entries(G.PARL_ACT)) { const e = G.parlCan(n.id, k), c = G.parlActCost(n.id, k);

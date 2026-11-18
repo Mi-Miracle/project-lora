@@ -103,6 +103,6 @@ LORA.sim.register('economy', 30, function (G) {
       n.stats.gdp = gdp; n.stats.pop = A.pop;
     });
     // зростання регіонів (один прохід)
-    for (const t of ter) { const n = N[t.owner]; const g = growthOf[t.owner]; t.gdp *= 1 + g / 365; t.pop *= 1 + (0.012 * (1 - Math.min(1, (n.pc || 1000) / 30000)) - 0.001) / 365; }
+    for (const t of ter) { const n = N[t.owner]; const rad = t.rad > G.day ? 1 : 0; const g = growthOf[t.owner] - rad * 0.08; t.gdp *= 1 + g / 365; t.pop *= 1 + (0.012 * (1 - Math.min(1, (n.pc || 1000) / 30000)) - 0.001 - rad * 0.05) / 365; }
   };
 });

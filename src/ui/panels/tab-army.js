@@ -6,7 +6,7 @@ TAB_FN.army = function () {
   const sub = curSub('army', 'land');
   let h = `<div class="kpi"><div><span>Особовий склад</span><b>${people(tr)}</b></div><div><span>Ліміт мобілізації</span><b>${people(pool)}</b></div><div><span>Якість</span><b>${n.q.toFixed(2)}</b></div><div><span>Арсенал</span><b>${money(n.milStock)}</b></div><div><span>Флот</span><b>${G.shipsOf(P).toFixed(0)} кор.</b></div><div data-tip="Бойові літаки. Перевага в повітрі посилює наступ; її знижують ворожа авіація й ППО. Виробляються на оборонних заводах."><span>Авіація</span><b>✈ ${Math.round(G.airTotal ? G.airTotal(n) : 0)}${n.airEdge && n.airEdge !== 1 ? ` <small class="${n.airEdge > 1 ? 'g' : 'r'}">${n.airEdge > 1 ? '+' : ''}${Math.round((n.airEdge - 1) * 100)}%</small>` : ''}</b></div><div><span>Втрати</span><b class="r">${people(n.casualties)}</b></div></div>
   ${n.ratio.chips < 0.9 || n.ratio.metal < 0.9 || n.ratio.machinery < 0.9 ? '<div class="card y">⚠ Дефіцит мікроелектроніки/металу/обладнання сповільнює виробництво озброєнь.</div>' : ''}${n.ratio.oil < 0.9 ? '<div class="card r">⚠ Дефіцит пального погіршує постачання армій.</div>' : ''}`;
-  h += subnav('army', [['land', 'Армії'], ['air', 'Авіація'], ['navy', 'Флот'], ['models', 'Техніка'], ['gens', 'Генерали'], ['war', 'Полонені й легіон'], ['units', 'Арсенал'], ['strike', 'Удари']]);
+  h += subnav('army', [['land', 'Армії'], ['air', 'Авіація'], ['navy', 'Флот'], ['models', 'Техніка'], ['gens', 'Генерали'], ['war', 'Полонені й легіон'], ['units', 'Арсенал'], ['strike', 'Удари'], ['nuke', '☢ Ядерка']]);
   if (sub === 'land') {
     h += arms.map(a => `<div class="card" style="cursor:pointer;${sel && sel.type === 'a' && sel.id === a.id ? 'border-color:#ffd34d' : ''}" onclick="selArmy(${a.id})"><div class="row"><b>${esc(a.name)}</b><span>${G.vetStars ? '<b class="y">' + G.vetStars(a) + '</b> ' : ''}${G.tplOf ? D.armyTemplates[G.tplOf(a)].ic + ' ' : ''}${people(a.k)}</span></div>
       <div class="row small"><span>${esc(regName(a.t))}${a.mv ? ' → ' + esc(regName(a.mv.dst)) : ''}</span><span>${a.train > 0 ? '⏳ ' + a.train + ' дн.' : a.mv ? (a.mv.sea ? '⚓ море' : '🚚 марш') : G.armies.some(x => x.t === a.t && G.atWar(x.n, P)) ? '<span class="r">⚔ бій</span>' : 'стоїть'}</span></div>
@@ -23,7 +23,7 @@ TAB_FN.army = function () {
     h += `<div class="card">${slider('shipK', 'Нові кораблі', 2, 60, 1, window._shipK || 10, v => v + ' кор.', '')}<div class="btns"><button class="pri" onclick="doShips()">Замовити на верфях</button></div><div class="mut small">≈ ${money((window._shipK || 10) * 1.2 * (0.6 + 0.4 * n.tech))}. Потрібні метал і мікроелектроніка.</div></div>
     ${G.building.filter(b => b.n === P).map(b => `<div class="row small"><span>⚓ ${b.s} кор. на верфі</span><span>${b.done - G.day} дн.</span></div>`).join('')}` + navyMixBlock(n);
   } else {
-    h += sub === 'units' ? arsenalTab(n) : sub === 'air' ? airTab(n) : sub === 'models' ? modelsTab(n) : sub === 'gens' ? gensTab(n) : sub === 'war' ? warTab(n) : strikeTab(n);
+    h += sub === 'units' ? arsenalTab(n) : sub === 'air' ? airTab(n) : sub === 'models' ? modelsTab(n) : sub === 'gens' ? gensTab(n) : sub === 'war' ? warTab(n) : sub === 'nuke' ? nukeTab(n) : strikeTab(n);
   }
   return h;
 };
@@ -138,3 +138,43 @@ function warTab(n) {
 }
 function doPOW(x) { const r = G.act.exchangePOW(x); hint(r.ok ? '🤝 ' + t_('Обмін відбувся') : '⚠ ' + r.err, 3000); renderTab(true); }
 function doLegion() { const r = G.act.createLegion(); hint(r.ok ? '🌍 ' + t_('Набір оголошено') : '⚠ ' + r.err, 3000); renderTab(true); }
+
+// ---- ядерна програма
+let nukeConfirm = null;
+function nukeTab(n) {
+  const s = G.nukeStatus(n.id); if (!s) return ''; const ck = ok => ok ? '<span class="g">✔</span>' : '<span class="mut">○</span>';
+  let h = `<div class="mut small">${t_('Ядерна зброя — це насамперед стримування: держава з бомбою рідко стає ціллю. Застосування — крайній крок, після якого світ відвернеться від вас, а ворог із бомбою відповість.')}</div>`;
+  h += `<div class="kpis"><div class="kpi"><span>${t_('Боєголовки')}</span><b>☢ ${s.w.toLocaleString()}</b></div><div class="kpi"><span>${t_('Виробництво')}</span><b>${s.rate ? '+' + s.rate + ' / ' + t_('міс.') : '—'}</b></div><div class="kpi"><span>${t_('Статус')}</span><b>${s.tested ? t_('ядерна держава') : s.w ? t_('бомба є, без випробування') : t_('немає')}</b></div><div class="kpi"><span>${t_('ПРО')}</span><b>${s.abm ? '✔' : '—'}</b></div></div>`;
+  if (!START_NUKE(n)) {
+    h += `<div class="grp">${t_('Ядерна програма')}</div><div class="card small">`;
+    h += `<div class="row"><span>${ck(G.has(n, 'nuke_enrich'))} ${t_('Дослідження «Військове збагачення урану»')}</span></div>`;
+    h += `<div class="row"><span>${ck(s.enr > 0)} ${t_('Будівля «Завод збагачення урану»')}</span><b>${s.enr}</b></div>`;
+    h += `<div class="row"><span>${ck(s.bomb)} ${t_('Дослідження «Ядерний заряд»')}</span></div>`;
+    h += `<div class="row"><span>${ck(s.lab > 0)} ${t_('Будівля «Ядерний збройовий центр»')}</span><b>${s.lab}</b></div>`;
+    h += `<div class="row"><span>${ck(s.tested)} ${t_('Ядерне випробування')}</span>${!s.tested && s.w >= 1 ? `<button onclick="if(confirm(t_('Провести ядерне випробування? Відносини з усім світом погіршаться, Захід запровадить санкції.'))){const r=G.act.nukeTest();hint(r.ok?'☢ '+t_('Випробування проведено'):'⚠ '+t_(r.err),3000);renderTab(true)}">☢ ${t_('Випробувати')}</button>` : ''}</div>`;
+    h += `<div class="row"><span>${ck(s.icbm)} ${t_('МБР: дослідження й «Шахти МБР»')}</span><b>${s.silo}</b></div></div>`;
+    h += `<div class="mut small">${t_('Кожна боєголовка коштує $0.4 млрд. Виробництво: до 2 на місяць за кожен завод збагачення й до 3 за кожен збройовий центр.')}</div>`;
+  } else h += `<div class="card small">${t_('Ваша держава має повну ядерну тріаду: МБР, бомбардувальники й підводні човни.')}</div>`;
+  // ескалація
+  const esc = Object.entries(n.nk && n.nk.esc || {}).filter(([e, v]) => v > 0.05);
+  const theirs = G.N.filter(m => m.alive && m.nk && m.nk.esc && m.nk.esc[n.id] > 0.05);
+  if (esc.length || theirs.length) {
+    h += `<div class="grp">${t_('Ескалація')}</div>`;
+    theirs.forEach(m => { const v = m.nk.esc[n.id]; h += `<div class="card small ${v > 1 ? 'r' : ''}"><div class="row"><b>☢ ${esc_(m.name)} ${t_('проти вас')}</b><b class="${v > 0.6 ? 'r' : 'y'}">${Math.round(v * 100)}%</b></div><div class="bar"><i style="width:${Math.min(100, v / 1.5 * 100)}%;background:#d33"></i></div><div class="mut">${t_('Росте, коли ви захоплюєте її власні регіони чи загрожуєте столиці. Понад 100% — ризик ядерного удару по ваших військах.')}</div></div>`; });
+    esc.forEach(([e, v]) => { h += `<div class="row small"><span>${t_('Ваша ескалація проти')} ${esc_(nat(+e).name)}</span><b>${Math.round(v * 100)}%</b></div>`; });
+  }
+  // удар
+  if (s.tested && s.w >= 1) {
+    const r = sel && sel.type === 't' ? sel.id : null; h += `<div class="grp">${t_('Застосування')}</div>`;
+    h += `<div class="card small">${t_('Ціль')}: <b>${r != null ? esc_(regName(r)) : t_('оберіть регіон на мапі')}</b></div>`;
+    for (const [k, K] of Object.entries(G.NUKE_KIND)) {
+      const e = r != null ? G.nukeCan(n.id, r, k) : t_('Оберіть регіон на мапі');
+      h += `<div class="card small"><div class="row"><b>☢ ${esc_(t_(K.n))} · ${K.w} ${t_('бг.')}</b>${nukeConfirm === k + r ? `<button class="pri" style="background:#a11" onclick="doNuke(${r},'${k}')">${t_('ПІДТВЕРДИТИ')}</button>` : `<button ${e ? 'disabled' : ''} onclick="nukeConfirm='${k}'+${r};renderTab(true)">${t_('Удар')}</button>`}</div><div class="mut">${esc_(t_(K.d))}</div>${e ? `<div class="r">${esc_(t_(e))}</div>` : nukeConfirm === k + r ? `<div class="r">${t_('Це незворотно. Натисніть ще раз, щоб підтвердити.')}</div>` : ''}</div>`;
+    }
+  }
+  h += `<div class="grp">${t_('Ядерний клуб')}</div>` + G.N.filter(m => m.alive && m.nuke && m.nw >= 1).sort((a, b) => b.nw - a.nw).map(m => `<div class="row small"><span>${nlink(m.id)}${m.nk && !m.nk.tested ? ' <span class="mut">(' + t_('без випробування') + ')</span>' : ''}</span><b>☢ ${m.nk && m.nk.tested || m.id === n.id ? m.nw.toLocaleString() : '?'}</b></div>`).join('');
+  return h;
+}
+function START_NUKE(n) { return ['RUS', 'USA', 'CHN', 'FRA', 'GBR'].includes(n.a3) && n.nk && n.nk.tested; }
+const esc_ = s => esc(String(s));
+function doNuke(r, k) { nukeConfirm = null; const res = G.act.nukeStrike(r, k); hint(res && res.ok ? (res.intercepted ? '🛡 ' + t_('Удар перехоплено ПРО') : '☢ ' + t_('Удар завдано')) : '⚠ ' + t_((res && res.err) || 'Помилка'), 4000); renderTab(true); renderRight && renderRight(); }

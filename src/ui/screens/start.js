@@ -49,7 +49,11 @@ function twitchBlock() {
   <div class="small mut">${t_('Читання чату без входу: голосування глядачів командами !1, !2, !3…')}</div></div>
   <label class="row"><span>${t_('Чат голосує за рішення в кризах (дилеми)')}</span><input type="checkbox" ${AUD.S.chatVotes !== false ? 'checked' : ''} onchange="AUD.set('chatVotes',this.checked)"></label>
   <label class="row"><span>${t_('Чат вирішує долю світу (голосування за світову подію)')}</span><input type="checkbox" ${AUD.S.chatChaos ? 'checked' : ''} onchange="AUD.set('chatChaos',this.checked)"></label>
-  <div class="row"><span>${t_('Як часто, хвилин')}</span><input type="number" min="3" max="60" value="${AUD.S.chaosMin || 8}" onchange="AUD.set('chaosMin',+this.value)" style="width:70px"></div></div></div>`;
+  <div class="row"><span>${t_('Як часто, хвилин')}</span><input type="number" min="3" max="60" value="${AUD.S.chaosMin || 8}" onchange="AUD.set('chaosMin',+this.value)" style="width:70px"></div>
+  <div class="card" style="border-color:#7a5cff"><label class="row"><span>🏛 <b>${t_('Режим «Президент і Рада»')}</b></span><input type="checkbox" ${AUD.S.chatRada ? 'checked' : ''} onchange="AUD.set('chatRada',this.checked)"></label>
+  <div class="small mut">${t_('Стрімер — президент, чат — Верховна Рада. Ваші закони (податки, бюджет, мобілізація, війна) ухвалює чат: !1 — за, !2 — проти. Глядачі-депутати вносять власні законопроєкти, а ви підписуєте або ветуєте їх. Довіра чату впливає на стабільність.')}</div>
+  <div class="row"><span>${t_('Ініціативи депутатів раз на, хвилин')}</span><input type="number" min="2" max="60" value="${AUD.S.radaMin || 6}" onchange="AUD.set('radaMin',+this.value)" style="width:70px"></div>
+  <div class="row"><span>${t_('Час на голосування, секунд')}</span><input type="number" min="20" max="180" value="${AUD.S.radaSec || 60}" onchange="AUD.set('radaSec',+this.value)" style="width:70px"></div></div></div></div>`;
 }
 function linkRow(label, url, tip) { return `<div class="linkrow" data-tip="${esc(tip || '')}"><span>${label}</span><input readonly value="${esc(url)}" onclick="this.select()"><button onclick="navigator.clipboard&&navigator.clipboard.writeText('${esc(url)}');hint('📋 ${t_('Скопійовано')}',1200)">📋</button></div>`; }
 function roomLinks(code) {
@@ -94,5 +98,6 @@ function startGame() {
   if (startMode === 'char') G.init(null, scen, { difficulty: startDiff, char: { name: (chName || '').trim() || t_('Олена Коваль'), type: chType, home: startSel } });
   else if (startMode === 'company') G.init(null, scen, { difficulty: startDiff, company: { name: (coName || '').trim() || t_('Моя компанія'), sector: coSector, home: startSel, cash: LORA.config.companyCash } });
   else G.init(startSel, scen, { difficulty: startDiff });
+  if (AUD.S.chatRada && G.player >= 0) G.radaEnable(true);
   $('#start').style.display = 'none'; startUI(); setTimeout(help, 300);
 }

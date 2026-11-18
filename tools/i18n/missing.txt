@@ -2,6 +2,14 @@ G._front[n.id] = front.map(f => f.i);
     let myIdle = mine.filter(a => !a.mv && a.train <= 0 && !G.armies.some(x => x.t === a.t && G.atWar(x.n, a.n)));
     let guard = 0;
     while (myIdle.length < Math.min(front.length, 14) && guard++ < 6) { const big = myIdle.sort((x, y) => y.k - x.k)[0]; if (!big || big.k < 60) break; const b = G.newArmy(n.id, big.t, big.k / 2, big.name.replace(/(-р|-2)+$/
+const yrs = ((G.day - (a.d || 0)) / 365).toFixed(1);
+  const ev = C.ev.slice().reverse();
+  const big = ev.filter(e => /☢|капітул|мир|Мир|Звільнено|звільнено|Розвилка|🏆|перемога|Переворот|Обвал|оголош|нападає/.test(e.text)).slice(0, 14);
+  const wars = ev.filter(e => /нападає|оголошує війну/.test(e.text)).length, peace = ev.filter(e => /мир|Мир/.test(e.text)).length;
+  let h
+it => {
+    const C = G.chron; if (!C || !G.N) return; const mine = it.nats && it.nats.includes(C.nid);
+    if ((mine || /☢|капітул|Обвал/.test(it.text)) && KEY.test(it.text) && !/Будівництво|будує/.test(it.text)) { if (C.ev.length && C.ev[C.ev.length - 1].text === it.text) return; C.ev.push({ d: it.d, text: it.text, k: it.kind
 2 : 0) + (/Землетрус|Цунамі|вулкана|метеорита|Пандемія|криза|капітул|перебрала|Переворот|Повстання/.test(it.text) ? 3 : 0) - (/Шторм|Міжнародна допомога|Будівництво|Збудовано|будує|Посуха/.test(it.text) ? 3 : 0);
     const seen = new Set();
     L.filter(n => !/^(✈|🚀) /.test(n.text)).map(n => ({ n, s: sc(n)
@@ -16,42 +24,68 @@ s || !/[а-яіїєґА-ЯІЇЄҐ]/.test(s)) return s; const d = I.dict[L.lang]
 filter(o => o.d < 900).sort((x, y) => x.d - y.d)[0];
       if (!cand) return; const a = cand.a; const need = Math.min(a.k * 0.45, f.inside * 1.3 / Math.max(0.3, n.q) + 10);
       const b = G.newArmy(n.id, a.t, need, a.name.replace(/(-р|-2)+$/
+const KEY = /☢|війн|нападає|капітул|Переворот|Повстання|мир|Мир|угод|союз|Звільнено|звільнено|встановлює контроль|🏆|перемога|Розвилка|закон|Обвал|вибори|Вибори|ухвалено|санкц/;
+  LORA.bus.on && LORA.bus.on
 startsWith(nat(P).name)) return false; 
     if (/Будівництво:|будує|Закладено|Сформовано/.test(it.text)) return false;
     const k = pick(it); if (!k) return false; const urgent = it.kind
 const err = G.canBuild(host, i, type); if (err && !/Лише на власній/.test(err)) return err;
     const cost = G.buildCost(host, i, type) * 1.1; if (c.cash < cost) return
 N.forEach(x => { if (x.alive && x.id !== n.id && G.blocsOf && G.blocsOf(x.id).some(b => /ЄС|EU/.test(b.n))) G.rel[x.id][n.id] = clamp(G.rel[x.id][n.id] + 8, -100, 100)
+n => { const yes = n.stab / 100 + 0.2 > G.rnd(); N.forEach(m => { if (m.alive && G.blocsOf(m.id).some(b => /ЄС|EU/.test(b.n))) rel(n.id, m.id, yes ? 12 : -5)
 pitch: 1.2, re: /Дефіцит:|енерг|Збудовано|Будівництво зупинено|порт|залізни|маршрут|Землетрус|Повінь|пожежі|тайфун|вулкан|спека|буря/i
 if (/Землетрус|Цунамі|Повінь|пожежі|Супертайфун|вулкана|метеорита|сонячна буря|спека/.test(it.text)) return mine || it.kind
+ють по компаніях країни; світова напруга піднімає ВПК; дорога нафта — енергетику. Дивіденди — 30% прибутку щомісяця.
 pitch: 1.1, re: /Стабільність|протест|Переворот|Рада|Сейм|Конгрес|парламент|Вибори|ухвалено|провалено|🗳|🏛/i
 pitch: 0.7, re: /війн|нападає|встановлює контроль|Звільнено|оточен|удар|ракет|дронів|Повстан|армі|мобіліз/i
 && /автократії/.test(err) && (G.leader.cont[G.leaderNation()] || 0) >= 80)) return { ok: false, err
 if (/встановлює контроль|Звільнено|капітул/.test(it.text) && mine) return { lvl: it.text.includes
 pitch: 1.35, re: /мир|союз|санкці|візит|прибув|ультиматум|відносин|Вільна торгівля|доступ/i
 pitch: 1.0, re: /дефіцит|борг|бюджет|Економічний бум|Резерви|криза|Дефолт|ціни|Рекордні/i
+дозволяє будувати завод збагачення — перший крок ядерної програми (міжнародна тривога)
+по місту: величезні жертви, руйнування й радіація на роки; світ відвернеться від вас
+big: 1, ok: n => G.blocsOf && !G.blocsOf(n.id).some(b => /ЄС|EU/.test(b.n)) && [
 /нападає|війн/.test(it.text);
     if (!urgent && cool[k] > G.day) return
 && mine && /війн|нападає|вступає|оголошує/i.test(it.text)) return { lvl
 // відкритий список не закриваємо if (G.player < 0) { const sp0 = [
 { const m = n.text.match(/влучань (\d+)/); return m && +m[1] >= 120
+ядерний збройовий центр виробляє боєголовки; потрібне випробування
 && mine && !/Будівництво:|будує:/.test(it.text)) return { lvl
 nat(k).parl ? G.dateStr(nat(k).parl.next).replace(/ р\.$/
 pitch: 0.85, re: /Дослідження|освоює|Технологічний/i
+Демілітаризована зона в спірних регіонах і перемир\
+бюджет +2% ВВП (у борг), Китай +20, США −15
+Посередник (+15 до межі, гонорар 0.4% ВВП)
+Потрібні МБР (шахти) або бомбардувальники
+Спершу розмінуйте регіон (міни > 30%)
+Індекс за 2 роки. Війни й санкції б\
 G.dateStr(ap.due).replace(/ р\.$/
+Гарант безпеки (оборонний союз)
 G.dateStr(n.d).replace(/ р\.$/
 const CYR = /[а-яіїєґА-ЯІЇЄҐʼ
 /NATO|НАТО/.test(b.n) || b.id
+На весь екран (для стріму)
+витрачається першим)
 <![а-яіїєґА-ЯІЇЄҐ])
+Рада (чат) ухвалила
 [а-яіїєґА-ЯІЇЄҐ])
+стабільність +4
+стабільність +2
+стабільність −1
 watch=КОД&obs=1
+боєголовок (є
+Ранковий кур\
 Округ Гуалянь
 /50 · блоків
 БМП-2 / M113
+Нейтралітет
 Захарченко
 Виноградов
+Недоступно
 $0.2 млрд
 $1.5 млрд
+Відкласти
 Кравченко
 Остапенко
 Дорошенко
@@ -63,6 +97,8 @@ $1.5 млрд
 Геннадій
 Богданов
 Воробйов
+при межі
+$1 млрд)
 березень
 вересень
 листопад
@@ -75,6 +111,7 @@ $1.5 млрд
 Морозов
 Голубєв
 Федоров
+Війська
 квітень
 травень
 червень
@@ -109,17 +146,23 @@ $1.5 млрд
 Бойко
 Павло
 Орлов
+Років
 лютий
 Олег
 Юрій
 Ігор
 і зв
+чат)
+за /
 язки
+Вето
 Зв\
 Щоб
+ПРО
 ввп
 зв
 із
+ми
 р
 б
 в

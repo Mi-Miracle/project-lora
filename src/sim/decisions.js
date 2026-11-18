@@ -41,12 +41,13 @@ LORA.sim.register('decisions', 99, function (G) {
           ['Подякувати', n => { n.ars.fpv += 60; return '+60 тис. FPV'; }]] }
   ];
   G.decEvents = EV; G.decisions = [];
+  G.DEC_EV = EV;
   G.decisionsMonthly = function () {
     if (G.day < 40) return;
     G.humans.forEach(nid => {
       const n = N[nid]; if (!n || !n.alive || G.decisions.some(d => d.nid === nid) || G.rnd() > 0.45) return;
-      const cand = EV.filter(e => e.ok(n) && !(n._dec && n._dec[e.id] > G.day)); const e = pick(cand); if (!e) return; const c = e.t(n); if (!c) return;
-      n._dec = n._dec || {}; n._dec[e.id] = G.day + 540; G.decisions.push({ id: G.nextId++, ev: e.id, nid, ctx: c, d: G.day });
+      const cand = EV.filter(e => e.ok(n) && !(n._dec && n._dec[e.id] > G.day)); const big = cand.filter(e => e.big); const e = big.length && G.rnd() < 0.5 ? pick(big) : pick(cand); if (!e) return; const c = e.t(n); if (!c) return;
+      n._dec = n._dec || {}; n._dec[e.id] = e.big ? 1e9 : G.day + 540; if (e.big) c.big = true; G.decisions.push({ id: G.nextId++, ev: e.id, nid, ctx: c, d: G.day });
     });
   };
   G.decide = function (did, opt) {
