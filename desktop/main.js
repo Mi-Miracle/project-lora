@@ -44,7 +44,7 @@ async function create() {
   const root = gameRoot(); await startServer(root);
   win = new BrowserWindow({ width: 1600, height: 900, minWidth: 1100, minHeight: 650, title: 'Project LORA', backgroundColor: '#0b1118', icon: path.join(root, 'assets', 'lora.png'), autoHideMenuBar: true, webPreferences: { contextIsolation: true, backgroundThrottling: false } });
   Menu.setApplicationMenu(null); win.maximize();
-  win.loadURL(`http://localhost:${PORT}/index.html`);
+  win.loadURL(`http://localhost:${PORT}/index.html`); ready = true;
   // зовнішні посилання (Twitch, GitHub) — у звичайному браузері; вхід Twitch повертається на localhost — лишаємо у вікні
   win.webContents.setWindowOpenHandler(({ url }) => { if (url.startsWith(`http://localhost:${PORT}`)) return { action: 'allow' }; shell.openExternal(url); return { action: 'deny' }; });
   win.webContents.on('before-input-event', (e, i) => {
@@ -56,4 +56,5 @@ async function create() {
   win.on('page-title-updated', e => e.preventDefault());
 }
 app.whenReady().then(create);
-app.on('window-all-closed', () => app.quit());
+let ready = false; // поки показується заставка, закриття її вікна не має завершувати застосунок
+app.on('window-all-closed', () => { if (ready) app.quit(); });
