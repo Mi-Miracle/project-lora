@@ -181,7 +181,7 @@ LORA.sim.register('buildings', 55, function (G) {
     ter.forEach(t => { for (const type in SB.convert) { const c = SB.convert[type]; const out = BD[type].out[c.r]; put(t.i, type, Math.min(c.max, Math.floor(t.prod[c.r] * c.share / out)), true); } });
     // 2) точні розміщення
     const placed = new Set();
-    SB.place.forEach(([cc, name, type, l]) => { const i = ter.findIndex(t => t.cc === cc && T[t.i].n === name); if (i >= 0) { put(i, type, l, false); placed.add(cc + ':' + type); } });
+    SB.place.forEach(([cc, name, type, l]) => { const i = ter.findIndex(t => t.cc === cc && (T[t.i].n0 || T[t.i].n) === name); if (i >= 0) { put(i, type, l, false); placed.add(cc + ':' + type); } });
     // 3) правила для всіх держав
     N.forEach(n => {
       if (!n.alive || n.home < 0) return;

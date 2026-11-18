@@ -3,7 +3,7 @@ function openModal(h) { $('#mbox').innerHTML = h; $('#modal').style.display = 'f
 function closeModal() { $('#modal').style.display = 'none'; modalOpen = false; }
 function checkPopups() {
   if (modalOpen) return;
-  if (G.gameOver) { openModal(`<h2>${G.gameOver.win ? '🏆 Перемога' : '☠ Кінець гри'}</h2><p>${esc(G.gameOver.text)}</p><p class="mut">${G.dateStr()} · день ${G.day}</p><div class="btns"><button class="pri" onclick="location.reload()">Нова гра</button></div>`); return; }
+  if (G.gameOver) { openModal(`<h2>${G.gameOver.win ? '🏆 ' + t_('Перемога') : '☠ ' + t_('Кінець гри')}</h2><p>${esc(t_(G.gameOver.text))}</p><p class="mut">${G.dateStr()} · ${t_('день')} ${G.day}</p><div class="btns">${G.gameOver.cont ? `<button class="pri" onclick="G.gameOver=null;closeModal()">▶ ${t_('Продовжити гру')}</button>` : ''}<button class="${G.gameOver.cont ? '' : 'pri'}" onclick="location.reload()">${t_('Нова гра')}</button></div>`); return; }
   const pi = G.pendingPeace.findIndex(p => p.to == null || p.to === G.player); if (pi < 0) return;
   const p = G.pendingPeace[pi], f = nat(p.from); let t = '';
   if (String(p.type).startsWith('h_')) { const K = { h_alliance: '🛡 Союз', h_treaty: '📑 Торговельна угода', h_access: '🛂 Військовий доступ', h_peace: '🕊 Мир', h_requestAid: '📦 Прохання про допомогу' }; t = `<h2>${K[p.type] || p.type}</h2><p>${t_('Гравець')} <b>${esc(f.name)}</b> ${t_('пропонує вам')}: ${K[p.type] || ''}${p.ptype ? ' (' + esc(p.ptype) + ')' : ''}.</p>`; }

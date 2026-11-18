@@ -163,7 +163,8 @@ LORA.sim.register('trade', 40, function (G) {
       let need = 0, used = 0;
       N.forEach(n => { if (!n.alive) return; const avail = n.agg.prod[r] - n.exp[r] + n.imp[r]; need += n.agg.need[r]; used += Math.min(avail, n.agg.need[r]); });
       const target = G.priceBase[r] * clamp(Math.pow(need / Math.max(1e-6, used), 3), 0.5, 5) * (1 + 0.03 * Math.sin(G.day / 97 + ri));
-      G.prices[r] += (target - G.prices[r]) * 0.05;
+      const sh = G.priceShock && G.priceShock[r]; const tgt = sh && sh.until > G.day ? target * (1 + (sh.m - 1) * Math.min(1, (sh.until - G.day) / 180)) : target;
+      G.prices[r] += (tgt - G.prices[r]) * 0.05;
     });
   };
 });
