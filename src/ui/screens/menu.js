@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['Future tech: 45 new technologies, 33 buildings, space programmes to Venus, asteroids and Jupiter', 'Demolish unneeded buildings', 'President also has skills, wealth, party and a personal team', 'Company directors and personal advisers with AI autopilot', 'Monthly news about you first, yearly summary, endless funny ticker']
-  : ['Технології майбутнього: +45 досліджень, +33 будівлі, місії до Венери, астероїдів і Юпітера', 'Знесення непотрібних будівель', 'Президент теж має навички, статки, партію й особисту команду', 'Директори компанії й особисті помічники з автокеруванням ШІ', 'Новини спершу про вас, підсумки року, нескінченна стрічка кумедних новин'];
+  ? ['Dynasty: marriage, children, education and heirs', 'Aliens, supervolcano, asteroid, kraken — with animations', 'TV debates, journalist investigations, Olympics and World Cup', 'Secret protocols you can leak, gifts, trolling and ultimatums between states', 'Climate change, space race, shady deals for characters']
+  : ['Династія: шлюб, діти, освіта й спадкоємці', 'Прибульці, супервулкан, астероїд, кальмар — з анімаціями', 'Теледебати, журналістські розслідування, Олімпіади й чемпіонати світу', 'Таємні протоколи (можна злити), подарунки, тролінг і ультиматуми між державами', 'Зміна клімату, космічні перегони, тіньові справи персонажа'];
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }
@@ -83,6 +83,7 @@ function settingsScreen() {
   else if (setTab === 'game') body = `<label class="row"><span>🌫 ${t_('Туман війни')}</span><input type="checkbox" ${LORA.config.fog !== false ? 'checked' : ''} onchange="LORA.config.fog=this.checked;try{localStorage.setItem('lora_fog',this.checked?'1':'0')}catch(e){};if(window.mapDirty!==undefined)mapDirty=true"></label>
     <label class="row"><span>${t_('Заставка при запуску')}</span><input type="checkbox" ${localStorage.getItem('lora_intro') === 'off' ? '' : 'checked'} onchange="localStorage.setItem('lora_intro',this.checked?'on':'off')"></label>
     <label class="row"><span>${t_('Гумористичні новини й події')}</span><input type="checkbox" ${S.humor !== false ? 'checked' : ''} onchange="AUD.set('humor',this.checked);LORA.tickerRefresh&&LORA.tickerRefresh()"></label>
+    <label class="row"><span>${t_('Анімації світових подій (прибульці, катаклізми)')}</span><input type="checkbox" ${S.fx !== false ? 'checked' : ''} onchange="AUD.set('fx',this.checked)"></label>
     <label class="row"><span>${t_('Стрічка кумедних новин унизу екрана')}</span><input type="checkbox" ${S.ticker !== false ? 'checked' : ''} onchange="AUD.set('ticker',this.checked);LORA.tickerRefresh&&LORA.tickerRefresh()"></label>
     <div class="row"><span>${t_('Мова')}</span>${typeof langSwitch === 'function' ? langSwitch() : ''}</div>
     <div class="card small"><b>${t_('Гарячі клавіші')}</b><div class="mut" style="line-height:1.7">Esc — ${t_('пауза / меню')} · ${t_('Пробіл — стоп/старт часу')} · 1–4 — ${t_('швидкість')} · Alt+1–8 — ${t_('вкладки')} · L — ${t_('до лідера')} · F9 — ${t_('режим стріму')} · F11 — ${t_('повний екран')}</div></div>`;

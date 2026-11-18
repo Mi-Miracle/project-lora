@@ -39,7 +39,7 @@ function terrPanel(i) {
     <button onclick="dact('requestAid',${t.owner})" ${war ? 'disabled' : ''} data-tip="Попросити зброю й гроші. Лише під час особистого візиту лідера; шанс залежить від відносин і ваших спільних ворогів">📦 Попросити допомогу</button>
     <button onclick="dact('alliance',${t.owner})" ${war ? 'disabled' : ''}>${G.allied(P, t.owner) ? (G.alliances.some(a => a.m.size === 2 && a.m.has(P) && a.m.has(t.owner)) ? 'Розірвати союз' : '🛡 Союзники') : '🛡 Запропонувати союз'}</button></div>
     <div class="btns"><span class="mut small" style="align-self:center">Допомога:</span>${[1, 5, 20].map(v => `<button onclick="aid(${t.owner},${v})">$${v} млрд</button>`).join('')}</div>
-    ${tradeWarBlock(t.owner)}
+    ${tradeWarBlock(t.owner)}${typeof interBlock === 'function' ? interBlock(t.owner) : ''}
     <div class="btns">${G.atWar(P, t.ctrl) ? `<button class="dang" onclick="tab='army';subtab.army='strike';renderTabs();renderTab(true);$('#left').classList.remove('hide')">🎯 Удар по регіону</button>` : ''}${war ? `<button onclick="peace(${t.owner},'white')">🕊 Запропонувати мир</button>` : `<button class="dang" onclick="confirmWar(${t.owner})">⚔ Оголосити війну</button>`}</div>`;
   } else {
     const p = t.pol; const pr = D.devPriorities;

@@ -479,3 +479,4 @@ body.stream #funTk { display: none !important; }
 .cr-logo { font: 700 44px Pixelify, system-ui; color: #ffd34d; text-shadow: 0 0 22px #ffb02088; margin-top: 4px; }
 .mincard.stf { border-left-color: #ffd34d; }
 .mincard.nohire { opacity: .8; border-style: dashed; }
+#fxcv { position: fixed; inset: 0; z-index: 9300; cursor: pointer; transition: opacity .4s; }
