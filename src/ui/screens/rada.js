@@ -41,7 +41,8 @@ function radaPanel(full) {
       ${b.st === 'vote' && !R.live ? `<div class="btns"><button onclick="radaManual(${b.id},true)">✔ ${t_('Ухвалити вручну')}</button><button onclick="radaManual(${b.id},false)">✖ ${t_('Відхилити')}</button></div>` : ''}${b.st === 'sign' ? `<div class="btns"><button class="pri" onclick="radaSign(${b.id},true)">✍ ${t_('Підписати')}</button><button onclick="radaSign(${b.id},false)">✋ ${t_('Ветувати')}</button></div>` : ''}</div>`).join(''); }
   if (R.log.length) h += `<div class="grp">${t_('Історія голосувань')}</div>` + R.log.slice(0, full ? 15 : 8).map(l => `<div class="row small"><span>${l.ok ? '✅' : '❌'} ${esc(t_(l.what))}${l.sign === false ? ' <span class="r">(' + t_('вето') + ')</span>' : ''}</span><span class="mut">${l.yes}/${l.no}</span></div>`).join('');
   h += `<div class="mut small">${t_('Ваші великі рішення (податки, бюджет, мобілізація, оголошення війни) автоматично стають законопроєктами. ШІ-парламент у цьому режимі вимкнено.')}</div>`;
-  return h;
+  if (R.trust < 30) h += `<div class="card small r">⚖ ${t_('Довіра нижче 20% — депутати-глядачі можуть ініціювати імпічмент!')}</div>`;
+  return h + chatCmdHelp() + chatStatsBlock();
 }
 function radaManual(id, ok) { const r = G.radaResolve(id, ok ? 1 : 0, ok ? 0 : 1); if (r && r.sign) radaSignModal(G.rada.bills.find(x => x.id === id) || { id }); renderTab(true); renderTop(); }
 // оверлеї для глядачів і джерела OBS: голосування Ради й «Чат вирішує долю світу»

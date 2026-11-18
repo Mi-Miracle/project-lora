@@ -53,6 +53,12 @@ LORA.sim.register('rada', 93.7, function (G) {
     const R = G.rada, b = R && R.bills.find(x => x.id === id); if (!b) return null; const n = N[G.player];
     const ok = yes > no && yes > 0; b.yes = yes; b.no = no; R.log.unshift({ d: G.day, what: b.what, yes, no, ok, by: b.by }); R.log.length = Math.min(R.log.length, 30);
     G.say(`🏛 ${t('Рада (чат)')}: «${b.what}» — ${ok ? 'ухвалено' : 'провалено'} (${yes} за / ${no} проти)`, ok ? 'good' : 'bad', [G.player]);
+    if (b.by === 'impeach') {
+      R.bills = R.bills.filter(x => x !== b);
+      if (ok) { n.stab = clamp(n.stab - 15, 0, 100); R.trust = 50; G.gameOver = { win: false, cont: true, text: `Чат проголосував за імпічмент (${yes} за / ${no} проти). Президента усунуто з посади. Можна продовжити гру — як новообраний президент із чистого аркуша довіри.` }; G.say('⚖ ІМПІЧМЕНТ: чат усунув президента!', 'bad', [G.player]); }
+      else { R.trust = clamp(R.trust + 15, 0, 100); G.say('⚖ Імпічмент провалився — президент вистояв! Довіра +15', 'good', [G.player]); }
+      return { ok };
+    }
     if (b.by === 'elect') {
       R.bills = R.bills.filter(x => x !== b);
       if (ok) { R.trust = clamp(R.trust + 10, 0, 100); n.stab = clamp(n.stab + 4, 0, 100); G.say('🗳 Чат переобрав президента на новий термін!', 'good', [G.player]); }

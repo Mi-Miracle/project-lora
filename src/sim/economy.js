@@ -14,7 +14,7 @@ LORA.sim.register('economy', 30, function (G) {
       if (t.ctrl !== t.owner) o.agg.occLost += t.gdp;
       const needF = Math.pow(Math.max(0.05, t.gdp / Math.max(0.01, t.gdp0)), 0.6) * (t.ctrl === t.owner ? 1 : 0.6);
       for (const r of RES) {
-        c.agg.prod[r] += t.prod[r] * eff * grow * mul[t.ctrl][r];
+        c.agg.prod[r] += t.prod[r] * eff * grow * mul[t.ctrl][r] * (t.depl && t.depl[r] ? 1 - t.depl[r] : 1);
         c.agg.need[r] += t.need0[r] * needF;
       }
     }

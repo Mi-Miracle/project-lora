@@ -121,7 +121,7 @@ function navyMixBlock(n) {
 function gensTab(n) {
   const TR = D.genTraits, gs = G.gensOf(G.player).sort((a, b) => b.skill - a.skill);
   let h = `<div class="mut small">${t_('Генерали командують арміями: навичка (★) дає до +10% сили, риса — свою перевагу. Призначайте в панелі армії. У боях генерали ростуть і можуть загинути.')}</div>`;
-  gs.forEach(g => { const a = g.army != null ? G.armies.find(x => x.id === g.army) : null; h += `<div class="card gen-row">${avatar('gen' + g.id + g.name, 40, { mil: 1, fem: false })}<div><div class="row"><b>🎖 ${esc(g.name)} <span class="y">${'★'.repeat(g.skill)}</span></b><span>${TR[g.trait].ic} ${esc(t_(TR[g.trait].n))}</span></div><div class="small mut">${esc(t_(TR[g.trait].d))}</div><div class="row small"><span>${a ? '⚔ ' + esc(a.name) + ' · ' + esc(regName(a.t)) : t_('у резерві')}</span>${a ? `<button onclick="selArmy(${a.id})">🔎</button>` : ''}</div></div></div>`; });
+  gs.forEach(g => { const a = g.army != null ? G.armies.find(x => x.id === g.army) : null; h += `<div class="card gen-row">${avatar('gen' + g.id + g.name, 40, { mil: 1, fem: false })}<div><div class="row"><b>🎖 ${g.viewer ? '🟣 ' : ''}${esc(g.name)} <span class="y">${'★'.repeat(g.skill)}</span></b><span>${TR[g.trait].ic} ${esc(t_(TR[g.trait].n))}</span></div><div class="small mut">${esc(t_(TR[g.trait].d))}</div><div class="row small"><span>${a ? '⚔ ' + esc(a.name) + ' · ' + esc(regName(a.t)) : t_('у резерві')}</span>${a ? `<button onclick="selArmy(${a.id})">🔎</button>` : ''}</div></div></div>`; });
   return h;
 }
 

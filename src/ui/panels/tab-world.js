@@ -2,10 +2,11 @@
 const priceHist = {}; RES.forEach(r => priceHist[r] = []);
 function spark(arr) { if (arr.length < 2) return ''; const w = 110, h = 22; const mx = Math.max(1.3, ...arr), mn = Math.min(0.7, ...arr); return `<svg width="${w}" height="${h}" style="vertical-align:middle"><line x1="0" x2="${w}" y1="${h - (1 - mn) / (mx - mn) * h}" y2="${h - (1 - mn) / (mx - mn) * h}" stroke="#3a4a5a" stroke-dasharray="2,2"/><polyline fill="none" stroke="#4fb3ff" stroke-width="1.5" points="${arr.map((v, i) => (i / (arr.length - 1) * w).toFixed(1) + ',' + (h - (v - mn) / (mx - mn) * h).toFixed(1)).join(' ')}"/></svg>`; }
 TAB_FN.world = function () {
-  const wsub = curSub('world', 'main'); const head = subnav('world', [['main', 'Огляд'], ['stock', '📈 Біржа'], ['media', '📰 Медіа'], ['balance', 'Баланс і ШІ']]);
+  const wsub = curSub('world', 'main'); const head = subnav('world', [['main', 'Огляд'], ['stock', '📈 Біржа'], ['media', '📰 Медіа'], ['events', '🏅 Події'], ['balance', 'Баланс і ШІ']]);
   if (wsub === 'balance') return head + balanceTab();
   if (wsub === 'stock') return head + stockTab();
   if (wsub === 'media') return head + mediaTab();
+  if (wsub === 'events') return head + wevTab();
   const alive = G.N.filter(x => x.alive); const byG = alive.slice().sort((a, b) => b.agg.gdp - a.agg.gdp).slice(0, 15);
   const pw = alive.map(x => ({ x, p: G.nationPower(x.id) })).sort((a, b) => b.p - a.p).slice(0, 15); const tot = alive.reduce((s, x) => s + x.agg.gdp, 0);
   return head + `<div class="kpi"><div><span>Світовий ВВП</span><b>${money(tot)}</b></div><div><span>Держав</span><b>${alive.length}</b></div><div><span>Пар у війні</span><b>${G.wars.size}</b></div><div><span>Торгових потоків</span><b>${G.flows.length}</b></div></div>
@@ -55,5 +56,17 @@ function mediaTab() {
   h += `<table class="small">${R.slice(0, 12).map((x, k) => `<tr ${x.n.id === G.player ? 'style="background:#2a3a1a"' : ''}><td>${k + 1}</td><td>${nlink(x.n.id)}</td><td>${t_('стаб.')} ${x.n.stab.toFixed(0)}</td><td>${x.s.toFixed(0)}</td></tr>`).join('')}</table>`;
   if (me >= 12) h += `<div class="small">${t_('Ваше місце')}: <b>${me + 1}</b> ${t_('з')} ${R.length}</div>`;
   h += `<div class="btns"><button class="pri" onclick="showChronicle()">📜 ${t_('Хроніка для стріму')}</button></div>`;
+  return h;
+}
+
+// ---- світові події й клімат
+function wevTab() {
+  let h = `<div class="kpi"><div><span>🌍 ${t_('Світове забруднення')}</span><b class="${G.worldPoll > 60 ? 'r' : 'y'}">${(G.worldPoll || 0).toFixed(0)}</b></div><div><span>${t_('Кліматичні лиха')}</span><b>${G.worldPoll > 60 ? t_('часті') : t_('помірні')}</b></div></div>`;
+  h += `<div class="mut small">${t_('Що брудніша світова економіка (вугілля, нафта, металургія), то частіші посухи, повені, пожежі й спека — і тим більше кліматичних мігрантів.')}</div><div class="grp">🏅 ${t_('Світові події')}</div>`;
+  if (!G.wev || !G.wev.length) return h + `<div class="mut small">${t_('Заявки на Олімпіаду, Чемпіонат світу й Expo відкриваються на початку року.')}</div>`;
+  G.wev.forEach((e, k) => { const E = G.WEV[e.k]; const mine = e.cand.includes(G.player);
+    h += `<div class="card small"><div class="row"><b>${E.ic} ${esc(t_(E.n))} ${2026 + e.y}</b><span>${e.host == null ? t_('голосування') + ' ' + G.dateStr(e.vote) : e.host >= 0 ? t_('господар') + ': ' + esc(nat(e.host).name) : t_('без господаря')}</span></div>
+      <div class="mut">${t_('Кандидати')}: ${e.cand.map(x => esc(nat(x).name)).join(', ') || '—'} · ${t_('ефект')}: ${t_('стабільність')} +${E.stab}, ${t_('зростання на рік')}, ${t_('відносини')}</div>
+      ${e.host == null && G.player >= 0 ? `<div class="btns">${mine ? `<button onclick="dact2(()=>G.act.wevLobby(${k}));renderTab(true)">🤝 ${t_('Лобіювати делегатів')}</button>` : `<button class="pri" onclick="dact2(()=>G.act.wevApply(${k}));renderTab(true)">📨 ${t_('Подати заявку')}</button>`}</div>` : ''}${e.done ? `<div class="g">✔ ${t_('Проведено')}</div>` : ''}</div>`; });
   return h;
 }

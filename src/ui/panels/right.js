@@ -18,6 +18,7 @@ function terrPanel(i) {
   const topRes = RES.filter(r => t.prod[r] > 0).map(r => ({ r, v: t.prod[r] / Math.max(1e-9, G.W_prod0[r]) })).sort((a, b) => b.v - a.v).slice(0, 5);
   let h = `<h2>${esc(regName(i))}</h2><div class="mut">${ndot(t.owner)}${esc(o.name)}${t.ctrl !== t.owner ? ` · <span class="r">контроль: ${esc(c.name)}</span>` : ''}</div><div>${tags.join('')}</div>`;
   if ((t.mine > 0.02 || t.dmg > 0.05 || t.rebuild > 0 || t.part > 0.05) && (isMe || t.ctrl === P)) h += recoveryBlock(i);
+  if (t.depl && Object.values(t.depl).some(v => v > 0.01)) h += deplBlock(i, isMe && t.ctrl === P);
   if (t.occ) h += `<div class="card"><div class="row"><span>Наступ: ${esc(nat(t.occ.by).name)}</span><b class="r">${t.occ.p.toFixed(0)}%</b></div><div class="bar"><i style="width:${t.occ.p}%;background:#ff5d5d"></i></div></div>`;
   h += `<div class="grp">Регіон</div><div class="row"><span>Рельєф</span><span>${G.TERRAIN[R.t].n}</span></div><div class="row"><span>Площа</span><span>${(t.area / 1000).toFixed(1)} тис. км²</span></div><div class="row"><span>Населення</span><span>${popM(t.pop)}</span></div><div class="row"><span>Економіка</span><span>${money(t.gdp)}</span></div>
   ${t.dmg > 0.01 ? `<div class="row"><span>Руйнування</span><span class="r">${pct(t.dmg, 0)}</span></div>` : ''}${t.fort > 0.03 ? `<div class="row"><span>Укріплення</span><span class="y">${pct(t.fort, 0)}</span></div>` : ''}${t.integ < 0.99 ? `<div class="row"><span>Інтеграція</span><span class="y">${pct(t.integ, 0)}</span></div>` : ''}
@@ -38,6 +39,7 @@ function terrPanel(i) {
     <button onclick="dact('requestAid',${t.owner})" ${war ? 'disabled' : ''} data-tip="Попросити зброю й гроші. Лише під час особистого візиту лідера; шанс залежить від відносин і ваших спільних ворогів">📦 Попросити допомогу</button>
     <button onclick="dact('alliance',${t.owner})" ${war ? 'disabled' : ''}>${G.allied(P, t.owner) ? (G.alliances.some(a => a.m.size === 2 && a.m.has(P) && a.m.has(t.owner)) ? 'Розірвати союз' : '🛡 Союзники') : '🛡 Запропонувати союз'}</button></div>
     <div class="btns"><span class="mut small" style="align-self:center">Допомога:</span>${[1, 5, 20].map(v => `<button onclick="aid(${t.owner},${v})">$${v} млрд</button>`).join('')}</div>
+    ${tradeWarBlock(t.owner)}
     <div class="btns">${G.atWar(P, t.ctrl) ? `<button class="dang" onclick="tab='army';subtab.army='strike';renderTabs();renderTab(true);$('#left').classList.remove('hide')">🎯 Удар по регіону</button>` : ''}${war ? `<button onclick="peace(${t.owner},'white')">🕊 Запропонувати мир</button>` : `<button class="dang" onclick="confirmWar(${t.owner})">⚔ Оголосити війну</button>`}</div>`;
   } else {
     const p = t.pol; const pr = D.devPriorities;
@@ -169,3 +171,17 @@ function recoveryBlock(i) {
   return h + `</div>`;
 }
 function recAct(k, i) { const r = G.act[k](i); hint(r && r.ok ? (k === 'demine' ? '🧹 ' + t_('Розмінування проведено') : '🏗 ' + t_('Відбудову розпочато')) : '⚠ ' + t_((r && r.err) || 'Помилка'), 3000); renderRight(); renderTop(); }
+
+// ---- торгова війна: мита й ембарго
+function tradeWarBlock(x) {
+  const P = G.player; if (P < 0 || x === P) return ''; const r = G.tariffs[P + '>' + x] || 0, their = G.tariffs[x + '>' + P] || 0, emb = G.embargo[P + '>' + x] || [];
+  return `<div class="grp">⚖ ${t_('Торгова політика')}</div><div class="row small"><span>${t_('Ваші мита на імпорт')}${their ? ` · <span class="r">${t_('їхні проти вас')}: ${Math.round(their * 100)}%</span>` : ''}</span><span>${[0, 0.1, 0.25, 0.5].map(v => `<button class="small ${Math.abs(r - v) < 0.01 ? 'on' : ''}" onclick="dact2(()=>G.act.setTariff(${x},${v}))">${Math.round(v * 100)}%</button>`).join('')}</span></div>
+  <div class="row small"><span>${t_('Ембарго')}</span><select onchange="if(this.value)dact2(()=>G.act.setEmbargo(${x},this.value,!${JSON.stringify(emb)}.includes(this.value)))"><option value="">${emb.length ? emb.map(k => k === 'all' ? t_('усе') : RI[k].n).join(', ') : t_('немає')}…</option><option value="all">${emb.includes('all') ? '✖ ' : '+ '}${t_('повне ембарго')}</option>${RES.map(k => `<option value="${k}">${emb.includes(k) ? '✖ ' : '+ '}${RI[k].n}</option>`).join('')}</select></div>
+  <div class="mut small">${t_('Мита дають бюджету дохід із імпорту, але дорожчають товари й гіршають відносини; ШІ часто відповідає дзеркально.')}</div>`;
+}
+function dact2(fn) { const r = fn(); if (r && r.ok === false) hint('⚠ ' + t_(r.err), 3000); renderRight(); renderTop(); }
+// ---- виснаження родовищ і розвідка надр
+function deplBlock(i, mine) {
+  const t = G.ter[i]; const L = Object.entries(t.depl).filter(([, v]) => v > 0.01);
+  return `<div class="card small"><div>⛏ ${t_('Виснаження родовищ')}: ${L.map(([r, v]) => `${ico(RI[r].ic)} −${Math.round(v * 100)}%`).join(' · ')}</div>${mine ? `<div class="btns"><button onclick="dact2(()=>G.act.explore(${i}))">🔎 ${t_('Геологорозвідка')} · ${money(G.exploreCost(i))}</button></div>` : ''}</div>`;
+}

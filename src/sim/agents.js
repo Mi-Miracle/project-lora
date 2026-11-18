@@ -55,7 +55,7 @@ LORA.sim.register('agents', 92.5, function (G) {
   G.armyPower = function (a) { const p = basePow(a); const c = ter[a.t].ctrl; const r = N[a.n].recon; if (c === a.n || !G.atWar(a.n, c)) return p; return r && r[c] > G.day ? p * 1.06 : G.has(N[a.n], 'sat_recon') && G.hasRecon && G.hasRecon(a.n) ? p * 1.03 : p; };
   const say = (a, txt, kind) => G.say(txt, kind, [a.n]);
   function caught(a, c) {
-    G.agents = G.agents.filter(x => x !== a); const n = N[a.n];
+    G.agents = G.agents.filter(x => x !== a); const n = N[a.n]; if (G.spyCaught) G.spyCaught(c, a.n);
     if (!G.atWar(a.n, c)) { G.rel[c][a.n] = clamp(G.rel[c][a.n] - 15, -100, 100); G.rel[a.n][c] = clamp(G.rel[a.n][c] - 8, -100, 100); }
     G.say(`🚨 ${N[c].name}: затримано агента ${n.name} — ${a.name}${G.atWar(a.n, c) ? '' : '. Дипломатичний скандал, відносини −15'}`, G.isHuman(a.n) ? 'bad' : 'info', [a.n, c]);
   }

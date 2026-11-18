@@ -35,7 +35,7 @@ const TW = (() => {
   }
   function disconnectChat() { if (S.ws) try { S.ws.close(); } catch (e) { } S.ws = null; S.connected = false; }
   // ---- голосування чату: !1, !2, !3
-  function vote(user, text) { const m = text.trim().match(/^!?([1-9])\b/); if (!m) return; const k = +m[1] - 1; if (k >= S.votes.n) return; S.votes.by[user.toLowerCase()] = k; S.votes.onUpdate && S.votes.onUpdate(tally()); }
+  function vote(user, text) { const m = text.trim().match(/^!?([1-9])\b/); if (!m) return; const k = +m[1] - 1; if (k >= S.votes.n) return; if (!(user.toLowerCase() in S.votes.by)) LORA.bus.emit('twitchVote', { user }); S.votes.by[user.toLowerCase()] = k; S.votes.onUpdate && S.votes.onUpdate(tally()); }
   function tally() { const t = Array(S.votes.n).fill(0); Object.values(S.votes.by).forEach(k => t[k]++); return t; }
   let chain = Promise.resolve(); // одне голосування за раз: решта стає в чергу
   function poll(n, seconds, onUpdate) { const p = chain.then(() => poll1(n, seconds, onUpdate)); chain = p.catch(() => {}); return p; }

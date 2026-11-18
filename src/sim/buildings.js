@@ -48,7 +48,7 @@ LORA.sim.register('buildings', 55, function (G) {
       for (const k of ks) {
         const lvl = t.bld[k] - (t.base[k] || 0); if (lvl <= 0) continue; const b = BD[k]; // базові (стартові) рівні вже враховані у виробництві регіону
         let inR = 1; if (b.in) for (const r in b.in) { c.agg.need[r] += b.in[r] * lvl; inR = Math.min(inR, c.ratio[r] != null ? c.ratio[r] : 1); }
-        if (b.out) for (const r in b.out) c.agg.prod[r] += b.out[r] * lvl * eff * inR;
+        if (b.out) for (const r in b.out) c.agg.prod[r] += b.out[r] * lvl * eff * inR * (t.depl && t.depl[r] ? 1 - t.depl[r] : 1);
       }
     }
     for (const n of N) if (n.prodK && n.agg) for (const r in n.prodK) if (n.agg.prod[r] != null) n.agg.prod[r] *= n.prodK[r];

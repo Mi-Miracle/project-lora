@@ -127,8 +127,8 @@ LORA.sim.register('trade', 40, function (G) {
       importers.forEach(j => {
         if (j === G.player && !N[j].autoTrade) return;
         const opts = [];
-        exporters.forEach(i => { if (!canTrade(i, j)) return; if (i === G.player && !N[i].autoTrade) return; const R = getRoute(i, j, RI[r].mode); if (!R) return;
-          opts.push({ i, landed: 1 + RI[r].tc * R.d / 1000 + tariff(i, j) - G.rel[i][j] / 2000, R }); });
+        exporters.forEach(i => { if (!canTrade(i, j) || (G.tradeBan && G.tradeBan(i, j, r))) return; if (i === G.player && !N[i].autoTrade) return; const R = getRoute(i, j, RI[r].mode); if (!R) return;
+          opts.push({ i, landed: 1 + RI[r].tc * R.d / 1000 + tariff(i, j) + (G.extraTariff ? G.extraTariff(i, j) : 0) - G.rel[i][j] / 2000, R }); });
         opts.sort((a, b) => a.landed - b.landed); optsOf[j] = opts;
       });
       const fl = {};
