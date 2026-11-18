@@ -19,3 +19,10 @@ Object.assign(LORA.data.buildings, {
   cement_plant:   { g: 'industry', n: 'Цементний завод', ic: '🧱', in: { coal: 0.6, gas: 0.2 }, out: { goods: 0.05, metal: 0.4 }, days: 300 },
   business_center:{ g: 'social', n: 'Бізнес-центр', ic: '🏢', in: { metal: 0.2, goods: 0.01 }, eff: { grow: 0.001, stab: 0.2 }, days: 330, cost: 1.5, req: { rt: 'bld_prefab' } }
 });
+Object.assign(LORA.data.buildings, {
+  recycling_plant:  { g: 'industry', n: 'Сміттєпереробний завод', ic: '♻', in: { goods: 0.01 }, out: { metal: 0.6, nonfer: 0.01 }, eff: { stab: 0.1 }, days: 260, req: { rt: 'circular' } },
+  lithium_refinery: { g: 'industry', n: 'Літієвий завод', ic: '🔋', in: { rare: 0.2, chem: 0.02 }, out: { nonfer: 0.03, chem: 0.05 }, days: 330, req: { geo: 'rare' } },
+  desalination:     { g: 'social', n: 'Опріснювальна станція', ic: '🚰', in: { gas: 0.2 }, eff: { stab: 0.4, grow: 0.0008 }, days: 300, cost: 1.4, req: { coast: 1 } },
+  training_center:  { g: 'military', n: 'Навчальний центр армії', ic: '🎖', in: { goods: 0.01 }, eff: { q: 0.004 }, days: 240, cost: 1.2 },
+  logistics_center: { g: 'logistics', n: 'Логістичний хаб', ic: '📦', in: { oil: 0.002 }, eff: { supply: 0.06, grow: 0.0006 }, days: 220, cost: 1.1 }
+});

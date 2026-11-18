@@ -145,9 +145,27 @@ function coFinTab(c) {
   let h = `<div class="kpi"><div><span>${t_('Кошти')}</span><b>${money(c.cash)}</b></div><div><span>${t_('Борг')}</span><b class="${c.debt > 0 ? 'y' : ''}">${money(c.debt)}</b></div><div><span>${t_('Відсотки / рік')}</span><b>${money(c.debt * 0.075)}</b></div></div>`;
   h += `<div class="card small">${t_('Банк дає кредит під 7.5% річних, до 60% вартості компанії. Кредит — щоб швидше будувати заводи й вигравати великі контракти.')}<div class="btns">${[0.5, 2, 5].map(v => `<button onclick="coAct(()=>G.act.corpLoan(${v}))">🏦 +${money(v)}</button>`).join('')}${c.debt > 0 ? [0.5, 2].map(v => `<button onclick="coAct(()=>G.act.corpLoan(-${v}))">↩ ${t_('погасити')} ${money(v)}</button>`).join('') : ''}</div></div>`;
   h += `<div class="row small"><span>${t_('Прибуток до податків / рік')}</span><b class="g">${money(c.profitY)}</b></div><div class="row small"><span>${t_('Податки / рік')}</span><b class="y">${money(c.taxY)}</b></div><div class="row small"><span>${t_('Офіси / рік')}</span><b>${money(c.offices.length * 0.048)}</b></div>`;
-  if (G.stock && G.stock.px[c.id] != null) h += `<div class="row small"><span>📈 ${t_('Ціна 1% акцій на біржі')}</span><b>${money(G.stock.px[c.id])}</b></div>`;
+  if (G.stock && G.stock.px[c.id] != null) { h += `<div class="grp">📈 ${t_('Акції компанії')}</div><div class="row small"><span>${t_('Ціна 1% акцій на біржі')}</span><b>${money(G.stock.px[c.id])}</b></div><div class="row small"><span>${t_('У вільному обігу')} / ${t_('у засновників')}</span><b>${G.stockFloat(c.id).toFixed(0)}% / ${(100 - G.stockFloat(c.id)).toFixed(0)}%</b></div>${G.stockController(c.id) ? `<div class="small r">⚠ ${t_('Контрольний пакет у когось іншого')}</div>` : ''}
+    <div class="btns small">${[2, 5, 10].map(v => `<button onclick="coAct(()=>G.act.stockIssue(${v}))" data-tip="${t_('Продати нові акції інвесторам: гроші йдуть компанії, частка засновників меншає')}">📤 ${t_('Емісія')} ${v}%</button>`).join('')}${[1, 5].map(v => `<button onclick="coAct(()=>G.act.stockBuyback(${v}))">📥 ${t_('Викуп')} ${v}%</button>`).join('')}</div>`; }
+  h += secBlock('co', c.home);
+  if (c.sector === 'military') { const P = G.secProviders().find(p => p.id === c.id), K = G.secContracts.filter(k => k.prov === c.id);
+    h += `<div class="grp">🛡 ${t_('Охоронні послуги (ПВК)')}</div><div class="mut small">${t_('Ваша компанія може охороняти персонажів і компанії (інших гравців теж). Місткість росте з кількістю заводів.')}</div>
+    <div class="row small"><span>${t_('Клієнтів')} / ${t_('місткість')}</span><b>${P ? P.used + ' / ' + P.cap : '—'}</b></div><div class="row small"><span>${t_('Дохід від охорони / рік')}</span><b class="g">${money(K.reduce((a, k) => a + k.fee * 12 * 0.6, 0))}</b></div>
+    <div class="row small"><span>${t_('Ціна (множник)')}</span><select onchange="coAct(()=>G.act.secPrice(+this.value))">${[0.6, 0.8, 1, 1.3, 1.6, 2].map(v => `<option value="${v}" ${(c.secMul || 1) === v ? 'selected' : ''}>×${v}</option>`).join('')}</select></div>`; }
   return h;
 }
+// найм охорони: who = 'co' (компанія) або 'L' (персонаж)
+function secBlock(who, home) {
+  const key = who === 'co' ? 'co' + G.pc : (G._lk != null ? 'L' + G._lk : 'L' + (G.player >= 0 ? G.player : 'me')); const cur = G.secOf(key);
+  const P = G.secProviders(home); const sel = window._secP != null && P.find(p => p.id === window._secP) ? window._secP : (P[0] || {}).id;
+  let h = `<div class="grp">🛡 ${t_(who === 'co' ? 'Безпека компанії' : 'Особиста охорона')}</div><div class="mut small">${t_(who === 'co' ? 'Захищає від диверсій, розкрадання складів, шпигунства й рейдерів.' : 'Захищає від пограбувань, шантажу, викрадень і замахів. Ризик росте зі статками, славою, політикою й поїздками в небезпечні країни.')}</div>`;
+  if (cur) { const pc = G.companies[cur.prov]; h += `<div class="card small g">${esc(t_(G.SEC_LV[cur.lvl].n))} — «${esc(pc ? pc.name : '?')}» · ${money(cur.fee)}/${t_('міс.')} <button class="small" onclick="secAct(G.act.secFire('${who}'))">${t_('Розірвати')}</button></div>`; }
+  if (!P.length) return h + `<div class="small mut">${t_('Немає доступних ПВК')}</div>`;
+  h += `<div class="row small"><span>${t_('Постачальник')}</span><select onchange="_secP=+this.value;renderTab(true)">${P.map(p => `<option value="${p.id}" ${p.id === sel ? 'selected' : ''}>${esc(p.name)}${p.human ? ' 🎮' : ''} · ${t_('якість')} ${Math.round(p.q * 100)}% · ${t_('вільно')} ${p.cap - p.used}</option>`).join('')}</select></div>`;
+  const p = P.find(x => x.id === sel); h += `<div class="btns small">${G.SEC_LV.slice(1).map((L, i) => `<button ${cur && cur.lvl === i + 1 && cur.prov === sel ? 'class="on"' : ''} onclick="secAct(G.act.secHire('${who}',${sel},${i + 1}))">${esc(t_(L.n))} · ${money(G.secFee(p, i + 1, who === 'co'))}/${t_('міс.')}</button>`).join('')}</div>`;
+  return h;
+}
+function secAct(r) { hint(r && r.ok ? '✅ ' + t_(r.msg || 'Готово') : '⚠ ' + t_((r && r.err) || 'Помилка'), 3000); renderTab(true); }
 
 // ---- окремі вкладки компанії
 const coWrap = fn => () => { const c = G.myCo(); if (!c) return '<div class="mut">' + t_('Компанії немає.') + '</div>'; G.corpInit(c); G.corpRes(c); return fn(c); };
@@ -159,7 +177,9 @@ TAB_FN.cofin = coWrap(c => coFinTab(c));
 let tradeQ = 0.25;
 TAB_FN.cotrade = coWrap(c => {
   const f = G.corpResFlow(c), R = new Set([...Object.keys(f.out), ...Object.keys(f.inn), ...Object.keys(c.res).filter(r => c.res[r] > 1e-6)]);
-  let h = `<div class="mut small">${t_('Ваші активи виробляють ресурси на склад, а сировину для них компанія купує на світовому ринку. Продавайте вручну чи автоматично, або укладайте контракти постачання з урядами (вкладка «Тендери»).')}</div>`;
+  let h = `<div class="mut small">${t_('Ринок замкнений: продати можна лише тим, хто купує (держави з дефіцитом платять зі свого бюджету, інші компанії — зі своїх коштів), купити — лише те, що хтось продає. Бракує сировини — активи стоять. Непродане лежить на складі (місткість — річний випуск), надлишок псується.')}</div>`;
+  if (c.lack && c.lack.length) h += `<div class="card small r">⛔ ${t_('Бракує сировини')}: ${c.lack.map(r => esc(t_(RI[r].n))).join(', ')} — ${t_('потужність')} ${pct(c.inRatio || 0, 0)}. ${t_('Відкрийте офіси в країнах-виробниках, покращіть відносини або купуйте в інших компаній.')}</div>`;
+  if (c.unsoldM && Object.keys(c.unsoldM).length) h += `<div class="card small y">📦 ${t_('Не знайшлося покупців минулого місяця')}: ${Object.entries(c.unsoldM).map(([r, q]) => esc(t_(RI[r].n)) + ' ' + q.toFixed(3)).join(', ')}. ${t_('Шукайте контракти в «Тендерах», відкривайте офіси в нових країнах.')}</div>`;
   h += `<div class="kpi"><div><span>${t_('Чистий дохід від ресурсів / рік')}</span><b class="${(c.resNetY || 0) >= 0 ? 'g' : 'r'}">${money(c.resNetY || 0)}</b></div><div><span>${t_('Контрактів постачання')}</span><b>${(c.supply || []).length}</b></div></div>`;
   if (!R.size) h += `<div class="card small">${t_('Поки що ви нічого не виробляєте. Збудуйте профільні активи (вкладка «Будівництво») — видобуток, станції, заводи, ферми.')}</div>`;
   h += `<div class="btns small"><span class="mut" style="align-self:center">${t_('Обсяг угоди')}:</span>${[0.1, 0.25, 1].map(v => `<button class="${tradeQ === v ? 'on' : ''}" onclick="tradeQ=${v};renderTab(true)">${Math.round(v * 100)}% ${t_('міс. виробництва')}</button>`).join('')}</div>`;

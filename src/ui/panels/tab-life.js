@@ -33,7 +33,8 @@ function lspark(a) { if (a.length < 2) return ''; const w = 90, h = 18, mx = Mat
 TAB_FN.life = function () {
   const L = G.leader; if (!L || L.role !== 'char') return ''; G.lifeInit(); const V = G.invValue(L), nid = G.leaderNation();
   let h = `<div class="kpi"><div><b>${money(G.lifeWealth(L))}</b><span>${t_('статки')}</span></div><div><b>${money(L.money)}</b><span>${t_('готівка')}</span></div><div><b>${money(V.tot)}</b><span>${t_('інвестиції')}</span></div><div><b>${(L.own || []).length}</b><span>${t_('майно')}</span></div></div>`;
-  h += subnav('life', [['lux', '💎 ' + t_('Розкіш')], ['own', '🗝 ' + t_('Моє майно')], ['inv', '📈 ' + t_('Інвестиції')]]); const sub = curSub('life', 'lux');
+  h += subnav('life', [['lux', '💎 ' + t_('Розкіш')], ['own', '🗝 ' + t_('Моє майно')], ['inv', '📈 ' + t_('Інвестиції')], ['sec', '🛡 ' + t_('Охорона')]]); const sub = curSub('life', 'lux');
+  if (sub === 'sec') return h + secBlock('L', L.home);
   if (sub === 'lux') {
     h += `<div class="mut small">${t_('Купівля — у країні, де зараз персонаж (нерухомість дорожча в багатих країнах). Розкіш дає славу, звʼязки, швидші перельоти, охорону, оренду — але й утримання; показна розкіш у бідних країнах шкодить популярності.')}</div>`;
     h += `<div class="sub">${Object.entries(G.LUX_CAT).map(([k, [ic, n]]) => `<button class="${luxCat === k ? 'on' : ''}" onclick="luxCat='${k}';renderTab(true)">${ic} ${esc(t_(n))}</button>`).join('')}</div>`;

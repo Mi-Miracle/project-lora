@@ -3005,3 +3005,199 @@ R&D вашої компанії швидше; лікар, професор	faste
 офіцерська карʼєра; у війну популярність вища	officer career; higher popularity in wartime
 Зʼїзд партії	Party congress
 Зʼїзд — раз на рік	A congress is once a year
+Ринок замкнений: продати можна лише тим, хто купує (держави з дефіцитом платять зі свого бюджету, інші компанії — зі своїх коштів), купити — лише те, що хтось продає. Бракує сировини — активи стоять. Непродане лежить на складі (місткість — річний випуск), надлишок псується.	The market is closed-loop: you can sell only to those who buy (countries with shortages pay from their budgets, other companies from their own funds), and buy only what someone sells. No raw materials — assets stand idle. Unsold goods stay in the warehouse (capacity is one year of output); the excess spoils.
+Офіційний сервіс за вашим власним ключем: portal.azure.com → Speech service → «Keys and Endpoint». Безкоштовний тариф F0 — 0,5 млн символів на місяць. Ключ зберігається лише на цьому компʼютері.	An official service with your own key: portal.azure.com → Speech service → «Keys and Endpoint». The free F0 tier gives 0.5M characters per month. The key is stored only on this computer.
+Роботизований, але працює без інтернету. Не входить до гри: за вашою командою завантажується (~9 МБ) з публічного реєстру npm, перевіряється й зберігається локально. Ліцензія GPL-3.0, код	Robotic, but works offline. Not bundled with the game: on your command it is downloaded (~9 MB) from the public npm registry, verified and stored locally. GPL-3.0 license, source code
+Офіційний сервіс за вашим ключем (elevenlabs.io → Profile → API key). Безкоштовний тариф має місячний ліміт символів. Voice ID — з бібліотеки голосів.	An official service with your key (elevenlabs.io → Profile → API key). The free tier has a monthly character limit. Voice ID comes from the voice library.
+Захищає від пограбувань, шантажу, викрадень і замахів. Ризик росте зі статками, славою, політикою й поїздками в небезпечні країни.	Protects from robbery, blackmail, kidnapping and assassination attempts. The risk grows with wealth, fame, politics and trips to dangerous countries.
+Ваша компанія може охороняти персонажів і компанії (інших гравців теж). Місткість росте з кількістю заводів.	Your company can guard characters and companies (other players too). Capacity grows with the number of factories.
+Відкрийте офіси в країнах-виробниках, покращіть відносини або купуйте в інших компаній.	Open offices in producer countries, improve relations or buy from other companies.
+Продати нові акції інвесторам: гроші йдуть компанії, частка засновників меншає	Sell new shares to investors: the money goes to the company, the founders' stake shrinks
+Розмінування, переправи, прорив укріплень: посилюють штурм і будують оборону	Demining, river crossings, breaching fortifications: boost assaults and build defenses
+Ніхто зараз не продає цей ресурс вам (санкції, війна або світовий дефіцит)	Nobody is selling this resource to you right now (sanctions, war or a world shortage)
+тяжке поранення, 2 місяці лікування. Хвиля співчуття: популярність +6	seriously wounded, 2 months of treatment. A wave of sympathy: popularity +6
+Немає покупців: усі ринки, куди ви можете продавати, вже забезпечені	No buyers: all markets you can sell to are already supplied
+Шукайте контракти в «Тендерах», відкривайте офіси в нових країнах.	Look for contracts in «Tenders», open offices in new countries.
+Засновники мають зберегти щонайменше 25% (інакше втрата контролю)	The founders must keep at least 25% (otherwise they lose control)
+Захищає від диверсій, розкрадання складів, шпигунства й рейдерів.	Protects from sabotage, warehouse theft, espionage and corporate raiders.
+📉 Біржова паніка: бульбашка луснула, індекси падають на чверть!	📉 Market panic: the bubble burst, indices fall by a quarter!
+Своя ПВК охороняє вас безкоштовно — найміть себе через рівень	Your own PMC guards you for free — hire yourself via the level
+Немає доступного голосу для цієї мови — оберіть рушій нижче	No voice available for this language — choose an engine below
+Для власних акцій — емісія або викуп (вкладка «Фінанси»)	For your own shares — issue or buy back («Finance» tab)
+вплив росте швидко, але бувають скандали (репутація −8)	influence grows fast, but scandals happen (reputation −8)
+Інвестори зараз не мають стільки грошей (слабкий ринок)	Investors don't have that much money right now (weak market)
+» (≥ 50%): тепер дивіденди визначає новий власник	» (≥ 50%): the new owner now sets the dividends
+прибуток активів +6%, але репутація поволі падає	asset profit +6%, but reputation slowly falls
+Енергомережі II: розумні мережі й накопичувачі	Power grids II: smart grids & storage
+вплив у всіх країнах з офісами росте щомісяця	influence in all countries with offices grows monthly
+спроба шантажу — охорона й юристи відбилися	a blackmail attempt — security and lawyers fought it off
+Стратегію можна міняти раз на пів року (ще	The strategy can be changed once every six months (left
+Глобальна стратегія на реальній мапі світу	Grand strategy on the real world map
+Енергомережі III: надпровідні магістралі	Power grids III: superconducting lines
+📰 Скандал навколо агресивних методів «	📰 Scandal over the aggressive methods of «
+На ринку зараз немає покупців (паніка)	There are no buyers on the market right now (panic)
+клік або будь-яка клавіша — пропустити	click or press any key to skip
+Не знайшлося покупців минулого місяця	No buyers were found last month
+»: розкрадання складу — втрачено 30%	»: warehouse theft — 30% lost of
+живі нейронні голоси (Поліна, Остап)	natural neural voices (Polina, Ostap)
+Оптоволоконні FPV й РЕБ-стійкі дрони	Fiber-optic FPV & EW-resistant drones
+В обігу немає стільки вільних акцій	There aren't that many free shares in circulation
+Енергомережі I: цифрові підстанції	Power grids I: digital substations
+зірвано охороною! Популярність +6	foiled by security! Popularity +6
+Контрольний пакет у когось іншого	Someone else holds a controlling stake
+Контрольний пакет іншої компанії	Controlling stake in another company
+шантаж компроматом — заплачено $	blackmail with compromising material — paid $
+Вплив біржі на світове зростання	Stock market effect on world growth
+Симулятори й віртуальні полігони	Simulators & virtual ranges
+Azure — Поліна/Остап (ваш ключ)	Azure — Polina/Ostap (your key)
+офлайн, українська й англійська	offline, Ukrainian and English
+Роботизоване розмінування (НРК)	Robotic demining (UGVs)
+Ринок перегрітий: ризик обвалу	The market is overheated: crash risk
+Інвестор (портфель ≥ $50 млн)	Investor (portfolio ≥ $50M)
+» немає вільних людей (вільно	» has no free personnel (free
+контрольна сума не збігається	checksum mismatch
+🕵 Інсайдерський скандал у «	🕵 Insider scandal at «
+найживіші багатомовні голоси	the most natural multilingual voices
+Навчання за стандартами НАТО	NATO-standard training
+Вершина професії (рівень 5)	Top of the profession (level 5)
+млн, 2 тижні на відновлення	M, 2 weeks of recovery
+🕵 Промислове шпигунство: «	🕵 Industrial espionage: «
+отримує контрольний пакет «	gets a controlling stake in «
+Броньований кортеж і група	Armored motorcade and team
+Потрібен контрольний пакет	Requires a controlling stake
+Економіка замкненого циклу	Circular economy
+Власник спортивного клубу	Sports club owner
+% нових акцій: залучено $	% new shares: raised $
+Підрозділи ударних дронів	Strike drone units
+Гроші інвесторів на ринку	Investors' money on the market
+Сучасні інженерні війська	Modern combat engineers
+Окремі дронові підрозділи	Dedicated drone units
+більше ніхто не продає)	nobody sells more)
+»: новий клієнт охорони	»: new security client
+💥 Диверсія на активі «	💥 Sabotage at an asset of «
+⚖ Рейдерська атака на «	⚖ Raider attack on «
+% — решта в засновників	% — the rest is held by the founders
+Завантажити й увімкнути	Download & enable
+Дохід від охорони / рік	Security income / year
+невідомий формат пакета	unknown package format
+Три навички на рівні 3	Three skills at level 3
+Невідомий постачальник	Unknown provider
+Охоронні послуги (ПВК)	Security services (PMC)
+Ваші контрольні пакети	Your controlling stakes
+Сміттєпереробний завод	Recycling plant
+Навчальний центр армії	Army training center
+Комерційні FPV і скиди	Commercial FPV & drop drones
+решту ніхто не купив)	nobody bought the rest)
+Прибуток $100 млн/рік	Profit $100M/year
+без особливих ефектів	no special effects
+Лише для компаній ВПК	Only for defense companies
+У вільному обігу лише	Only in free float:
+ElevenLabs (ваш ключ)	ElevenLabs (your key)
+Опріснювальна станція	Desalination plant
+Звʼязки в 10 країнах	Connections in 10 countries
+Прибуток $1 млрд/рік	Profit $1B/year
+Приватна армія (ПВК)	Private army (PMC)
+🚀 Ажіотаж навколо «	🚀 Hype around «
+Заставка при запуску	Launch intro
+Партія в парламенті	Party in parliament
+Депутатський мандат	Parliamentary seat
+50 млн користувачів	50M users
+Вплив ≥ 50 у країні	Influence ≥ 50 in a country
+Особистий охоронець	Personal bodyguard
+»: судові витрати $	»: legal costs $
+Немає доступних ПВК	No PMCs available
+Рої з ШІ-наведенням	AI-guided swarms
+5 власних розробок	5 own developments
+Лідер за витратами	Cost leader
+Контракт розірвано	Contract terminated
+Інженерно-штурмова	Engineer assault
+eSpeak NG (офлайн)	eSpeak NG (offline)
+Голос встановлено.	Voice installed.
+Стратегія компанії	Company strategy
+10 рівнів активів	10 asset levels
+Офіси в 5 країнах	Offices in 5 countries
+Вартість $10 млрд	Value $10B
+Інженерні війська	Combat engineers
+Дронова (сучасна)	Drone (modern)
+У вільному обігу	In free float
+Безпека компанії	Company security
+Особиста охорона	Personal security
+»: репутація −8	»: reputation −8
+Гірсько-піхотна	Mountain infantry
+Системні голоси	System voices
+системний голос	system voice
+Системний голос	System voice
+Гучність голосу	Voice volume
+Бракує сировини	Raw materials missing
+Паніка на біржі	Stock market panic
+Логістичний хаб	Logistics hub
+Перший мільйон	First million
+Оберіть рівень	Choose a level
+пограбування в	robbery in
+Морська піхота	Marines
+Зараз говорить	Now speaking
+Не встановлено	Not installed
+Акції компанії	Company shares
+Ціна (множник)	Price (multiplier)
+Літієвий завод	Lithium plant
+100 мільйонів	100 million
+Власна партія	Own party
+Преміум-бренд	Premium brand
+🏅 Досягнення	🏅 Achievement
+»: досягнення	»: achievement
+Група охорони	Security team
+Охорони немає	No security
+Вкажіть обсяг	Enter a volume
+»: акції +25%	»: shares +25%
+»: акції −22%	»: shares −22%
+у засновників	held by founders
+Індекси країн	Country indices
+10 мільйонів	10 million
+Голос (англ)	Voice (EN)
+Саперні роти	Sapper companies
+Без охорони	No security
+викрадено в	kidnapped in
+🔫 Замах на	🔫 Assassination attempt on
+Голос (укр)	Voice (UA)
+представляє	presents
+втрачено $	lost $
+пошкоджено	damaged
+% прибутку	% of profit
+» розміщує	» places
+Залучено $	Raised $
+репутація	reputation
+» втрачає	» loses
+місткість	capacity
+дивіденди	dividends
+Джет-сет	Jet set
+очок R&D	R&D points
+Викуп $	Buyback $
+Досягнення	Achievements
+Емісія	Issue
+Викуп	Buyback
+Капіталізація	Capitalization
+Компаній	Companies
+Обіг	Float
+Охорона	Security
+Постачальник	Provider
+Розірвати	Terminate
+якість	quality
+вільно	free
+Рушій	Engine
+Ключ	Key
+Регіон	Region
+Голос	Voice
+Встановлено	Installed
+Завантаження	Downloading
+Увімкнено	Enabled
+Гірсько-піхотна	Mountain infantry
+Збалансована	Balanced
+Експансія	Expansion
+Зелена	Green
+Агресивна	Aggressive
+Мільярдер	Billionaire
+Медіамагнат	Media mogul
+Дронова	Drone
+Морська	Naval
+Клієнтів	Clients
+Купуючи з обігу, ви платите інвесторам; дивіденди платить сама компанія. Хто набере ≥ 50% акцій — отримує контроль. Компанії залучають гроші емісією (до 75% в обігу).	When buying from the float you pay investors; dividends are paid by the company itself. Whoever gathers ≥ 50% of the shares gets control. Companies raise money by issuing shares (up to 75% in float).

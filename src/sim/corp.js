@@ -107,14 +107,14 @@ LORA.sim.register('corp', 99.6, function (G) {
       // поставки за контрактами
       c.contracts.forEach(k => {
         if (k.kind === 'good') {
-          const have = c.inv[k.good] || 0, d = Math.min(have, k.left); if (d > 0) { c.inv[k.good] -= d; k.left -= d; const pay = d * k.price; c.cash += pay; const b = N[k.buyer]; if (b && b.alive) { b.ars[k.good] = (b.ars[k.good] || 0) + d; b.cash -= pay * 0.5; } }
+          const have = c.inv[k.good] || 0, d = Math.min(have, k.left); if (d > 0) { c.inv[k.good] -= d; k.left -= d; const pay = d * k.price; c.cash += pay; const b = N[k.buyer]; if (b && b.alive) { b.ars[k.good] = (b.ars[k.good] || 0) + d; b.cash -= pay; } }
           if (k.left <= 0) { k.fin = 1; c.rep = clamp(c.rep + 3, 0, 100); c.infl[k.buyer] = Math.min(100, (c.infl[k.buyer] || 0) + 2); if (human) G.say(`✅ Контракт виконано: ${GOODS[k.good].n} для ${N[k.buyer].name}`, 'good', [c.home]); }
           else if (G.day > k.due) { k.fin = 2; const pen = k.left * k.price * 0.2; c.cash -= pen; c.rep = clamp(c.rep - 8, 0, 100); if (human) G.say(`⛔ Зірвано контракт для ${N[k.buyer].name}: штраф ${pen.toFixed(2)} млрд, репутація −8`, 'bad', [c.home]); }
-        } else if (G.day >= k.done) { k.fin = 1; c.cash += k.value; c.rep = clamp(c.rep + 2, 0, 100); const b = N[k.buyer]; if (b && b.alive) { b.cash -= k.value * 0.6; if (/енерг|ППО|фортиф/i.test(k.name)) b.stab = Math.min(100, b.stab + 0.5); } if (human) G.say(`✅ Проєкт «${k.name}» для ${N[k.buyer].name} завершено: +${k.value.toFixed(2)} млрд`, 'good', [c.home]); }
+        } else if (G.day >= k.done) { k.fin = 1; c.cash += k.value; c.rep = clamp(c.rep + 2, 0, 100); const b = N[k.buyer]; if (b && b.alive) { b.cash -= k.value; if (/енерг|ППО|фортиф/i.test(k.name)) b.stab = Math.min(100, b.stab + 0.5); } if (human) G.say(`✅ Проєкт «${k.name}» для ${N[k.buyer].name} завершено: +${k.value.toFixed(2)} млрд`, 'good', [c.home]); }
       });
       c.contracts = c.contracts.filter(k => !k.fin);
       // надлишок продукції: держава штабу викуповує за 70% ціни, якщо воює (інакше лежить на складі)
-      if (c.sector === 'military' && (!human || c.autoSell)) Object.keys(c.inv).forEach(k => { const v = c.inv[k] - (c.contracts.filter(x => x.good === k).reduce((s, x) => s + x.left, 0)); if (v > 0 && G.enemiesOf(c.home).length) { c.inv[k] -= v; c.cash += v * GOODS[k].price * 0.7; N[c.home].ars[k] = (N[c.home].ars[k] || 0) + v; N[c.home].cash -= v * GOODS[k].price * 0.35; } });
+      if (c.sector === 'military' && (!human || c.autoSell)) Object.keys(c.inv).forEach(k => { const v = c.inv[k] - (c.contracts.filter(x => x.good === k).reduce((s, x) => s + x.left, 0)); if (v > 0 && G.enemiesOf(c.home).length) { c.inv[k] -= v; c.cash += v * GOODS[k].price * 0.7; N[c.home].ars[k] = (N[c.home].ars[k] || 0) + v; N[c.home].cash -= v * GOODS[k].price * 0.7; } });
       // кредити
       if (c.debt > 0) { const int = c.debt * 0.075 / 12; c.cash -= int; }
       if (c.cash < -1 && c.debt < G.coValue(c) * 0.6) { c.debt += 1.5; c.cash += 1.5; if (human) G.say(`🏦 «${c.name}»: автоматичний кредит $1.5 млрд через касовий розрив`, 'bad', [c.home]); }
@@ -126,8 +126,8 @@ LORA.sim.register('corp', 99.6, function (G) {
   G.corpSellTo = function (c, nid, k) {
     const b = N[nid], g = GOODS[k]; if (!b || !b.alive || !g) return { ok: false, err: 'Недоступно' }; const q = Math.floor(c.inv[k] || 0) - c.contracts.filter(x => x.good === k).reduce((s, x) => s + x.left, 0); if (q < 1) return { ok: false, err: 'Склад порожній (або все під контракти)' };
     if (nid !== c.home && (G.rel[c.home][nid] < 20 || G.sanctioned(c.home, nid) || G.atWar(c.home, nid))) return { ok: false, err: 'Уряд вашого штабу не дає ліцензії на експорт у цю країну' };
-    const pay = q * g.price * 0.85; if (b.cash < pay * 0.5) return { ok: false, err: `${b.name} не має грошей на таку закупівлю` };
-    c.inv[k] -= q; c.cash += pay; b.cash -= pay * 0.5; b.ars[k] = (b.ars[k] || 0) + q; c.infl[nid] = Math.min(100, (c.infl[nid] || 0) + 1); G.rel[nid][c.home] = clamp(G.rel[nid][c.home] + Math.min(4, pay * 3), -100, 100);
+    const pay = q * g.price * 0.85; if (b.cash < pay) return { ok: false, err: `${b.name} не має грошей на таку закупівлю` };
+    c.inv[k] -= q; c.cash += pay; b.cash -= pay; b.ars[k] = (b.ars[k] || 0) + q; c.infl[nid] = Math.min(100, (c.infl[nid] || 0) + 1); G.rel[nid][c.home] = clamp(G.rel[nid][c.home] + Math.min(4, pay * 3), -100, 100);
     return { ok: true, msg: `Продано ${q.toLocaleString()} → ${b.name}: +$${pay.toFixed(3)} млрд` };
   };
   G.corpBuyers = c => N.filter(n => n.alive && (n.id === c.home || (G.rel[c.home][n.id] >= 20 && !G.sanctioned(c.home, n.id) && !G.atWar(c.home, n.id))) && (G.enemiesOf(n.id).length || n.id === c.home)).map(n => n.id);

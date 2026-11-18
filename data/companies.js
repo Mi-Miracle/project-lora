@@ -1,20 +1,20 @@
 // КОМПАНІЇ. Сектори визначають, які активи (будівлі) компанія може будувати в регіонах, де має офіс.
 // Назви ШІ-компаній вигадані. Формат компанії: [назва укр, назва англ, сектор, країна штабу, стартовий капітал $ млрд]
 LORA.data.companySectors = {
-  military:  { n: 'ВПК', en: 'Defense', ic: '🛡', assets: ['arms_factory', 'drone_factory', 'missile_plant', 'shipyard', 'air_defense', 'tank_plant', 'aircraft_plant', 'radar', 'ew_station', 'laser_battery'], d: 'Зброя для урядів: дохід — державні замовлення. Бази, ядерні обʼєкти й фортифікації будує лише держава' },
+  military:  { n: 'ВПК', en: 'Defense', ic: '🛡', assets: ['arms_factory', 'drone_factory', 'missile_plant', 'shipyard', 'air_defense', 'tank_plant', 'aircraft_plant', 'radar', 'ew_station', 'laser_battery', 'training_center'], d: 'Зброя для урядів: дохід — державні замовлення. Бази, ядерні обʼєкти й фортифікації будує лише держава' },
   agro:      { n: 'Агро й продовольство', en: 'Agro & Food', ic: '🌾', assets: ['farm', 'greenhouse', 'livestock', 'irrigation', 'seed_center', 'elevator', 'food_plant', 'dairy', 'sugar_plant', 'winery', 'fert_plant', 'fishery', 'aquafarm', 'forestry', 'vertical_farm'], d: 'Поля, тваринництво, переробка, добрива' },
   oil:       { n: 'Нафта й газ', en: 'Oil & Gas', ic: '🛢', assets: ['oil_field', 'gas_field', 'refinery', 'lng_terminal'], d: 'Видобуток і переробка вуглеводнів, СПГ' },
   mining:    { n: 'Видобуток', en: 'Mining', ic: '⛏', assets: ['coal_mine', 'ore_mine', 'nonfer_mine', 'rare_mine', 'uranium_mine'], d: 'Вугілля, руди, кольорові й рідкісні метали, уран' },
   energy:    { n: 'Електроенергетика', en: 'Power', ic: '⚡', assets: ['coal_plant', 'gas_plant', 'npp', 'smr', 'hydro_plant', 'renewables', 'solar_farm', 'wind_farm', 'offshore_wind', 'geothermal', 'hydrogen_plant', 'battery_storage', 'fusion_plant'], d: 'Станції продають електрику; паливо (вугілля, газ, уран) купують на ринку або в видобувних компаній' },
-  industry:  { n: 'Промисловість', en: 'Industry', ic: '🏭', assets: ['steel_plant', 'chem_plant', 'pharma_plant', 'machine_plant', 'goods_factory', 'auto_plant', 'textile_plant', 'battery_plant', 'cement_plant'], d: 'Метал, хімія, машини, товари, ліки' },
+  industry:  { n: 'Промисловість', en: 'Industry', ic: '🏭', assets: ['steel_plant', 'chem_plant', 'pharma_plant', 'machine_plant', 'goods_factory', 'auto_plant', 'textile_plant', 'battery_plant', 'cement_plant', 'recycling_plant', 'lithium_refinery'], d: 'Метал, хімія, машини, товари, ліки' },
   semi:      { n: 'Мікроелектроніка', en: 'Semiconductors', ic: '🔌', assets: ['chip_fab'], d: 'Фабрики чипів: дорогі, але стратегічні; потрібні рідкісні метали й хімія' },
   tech:      { n: 'IT і штучний інтелект', en: 'IT & AI', ic: '💾', assets: ['datacenter', 'cloud_region', 'ai_datacenter', 'ai_lab', 'it_park', 'game_studio', 'cyber_center', 'platform_hub', 'research_center'], d: 'Без заводів: дохід від цифрових продуктів (користувачі × дохід з користувача), ліцензій на розробки й держзамовлень' },
   telecom:   { n: 'Телеком', en: 'Telecom', ic: '📶', assets: ['fiber_backbone', 'cell_5g', 'subsea_cable'], d: 'Інтернет і звʼязок: дохід росте з розвитком інтернету в країні' },
   space:     { n: 'Космос', en: 'Space', ic: '🚀', assets: ['launch_site', 'sat_factory', 'ground_station', 'spaceport'], d: 'Комерційні запуски й супутники: дорого, але дохідно; потрібні дослідження країни-господаря' },
   leisure:   { n: 'Медіа, туризм і розваги', en: 'Media & Leisure', ic: '🏨', assets: ['tourism', 'stadium', 'media_center'], d: 'Готелі, арени, медіа: стабільний дохід у мирних країнах' },
-  build:     { n: 'Будівництво й девелопмент', en: 'Construction', ic: '🏗', assets: ['housing', 'business_center'], d: 'Житло й офіси: дохід від продажу та оренди, держзамовлення на відбудову' },
+  build:     { n: 'Будівництво й девелопмент', en: 'Construction', ic: '🏗', assets: ['housing', 'business_center', 'desalination'], d: 'Житло й офіси: дохід від продажу та оренди, держзамовлення на відбудову' },
   health:    { n: 'Медицина й освіта', en: 'Health & Education', ic: '🏥', assets: ['hospital', 'university'], d: 'Приватні клініки й університети: стабільний дохід і повага суспільства' },
-  logistics: { n: 'Логістика', en: 'Logistics', ic: '🚢', assets: ['port', 'rail_hub', 'depot', 'airport'], d: 'Порти, вузли, склади — дохід від торгових потоків' }
+  logistics: { n: 'Логістика', en: 'Logistics', ic: '🚢', assets: ['port', 'rail_hub', 'depot', 'airport', 'logistics_center'], d: 'Порти, вузли, склади — дохід від торгових потоків' }
 };
 LORA.data.companies = [
   ['Атлант Дефенс', 'Atlant Defense', 'military', 'USA', 140], ['Сіверська Зброярня', 'Siverska Arms', 'military', 'UKR', 6], ['Анадолу Савунма', 'Anadolu Savunma', 'military', 'TUR', 18],

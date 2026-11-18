@@ -27,6 +27,7 @@ function menu() {
   <label class="row"><span>Радники з порадами</span><input type="checkbox" ${AUD.S.advisors ? 'checked' : ''} onchange="AUD.set('advisors',this.checked)"></label>
   <div class="sl"><div class="lab"><span>Гучність музики</span></div><input type="range" min="0" max="1" step="0.05" value="${AUD.S.mvol}" oninput="AUD.set('mvol',+this.value)"></div>
   <label class="row"><span>Спливаючі сповіщення</span><input type="checkbox" ${AUD.S.toasts ? 'checked' : ''} onchange="AUD.set('toasts',this.checked)"></label>
+  <label class="row"><span>${t_('Заставка при запуску')}</span><input type="checkbox" ${localStorage.getItem('lora_intro') === 'off' ? '' : 'checked'} onchange="localStorage.setItem('lora_intro',this.checked?'on':'off')"></label>
   <label class="row"><span>Щомісячний випуск новин</span><input type="checkbox" ${AUD.S.newscast ? 'checked' : ''} onchange="AUD.set('newscast',this.checked)"></label>
   <div class="grp">🟣 Twitch і трансляція</div>
   <div class="btns"><button class="pri" onclick="closeModal();streamMenu()">📺 Вивід на стрім (Shift+F9)</button></div>
@@ -38,7 +39,7 @@ function menu() {
   <div class="row"><span>Як часто, хвилин</span><input type="number" min="3" max="60" value="${AUD.S.chaosMin || 8}" onchange="AUD.set('chaosMin',+this.value)" style="width:70px"></div>
   <div class="row"><span>Twitch Client ID (для входу)</span><input type="text" id="twId" value="${esc(TW.cfg().id)}" placeholder="dev.twitch.tv/console" style="width:45%"></div>
   <div class="btns"><button onclick="TW.setClient(document.getElementById('twId').value);hint('✅ Збережено',1500)">Зберегти Client ID</button>${TW.S.user ? `<span class="small">Ви: <b>${esc(TW.S.user.name)}</b></span>` : `<button onclick="TW.login()">🟣 Увійти через Twitch</button>`}</div>
-  <label class="row"><span>Озвучувати новини голосом (якщо браузер має голос)</span><input type="checkbox" ${AUD.S.tts ? 'checked' : ''} onchange="AUD.set('tts',this.checked)"></label>${voiceSettings()}`);
+  <label class="row"><span>Озвучувати новини голосом (якщо браузер має голос)</span><input type="checkbox" ${AUD.S.tts ? 'checked' : ''} onchange="AUD.set('tts',this.checked)"></label><div id="voiceBox">${voiceSettings()}</div>`);
 }
 function streamPanel() {
   const st = LORA.stream.status ? LORA.stream.status() : {};
@@ -53,8 +54,9 @@ function streamPanel() {
   <label class="row"><span>Радники з порадами</span><input type="checkbox" ${AUD.S.advisors ? 'checked' : ''} onchange="AUD.set('advisors',this.checked)"></label>
   <div class="sl"><div class="lab"><span>Гучність музики</span></div><input type="range" min="0" max="1" step="0.05" value="${AUD.S.mvol}" oninput="AUD.set('mvol',+this.value)"></div>
   <label class="row"><span>Спливаючі сповіщення</span><input type="checkbox" ${AUD.S.toasts ? 'checked' : ''} onchange="AUD.set('toasts',this.checked)"></label>
+  <label class="row"><span>${t_('Заставка при запуску')}</span><input type="checkbox" ${localStorage.getItem('lora_intro') === 'off' ? '' : 'checked'} onchange="localStorage.setItem('lora_intro',this.checked?'on':'off')"></label>
   <label class="row"><span>Щомісячний випуск новин</span><input type="checkbox" ${AUD.S.newscast ? 'checked' : ''} onchange="AUD.set('newscast',this.checked)"></label>
-  <label class="row"><span>Озвучувати новини голосом (якщо браузер має голос)</span><input type="checkbox" ${AUD.S.tts ? 'checked' : ''} onchange="AUD.set('tts',this.checked)"></label>${voiceSettings()}`);
+  <label class="row"><span>Озвучувати новини голосом (якщо браузер має голос)</span><input type="checkbox" ${AUD.S.tts ? 'checked' : ''} onchange="AUD.set('tts',this.checked)"></label><div id="voiceBox">${voiceSettings()}</div>`);
 }
 function help() {
   const sec = (ic, t, d) => `<div class="card"><b>${ic} ${t_(t)}</b><div class="small" style="line-height:1.55">${t_(d)}</div></div>`;
@@ -80,16 +82,33 @@ function loadGame() {
 
 // налаштування голосу: вибір системного голосу, швидкість, тон; що озвучувати
 function voiceSettings() {
-  const I = AUD.voiceInfo(), V = AUD.voices().filter(v => AUD.S.vAnyLang || /^(uk|en)/i.test(v.lang));
+  const I = AUD.voiceInfo(), V = AUD.voices().filter(v => AUD.S.vAnyLang || /^(uk|en)/i.test(v.lang)), E = VOICE.state(), S = AUD.S;
+  const ENG = [['auto', 'Авто'], ['system', 'Системні голоси'], ['espeak', 'eSpeak NG (офлайн)'], ['azure', 'Azure — Поліна/Остап (ваш ключ)'], ['eleven', 'ElevenLabs (ваш ключ)']];
+  const inp = (k, ph, w) => `<input type="${/Key$/.test(k) ? 'password' : 'text'}" value="${esc(S[k] || '')}" placeholder="${esc(ph)}" style="width:${w || 55}%" onchange="AUD.set('${k}',this.value.trim());voiceRefresh()">`;
   return `<div class="grp">🗣 ${t_('Озвучка')}</div>
-  <div class="small ${I.uk ? 'g' : 'y'}">${t_('Голосів у системі')}: ${I.all} · ${t_('українських')}: ${I.uk} · ${t_('англійських')}: ${I.en}${I.cur ? ' · ' + t_('зараз') + ': <b>' + esc(I.cur) + '</b>' : ''}</div>
-  ${!I.uk ? `<div class="small mut">${t_('Українського голосу немає: у Windows додайте його в «Параметри → Час і мова → Мовлення → Додати голоси», у браузері Chrome/Edge — онлайн-голоси Google/Microsoft. Або увімкніть читання будь-яким голосом.')}</div>` : ''}
-  <div class="row"><span>${t_('Голос')}</span><select onchange="AUD.set('voice',this.value)"><option value="">${t_('Авто')}</option>${V.map(v => `<option value="${esc(v.name)}" ${AUD.S.voice === v.name ? 'selected' : ''}>${esc(v.name)} (${esc(v.lang)})</option>`).join('')}</select></div>
-  <div class="sl"><div class="lab"><span>${t_('Швидкість мовлення')}</span><b>${(AUD.S.vrate || 1).toFixed(2)}</b></div><input type="range" min="0.6" max="1.6" step="0.05" value="${AUD.S.vrate || 1.03}" onchange="AUD.set('vrate',+this.value)"></div>
-  <div class="sl"><div class="lab"><span>${t_('Тон голосу')}</span><b>${(AUD.S.vpitch || 1).toFixed(2)}</b></div><input type="range" min="0.5" max="1.6" step="0.05" value="${AUD.S.vpitch || 1}" onchange="AUD.set('vpitch',+this.value)"></div>
-  <label class="row"><span>${t_('Озвучувати важливі події (війни, вибори, катастрофи)')}</span><input type="checkbox" ${AUD.S.vEvents ? 'checked' : ''} onchange="AUD.set('vEvents',this.checked)"></label>
-  <label class="row"><span>${t_('Озвучувати поради радників')}</span><input type="checkbox" ${AUD.S.vAdv ? 'checked' : ''} onchange="AUD.set('vAdv',this.checked)"></label>
-  <label class="row"><span>${t_('Читати будь-яким доступним голосом, якщо немає потрібної мови')}</span><input type="checkbox" ${AUD.S.vAnyLang ? 'checked' : ''} onchange="AUD.set('vAnyLang',this.checked)"></label>
+  <div class="row"><span>${t_('Рушій')}</span><select onchange="AUD.set('engine',this.value);voiceRefresh()">${ENG.map(([k, n]) => `<option value="${k}" ${(S.engine || 'auto') === k ? 'selected' : ''}>${t_(n)}</option>`).join('')}</select></div>
+  <div class="small ${I.engine ? 'g' : 'y'}">${I.engine ? t_('Зараз говорить') + ': <b>' + esc({ system: t_('системний голос') + ' ' + I.cur, espeak: 'eSpeak NG', azure: 'Azure Speech', eleven: 'ElevenLabs' }[I.engine]) + '</b>' : t_('Немає доступного голосу для цієї мови — оберіть рушій нижче')}${I.err ? ' · <span class="r">' + esc(I.err) + '</span>' : ''}</div>
+  <div class="small mut">${t_('Голосів у системі')}: ${I.all} · ${t_('українських')}: ${I.uk} · ${t_('англійських')}: ${I.en}</div>
+  <div class="card small"><b>🖥 eSpeak NG — ${t_('офлайн, українська й англійська')}</b><div class="mut">${t_('Роботизований, але працює без інтернету. Не входить до гри: за вашою командою завантажується (~9 МБ) з публічного реєстру npm, перевіряється й зберігається локально. Ліцензія GPL-3.0, код:')} github.com/espeak-ng/espeak-ng</div>
+    <div class="row"><span>${E.es === 'ready' ? '✅ ' + t_('Встановлено') : E.es === 'loading' ? '⏳ ' + t_('Завантаження') + ' ' + Math.round(E.prog * 100) + '%' : E.es === 'error' ? '⚠ ' + esc(E.err) : t_('Не встановлено')}</span><button onclick="voiceEsp()" ${E.es === 'loading' ? 'disabled' : ''}>${E.es === 'ready' ? t_('Увімкнено') : t_('Завантажити й увімкнути')}</button></div></div>
+  <div class="card small"><b>☁ Microsoft Azure Speech — ${t_('живі нейронні голоси (Поліна, Остап)')}</b><div class="mut">${t_('Офіційний сервіс за вашим власним ключем: portal.azure.com → Speech service → «Keys and Endpoint». Безкоштовний тариф F0 — 0,5 млн символів на місяць. Ключ зберігається лише на цьому компʼютері.')}</div>
+    <div class="row"><span>${t_('Ключ')}</span>${inp('azKey', 'Azure key')}</div><div class="row"><span>${t_('Регіон')}</span>${inp('azRegion', 'westeurope')}</div>
+    <div class="row"><span>${t_('Голос (укр)')}</span><select onchange="AUD.set('azVoice',this.value)">${['uk-UA-PolinaNeural', 'uk-UA-OstapNeural'].map(v => `<option ${S.azVoice === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+    <div class="row"><span>${t_('Голос (англ)')}</span><select onchange="AUD.set('azVoiceEn',this.value)">${['en-US-AvaMultilingualNeural', 'en-US-AndrewMultilingualNeural', 'en-GB-SoniaNeural', 'en-GB-RyanNeural'].map(v => `<option ${S.azVoiceEn === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>
+  <div class="card small"><b>🎙 ElevenLabs — ${t_('найживіші багатомовні голоси')}</b><div class="mut">${t_('Офіційний сервіс за вашим ключем (elevenlabs.io → Profile → API key). Безкоштовний тариф має місячний ліміт символів. Voice ID — з бібліотеки голосів.')}</div>
+    <div class="row"><span>${t_('Ключ')}</span>${inp('elKey', 'xi-api-key')}</div><div class="row"><span>Voice ID</span>${inp('elVoice', 'EXAVITQu4vr4xnSDxMaL')}</div></div>
+  <div class="row"><span>${t_('Системний голос')}</span><select onchange="AUD.set('voice',this.value)"><option value="">${t_('Авто')}</option>${V.map(v => `<option value="${esc(v.name)}" ${S.voice === v.name ? 'selected' : ''}>${esc(v.name)} (${esc(v.lang)})</option>`).join('')}</select></div>
+  <div class="sl"><div class="lab"><span>${t_('Гучність голосу')}</span><b>${Math.round((S.voiceVol != null ? S.voiceVol : 0.9) * 100)}%</b></div><input type="range" min="0" max="1" step="0.05" value="${S.voiceVol != null ? S.voiceVol : 0.9}" onchange="AUD.set('voiceVol',+this.value)"></div>
+  <div class="sl"><div class="lab"><span>${t_('Швидкість мовлення')}</span><b>${(S.vrate || 1).toFixed(2)}</b></div><input type="range" min="0.6" max="1.6" step="0.05" value="${S.vrate || 1.03}" onchange="AUD.set('vrate',+this.value)"></div>
+  <div class="sl"><div class="lab"><span>${t_('Тон голосу')}</span><b>${(S.vpitch || 1).toFixed(2)}</b></div><input type="range" min="0.5" max="1.6" step="0.05" value="${S.vpitch || 1}" onchange="AUD.set('vpitch',+this.value)"></div>
+  <label class="row"><span>${t_('Озвучувати важливі події (війни, вибори, катастрофи)')}</span><input type="checkbox" ${S.vEvents ? 'checked' : ''} onchange="AUD.set('vEvents',this.checked)"></label>
+  <label class="row"><span>${t_('Озвучувати поради радників')}</span><input type="checkbox" ${S.vAdv ? 'checked' : ''} onchange="AUD.set('vAdv',this.checked)"></label>
+  <label class="row"><span>${t_('Читати будь-яким доступним голосом, якщо немає потрібної мови')}</span><input type="checkbox" ${S.vAnyLang ? 'checked' : ''} onchange="AUD.set('vAnyLang',this.checked)"></label>
   <div class="btns"><button onclick="AUD.speak(t_('Перевірка голосу. Проєкт Лора: світ чекає на ваші рішення.'))">🔊 ${t_('Перевірити голос')}</button></div>`;
 }
+function voiceRefresh() { const el = document.getElementById('voiceBox'); if (el) el.innerHTML = voiceSettings(); }
+function voiceEsp() { AUD.set('espeak', true); if (!AUD.S.engine || AUD.S.engine === 'system') AUD.set('engine', 'auto'); const t = setInterval(voiceRefresh, 400);
+  VOICE.esInstall().then(() => { clearInterval(t); voiceRefresh(); hint('✅ eSpeak NG', 2000); AUD.speak(t_('Голос встановлено.')); }, e => { clearInterval(t); voiceRefresh(); hint('⚠ ' + e.message, 4000); }); voiceRefresh(); }
 if (window.speechSynthesis) try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => { }; } catch (e) { }
+
+if (AUD.S.espeak) setTimeout(() => VOICE.esInstall().catch(() => { }), 3000);

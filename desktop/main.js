@@ -18,9 +18,16 @@ function gameRoot() {
 // заставка з перевіркою оновлень
 async function splashUpdate() {
   if (process.argv.includes('--no-update')) return;
-  const sp = new BrowserWindow({ width: 460, height: 220, frame: false, resizable: false, backgroundColor: '#0b1118', show: true, alwaysOnTop: true, webPreferences: { contextIsolation: true } });
-  const html = msg => `data:text/html;charset=utf-8,` + encodeURIComponent(`<body style="margin:0;background:#0b1118;color:#dfe9f5;font:15px system-ui;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;border:2px solid #ffd34d"><div style="font:700 26px system-ui;letter-spacing:2px;color:#ffd34d">PROJECT LORA</div><div style="margin-top:18px">${msg}</div></body>`);
-  const log = m => { try { sp.loadURL(html(m)); } catch (e) { } };
+  const sp = new BrowserWindow({ width: 560, height: 320, frame: false, resizable: false, backgroundColor: '#05080d', show: true, alwaysOnTop: true, webPreferences: { contextIsolation: true } });
+  const page = `<!doctype html><meta charset="utf-8"><body style="margin:0;background:#05080d;color:#dfe9f5;font:14px system-ui;height:100vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #1d3550">
+<style>@keyframes sp{to{transform:rotate(360deg)}}@keyframes gl{0%,100%{text-shadow:0 0 6px #ffb020}50%{text-shadow:0 0 22px #ffb020}}@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+.r{width:96px;height:96px;border-radius:50%;border:2px solid #2b5d8f;position:relative;box-shadow:inset 0 0 30px #12325a}.r:before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(255,200,80,.0),rgba(255,200,80,.45) 12%,rgba(255,200,80,0) 13%);animation:sp 2.2s linear infinite}
+.r:after{content:"";position:absolute;inset:22px;border-radius:50%;border:1px dashed #2b5d8f}.m{font:700 30px system-ui;letter-spacing:1px;color:#ffd34d;margin-top:16px;animation:gl 2.4s ease-in-out infinite,fi .8s ease}
+.t{font:600 13px system-ui;letter-spacing:6px;color:#9cc8f0;margin-top:4px;animation:fi 1.4s ease}.s{margin-top:18px;color:#8aa0b8;min-height:18px}</style>
+<div class="r"></div><div class="m">Mi_Miracle</div><div class="t">PROJECT LORA</div><div class="s" id="m"></div></body>`;
+  sp.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(page));
+  await new Promise(r => sp.webContents.once('did-finish-load', r));
+  const log = m => { try { sp.webContents.executeJavaScript(`document.getElementById('m').textContent=${JSON.stringify(String(m))}`); } catch (e) { } };
   log('Перевіряю оновлення…');
   try { await Promise.race([updater.check(net, app.getPath('userData'), log), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 90000))]); }
   catch (e) { log('Оновлення недоступне: ' + String(e.message || e).slice(0, 60)); await new Promise(r => setTimeout(r, 1200)); }

@@ -13,7 +13,9 @@ LORA.sim.register('units', 61, function (G) {
     ifv:  { n: 'БМП / БТР', ic: '🚙', col: '#a8b07a', d: 'Мобільна піхота: добре і в наступі, і в обороні; теж залежить від бронетехніки' },
     tube: { n: 'Ствольна артилерія', ic: '💥', col: '#d8664a', d: 'Сила оборони й артпідготовки; витрачає снаряди' },
     mlrs: { n: 'РСЗВ', ic: '🎆', col: '#ff8a3b', d: 'Потужний вогневий удар перед штурмом; витрачає багато снарядів' },
-    ad:   { n: 'Мобільна ППО', ic: '📡', col: '#5aa7d8', d: 'Прикриває армію від штурмовиків і гелікоптерів ворога' }
+    ad:   { n: 'Мобільна ППО', ic: '📡', col: '#5aa7d8', d: 'Прикриває армію від штурмовиків і гелікоптерів ворога' },
+    uav:  { n: 'Підрозділи ударних дронів', ic: '🛸', col: '#e05ab0', d: 'FPV і ударні дрони: сильні і в обороні, і в наступі; сила залежить від запасу FPV-дронів в арсеналі' },
+    eng:  { n: 'Інженерні війська', ic: '🛠', col: '#9a8f6a', d: 'Розмінування, переправи, прорив укріплень: посилюють штурм і будують оборону' }
   };
   const TK = Object.keys(TY);
   const mk = o => { const c = {}; TK.forEach(k => c[k] = o[k] || 0); return c; };
@@ -23,7 +25,11 @@ LORA.sim.register('units', 61, function (G) {
     tank:    { n: 'Танкова (прорив)', ic: '🛡', c: mk({ inf: 0.25, mbt: 0.35, ifv: 0.2, tube: 0.1, mlrs: 0.04, ad: 0.06 }) },
     assault: { n: 'Штурмова (ДШВ)', ic: '🎯', c: mk({ inf: 0.3, spec: 0.3, ifv: 0.2, tube: 0.1, mlrs: 0.03, ad: 0.07 }) },
     art:     { n: 'Артилерійська', ic: '💥', c: mk({ inf: 0.4, ifv: 0.05, tube: 0.3, mlrs: 0.15, ad: 0.1 }) },
-    shield:  { n: 'Прикриття ППО', ic: '📡', c: mk({ inf: 0.5, mbt: 0.05, ifv: 0.1, tube: 0.08, mlrs: 0.02, ad: 0.25 }) }
+    shield:  { n: 'Прикриття ППО', ic: '📡', c: mk({ inf: 0.5, mbt: 0.05, ifv: 0.1, tube: 0.08, mlrs: 0.02, ad: 0.25 }) },
+    drone:   { n: 'Дронова (сучасна)', ic: '🛸', c: mk({ inf: 0.45, ifv: 0.1, tube: 0.1, ad: 0.1, uav: 0.2, eng: 0.05 }) },
+    breach:  { n: 'Інженерно-штурмова', ic: '🛠', c: mk({ inf: 0.35, spec: 0.1, ifv: 0.15, tube: 0.1, ad: 0.08, eng: 0.17, uav: 0.05 }) },
+    marine:  { n: 'Морська піхота', ic: '⚓', c: mk({ inf: 0.4, spec: 0.18, ifv: 0.2, tube: 0.1, ad: 0.07, eng: 0.05 }) },
+    mountain:{ n: 'Гірсько-піхотна', ic: '⛰', c: mk({ inf: 0.6, spec: 0.15, tube: 0.12, ad: 0.08, uav: 0.05 }) }
   };
   TP.mech = TP.tank; // сумісність зі збереженнями 1.1
   const TA = { plains: 1.15, steppe: 1.25, forest: 0.85, hills: 0.85, mountain: 0.6, desert: 1.1, arctic: 0.7 };
@@ -67,6 +73,7 @@ LORA.sim.register('units', 61, function (G) {
     let c = a.comp;
     if (!c) c = a.comp = Object.assign({}, TP.std.c);
     else if (c.armor != null) { c = a.comp = mk({ inf: c.inf, mbt: c.armor * 0.5, ifv: c.armor * 0.5, tube: (c.art || 0) * 0.7, mlrs: (c.art || 0) * 0.3, ad: c.ad }); } // міграція 1.1
+    for (const k of TK) if (c[k] == null) c[k] = 0;
     return c;
   }
   G.armyComp = comp;
@@ -85,10 +92,10 @@ LORA.sim.register('units', 61, function (G) {
   let _need = {};
   function armorSat(n) { if (!n.ars || n.ars.armor == null) return 1; const need = _need[n.id] || 0; return need > 0 ? clamp(n.ars.armor / need, 0.35, 1) : 1; }
   function mult(c, tr, urb, ao, attack, mud, winter, um, n) {
-    um = um || {}; const mm = n ? modelCache(n)[attack ? 0 : 1] : null; const u = mm ? k => c[k] * (1 + (um[k] || 0)) * mm[k] : k => c[k] * (1 + (um[k] || 0));
+    um = um || {}; const mm = n ? modelCache(n)[attack ? 0 : 1] : null; const u = mm ? k => (c[k] || 0) * (1 + (um[k] || 0)) * (mm[k] || 1) : k => (c[k] || 0) * (1 + (um[k] || 0));
     const ti = TI[tr] || 1, ta = TA[tr] || 1, md = 1 - 0.4 * mud, wn = attack && winter ? 0.93 : 1;
-    if (attack) return wn * (u('inf') * 0.85 * ti + u('spec') * 1.3 * ti * (1 + urb * 0.4) + u('mbt') * 1.9 * ta * (1 - urb * 0.6) * ao * md + u('ifv') * 1.3 * (ta + 1) / 2 * (1 - urb * 0.3) * ao * (1 - 0.25 * mud) + u('tube') * 1.15 + u('mlrs') * 1.45 + u('ad') * 0.55);
-    return u('inf') * 1.05 * ti * (1 + urb * 0.5) + u('spec') * 1.0 * ti * (1 + urb * 0.3) + u('mbt') * 1.1 * ao + u('ifv') * 1.05 * ao + u('tube') * 1.2 + u('mlrs') * 1.0 + u('ad') * 0.8;
+    if (attack) return wn * (u('inf') * 0.85 * ti + u('spec') * 1.3 * ti * (1 + urb * 0.4) + u('mbt') * 1.9 * ta * (1 - urb * 0.6) * ao * md + u('ifv') * 1.3 * (ta + 1) / 2 * (1 - urb * 0.3) * ao * (1 - 0.25 * mud) + u('tube') * 1.15 + u('mlrs') * 1.45 + u('ad') * 0.55 + u('uav') * 1.5 * (n && n.ars && n.ars.fpv != null ? Math.min(1, 0.35 + n.ars.fpv / 4e4) : 1) + u('eng') * 1.35 * (1 + urb * 0.3));
+    return u('inf') * 1.05 * ti * (1 + urb * 0.5) + u('spec') * 1.0 * ti * (1 + urb * 0.3) + u('mbt') * 1.1 * ao + u('ifv') * 1.05 * ao + u('tube') * 1.2 + u('mlrs') * 1.0 + u('ad') * 0.8 + u('uav') * 1.35 * (n && n.ars && n.ars.fpv != null ? Math.min(1, 0.35 + n.ars.fpv / 4e4) : 1) + u('eng') * 1.25;
   }
   G.compMult = function (a, attack) { const n = N[a.n], s = G.season(a.t); return mult(comp(a), T[a.t].t, G.urbanDef ? G.urbanDef(a.t) || 0 : 0, n._armSat != null ? n._armSat : 1, attack, s.mud, s.winter, techMods(n).um, n); };
   const NORM_A = mult(TP.std.c, 'plains', 0, 1, true, 0, 0), NORM_D = mult(TP.std.c, 'plains', 0, 1, false, 0, 0);
@@ -113,7 +120,7 @@ LORA.sim.register('units', 61, function (G) {
     a.retrain = { to: tpl, until: G.day + 30 }; a.org = Math.min(a.org, 0.6); return { ok: true, days: 30, cost };
   };
   // власний склад армії: c = { inf, spec, mbt, ifv, tube, mlrs, ad } у частках (нормалізується)
-  G.COMP_LIM = { inf: [0.15, 0.9], spec: [0, 0.2], mbt: [0, 0.45], ifv: [0, 0.4], tube: [0, 0.35], mlrs: [0, 0.2], ad: [0, 0.3] };
+  G.COMP_LIM = { inf: [0.15, 0.9], spec: [0, 0.2], mbt: [0, 0.45], ifv: [0, 0.4], tube: [0, 0.35], mlrs: [0, 0.2], ad: [0, 0.3], uav: [0, 0.25], eng: [0, 0.2] };
   G.normComp = function (c) { const o = {}; let s = 0; for (const k of TK) { o[k] = clamp(+c[k] || 0, G.COMP_LIM[k][0], G.COMP_LIM[k][1]); s += o[k]; } for (const k of TK) o[k] = +(o[k] / (s || 1)).toFixed(3); return o; };
   G.compChange = (a, c) => { const cur = comp(a); let d = 0; for (const k of TK) d += Math.abs((c[k] || 0) - (cur[k] || 0)); return d / 2; };
   G.setArmyComp = function (a, c) {

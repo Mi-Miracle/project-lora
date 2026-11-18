@@ -75,7 +75,8 @@ TAB_FN.career = function () {
   const L = G.leader; if (!L || L.role !== 'char') return '';
   const nid = G.leaderNation(), here = nid >= 0 ? nat(nid) : null; const stage = G.player >= 0 ? 4 : L.mp != null ? 2 : G.pc >= 0 ? 3 : L.party ? 1 : 0;
   const steps = [['🧑', 'Персонаж'], ['🎗', 'Партія'], ['🏛', 'Депутат'], ['🏢', 'Власник компанії'], ['👑', 'Президент']];
-  let h = `<div class="career-path">${steps.map(([ic, n], k) => `<span class="${k <= stage || (k === 3 && G.pc >= 0) || (k === 2 && L.mp != null) ? 'on' : ''}">${ico(ic)} ${t_(n)}</span>`).join('<i>›</i>')}</div>`;
+  const got = [true, !!L.party, L.mp != null, G.pc >= 0, G.player >= 0];
+  let h = `<div class="career-path">${steps.map(([ic, n], k) => `<span class="${got[k] ? 'on' : ''}">${ico(ic)} ${t_(n)}</span>`).join('<i>›</i>')}</div>`;
   h += `<div class="mut small">${t_('Етапи можна проходити в будь-якому порядку: заробіть гроші й вплив, станьте депутатом або засновником компанії — і балотуйтеся в президенти (вкладка «Персонаж» → «Балотуватися»).')}</div>`;
   const btn = (k, a, label) => { const e = G.careerCan(k, a); const A = G.CAREER[k]; return `<button class="${e ? '' : 'pri'}" ${e ? 'disabled' : ''} data-tip="${esc(t_(A.d))}${e ? ' — ' + esc(t_(e)) : ''}" onclick="carDo('${k}',${a == null ? 'null' : `'${a}'`})">${A.ic} ${esc(t_(label || A.n))}${A.cost ? ' · ' + money(A.cost) : ''}</button>`; };
   // робота

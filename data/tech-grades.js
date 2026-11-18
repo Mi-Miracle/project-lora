@@ -43,6 +43,14 @@
     dig_cyber_c:  { br: 'cyber', era: 2, n: 'Кіберцентри', en: 'Cyber centers', c: 1000, req: ['cyber_def'], e: { cyber: 0.06 } },
     // будівництво
     bld_prefab:   { br: 'ind', era: 1, n: 'Збірне будівництво', en: 'Prefab construction', c: 300, e: { build: 0.05 } },
+    circular:     { br: 'ind', era: 2, n: 'Економіка замкненого циклу', en: 'Circular economy', c: 1000, req: ['bld_prefab'], e: { prod: { metal: 1.02, goods: 1.02 }, stab: 1 } },
+    grid1:        { br: 'energy', era: 1, n: 'Енергомережі I: цифрові підстанції', en: 'Power grids I', c: 360, e: { g: 0.001 } },
+    grid2:        { br: 'energy', era: 2, n: 'Енергомережі II: розумні мережі й накопичувачі', en: 'Power grids II', c: 1250, req: ['grid1'], e: { g: 0.0015, stab: 1 } },
+    grid3:        { br: 'energy', era: 3, n: 'Енергомережі III: надпровідні магістралі', en: 'Power grids III', c: 4200, req: ['grid2'], e: { g: 0.002 } },
+    mil_train1:   { br: 'mil', era: 1, n: 'Навчання за стандартами НАТО', en: 'NATO-standard training', c: 320, e: { q: 0.03 } },
+    mil_train2:   { br: 'mil', era: 2, n: 'Симулятори й віртуальні полігони', en: 'Simulators & virtual ranges', c: 1100, req: ['mil_train1'], e: { q: 0.04 } },
+    mil_eng:      { br: 'mil', era: 1, n: 'Сучасні інженерні війська', en: 'Modern combat engineers', c: 300, e: { q: 0.015, um: { eng: 0.15 } } },
+    drone_units:  { br: 'drone', era: 1, n: 'Окремі дронові підрозділи', en: 'Dedicated drone units', c: 330, req: ['fpv'], e: { um: { uav: 0.2 } } },
     bld_3d:       { br: 'ind', era: 2, n: '3D-друк будинків', en: '3D-printed buildings', c: 1000, req: ['bld_prefab'], e: { build: 0.08, stab: 1 } }
   });
 })();

@@ -1,7 +1,7 @@
 // ЗВУК І МУЗИКА: усе синтезується WebAudio (без аудіофайлів). Ефекти — sfx(тип); музика — генеративний чіптюн-ембієнт,
 // що стає напруженішим під час війни. Налаштування зберігаються в localStorage('lora_audio').
 const AUD = (() => {
-  let S = { sfx: true, music: true, vol: 0.55, mvol: 0.32, tts: true, toasts: true, newscast: true, advisors: true, style: 'auto', voice: '', vrate: 1.03, vpitch: 1, vEvents: true, vAdv: false, vAnyLang: false };
+  let S = { sfx: true, music: true, vol: 0.55, mvol: 0.32, tts: true, toasts: true, newscast: true, advisors: true, style: 'auto', voice: '', vrate: 1.03, vpitch: 1, vEvents: true, vAdv: false, vAnyLang: false, engine: 'auto', espeak: false, azKey: '', azRegion: 'westeurope', azVoice: 'uk-UA-PolinaNeural', azVoiceEn: 'en-US-AvaMultilingualNeural', elKey: '', elVoice: '', voiceVol: 0.9 };
   try { Object.assign(S, JSON.parse(localStorage.getItem('lora_audio') || '{}')); } catch (e) { }
   let ctx = null, master = null, sfxG = null, musG = null, noiseBuf = null;
   const save = () => { try { localStorage.setItem('lora_audio', JSON.stringify(S)); } catch (e) { } };
@@ -104,16 +104,24 @@ const AUD = (() => {
   function pickVoice() { const lang = LORA.lang === 'en' ? 'en' : 'uk', V = voices(); if (S.voice) { const v = V.find(x => x.name === S.voice); if (v) return v; }
     return V.find(v => v.lang.toLowerCase().startsWith(lang) && /female|жін|Polina|Lesya|Ostap|Samantha|Zira|Natural|Google/i.test(v.name)) || V.find(v => v.lang.toLowerCase().startsWith(lang)) || (S.vAnyLang ? V[0] : null); }
   let vQ = [], vBusy = false;
-  function speak(text, onEnd, prio) {
-    if (!S.tts || !window.speechSynthesis) { onEnd && onEnd(); return false; }
-    try { const v = pickVoice(); if (!v) { onEnd && onEnd(); return false; }
-      if (prio !== 'queue') { speechSynthesis.cancel(); vQ = []; vBusy = false; }
-      else if (vBusy || speechSynthesis.speaking) { if (vQ.length < 3) vQ.push([text, onEnd]); return true; }
-      const u = new SpeechSynthesisUtterance(String(text).replace(/[\p{Extended_Pictographic}️]/gu, '').trim()); u.voice = v; u.lang = v.lang; u.rate = S.vrate || 1.03; u.pitch = S.vpitch || 1;
-      vBusy = true; u.onend = u.onerror = () => { vBusy = false; onEnd && onEnd(); const nx = vQ.shift(); if (nx) speak(nx[0], nx[1], 'queue'); };
-      speechSynthesis.speak(u); return true; } catch (e) { onEnd && onEnd(); return false; }
+  // який рушій говоритиме: вибраний у налаштуваннях або «авто» (хмарний із ключем → системний голос мови → eSpeak)
+  function engineFor() {
+    const want = S.engine || 'auto'; const sysOk = !!(window.speechSynthesis && pickVoice());
+    if (want === 'system') return sysOk ? 'system' : null; if (want === 'azure') return S.azKey ? 'azure' : null; if (want === 'eleven') return S.elKey ? 'eleven' : null; if (want === 'espeak') return (typeof VOICE !== 'undefined') ? 'espeak' : null;
+    if (S.azKey) return 'azure'; if (S.elKey) return 'eleven'; if (sysOk) return 'system'; if (S.espeak && (typeof VOICE !== 'undefined')) return 'espeak'; return null;
   }
-  const voiceInfo = () => { const V = voices(); return { all: V.length, uk: V.filter(v => v.lang.toLowerCase().startsWith('uk')).length, en: V.filter(v => v.lang.toLowerCase().startsWith('en')).length, cur: (pickVoice() || {}).name || '' }; };
+  function speak(text, onEnd, prio) {
+    const eng = S.tts ? engineFor() : null; if (!eng) { onEnd && onEnd(); return false; }
+    const clean = String(text).replace(/[\p{Extended_Pictographic}\uFE0F]/gu, '').replace(/\s+/g, ' ').trim(); if (!clean) { onEnd && onEnd(); return false; }
+    if (prio !== 'queue') { try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) { } (typeof VOICE !== 'undefined') && VOICE.stop(); vQ = []; vBusy = false; }
+    else if (vBusy) { if (vQ.length < 3) vQ.push([text, onEnd]); return true; }
+    vBusy = true; let fin = false; const done = () => { if (fin) return; fin = true; vBusy = false; onEnd && onEnd(); const nx = vQ.shift(); if (nx) speak(nx[0], nx[1], 'queue'); };
+    const lang = LORA.lang === 'en' ? 'en' : 'uk';
+    if (eng === 'system') { try { const v = pickVoice(); const u = new SpeechSynthesisUtterance(clean); u.voice = v; u.lang = v.lang; u.rate = S.vrate || 1.03; u.pitch = S.vpitch || 1; u.volume = S.voiceVol != null ? S.voiceVol : 0.9; u.onend = u.onerror = done; speechSynthesis.speak(u); } catch (e) { done(); return false; } return true; }
+    VOICE.say(eng, clean.slice(0, 600), lang, S).then(done, e => { console.warn('voice', e); lastErr = String(e.message || e); done(); }); return true;
+  }
+  let lastErr = '';
+  const voiceInfo = () => { const V = voices(); return { engine: engineFor(), err: lastErr, all: V.length, uk: V.filter(v => v.lang.toLowerCase().startsWith('uk')).length, en: V.filter(v => v.lang.toLowerCase().startsWith('en')).length, cur: (pickVoice() || {}).name || '' }; };
   document.addEventListener('pointerdown', () => init(), { once: true });
   document.addEventListener('click', e => { if (e.target.closest && e.target.closest('button')) sfx('click'); });
   return { S, sfx, set, init, speak, blip, STY, voices, voiceInfo };

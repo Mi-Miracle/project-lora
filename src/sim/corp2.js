@@ -24,7 +24,7 @@ LORA.sim.register('corp2', 99.65, function (G) {
       for (const r in f.inn) { const need = f.inn[r], have = c.res[r] || 0, use = Math.min(have, need); c.res[r] = have - use; const buy = need - use; if (buy > 0) { const v = buy * G.spotBuy(r); c.cash -= v; L.cost += v; } }
       for (const r in f.out) c.res[r] = (c.res[r] || 0) + f.out[r];
       // постачання за ресурсними контрактами
-      (c.supply || []).forEach(k => { const have = c.res[k.r] || 0, d = Math.min(have, k.q); c.res[k.r] = have - d; const pay = d * k.p; c.cash += pay; L.rev += pay; const b = N[k.buyer]; if (b && b.alive) { b.cash -= pay * 0.3; b.mods.push({ r: k.r, mul: 1 + Math.min(0.15, d / Math.max(0.001, b.agg.need[k.r] / 12 || 1) * 0.5), until: G.day + 31 }); }
+      (c.supply || []).forEach(k => { const have = c.res[k.r] || 0, d = Math.min(have, k.q); c.res[k.r] = have - d; const pay = d * k.p; c.cash += pay; L.rev += pay; const b = N[k.buyer]; if (b && b.alive) { b.cash -= pay; b.mods.push({ r: k.r, mul: 1 + Math.min(0.15, d / Math.max(0.001, b.agg.need[k.r] / 12 || 1) * 0.5), until: G.day + 31 }); }
         if (d < k.q * 0.98) { const pen = (k.q - d) * k.p * 0.25; c.cash -= pen; L.cost += pen; c.rep = clamp((c.rep || 50) - 2, 0, 100); }
         k.left--; if (k.left <= 0) { k.fin = 1; c.rep = clamp((c.rep || 50) + 3, 0, 100); G.say(`✅ Контракт постачання ${RI[k.r].n.toLowerCase()} для ${N[k.buyer].name} завершено`, 'good', [c.home]); } });
       c.supply = (c.supply || []).filter(k => !k.fin);
