@@ -94,6 +94,7 @@ LORA.sim.register('wevents', 99.97, function (G) {
   function outcome(e, oi, n) { const O = e.o[oi] || e.o[0]; const list = O[1]; const ws = list.map(x => typeof x[0] === 'function' ? x[0](n) : x[0]); let r = G.rnd() * ws.reduce((a, b) => a + b, 0); for (let i = 0; i < list.length; i++) { r -= ws[i]; if (r <= 0) return list[i]; } return list[list.length - 1]; }
   function resolve(e, oi, n, human) { const [, scene, text, f] = outcome(e, oi, n); try { f(n); } catch (x) { } if (human) fx({ kind: scene, title: e.o[oi][0], sub: text });
     if (!human) G.say(`${e.title.split(' ')[0]} ${n.name}: «${e.o[oi][0]}» — ${text}`, 'info', [n.id]); return text; }
+  G.wevResolve = resolve; G.wevE = E; G.wevHelpers = { techy, strong };
   G.wevFire = function (id, forceN) {
     const e = G.WEV.find(x => x.id === id); if (!e) return; const A = N.filter(n => ok(e, n)); if (!A.length) return;
     if (e.scope === 'world') { const hs = [...(G.humans || [])].filter(h => N[h] && N[h].alive); fx({ kind: e.scene, title: e.title, sub: e.text() }); G.say(`${e.title}: ${e.text()}`, 'big', []);

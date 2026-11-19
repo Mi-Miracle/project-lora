@@ -481,3 +481,12 @@ body.stream #funTk { display: none !important; }
 .mincard.nohire { opacity: .8; border-style: dashed; }
 #fxcv { position: fixed; inset: 0; z-index: 9300; cursor: pointer; transition: opacity .4s; }
 #mm .mm-full { color: #ffd34d; font: 700 15px system-ui; letter-spacing: .35em; margin: -2px 0 6px; }
+/* кампанія й навчання */
+#campCard { position: fixed; left: 462px; top: 58px; z-index: 30; width: 300px; background: rgba(9,14,22,.92); border: 1px solid #1d3550; border-left: 3px solid #ffd34d; border-radius: 10px; padding: 8px 10px; font: 13px system-ui; color: #e8f0f8; box-shadow: 0 8px 30px #0008; }
+body.lhide #campCard { left: 82px; }
+#campCard .cc-h { cursor: pointer; margin-bottom: 4px; } #campCard .cc-g { padding: 2px 0; } #campCard .cc-g.ok { color: #6ad08a; } #campCard .cc-b { margin-top: 6px; }
+#campCard.fold .cc-g, #campCard.fold .cc-b { display: none; }
+.camp-st { display: flex; gap: 16px; align-items: flex-start; } .camp-st p { line-height: 1.55; font-size: 15px; }
+.tut-hl { position: fixed; z-index: 9650; border: 3px solid #ffd34d; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0,0,0,.35), 0 0 24px #ffd34d; pointer-events: none; animation: tutP 1.2s infinite; }
+@keyframes tutP { 50% { box-shadow: 0 0 0 9999px rgba(0,0,0,.35), 0 0 40px #ffd34d; } }
+.tut-tip { position: fixed; z-index: 9660; width: 340px; background: #0f1a28; border: 1px solid #ffd34d; border-radius: 10px; padding: 12px; color: #e8f0f8; font: 14px system-ui; box-shadow: 0 10px 40px #000a; }

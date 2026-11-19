@@ -1,13 +1,13 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['New name: L.O.R.A. — Lords Of Real Atlas', '18 interactive world events: start animation → your choice → random outcome animation', 'New resources: lithium, timber, medicine, hydrogen, graphene, helium-3 — with buildings and techs', 'Space weapons: orbital kinetic strikes and lasers, killer satellites', 'Roads follow the land and sea lanes follow the sea']
-  : ['Нова назва: L.O.R.A. — Lords Of Real Atlas', '18 інтерактивних світових подій: анімація → ваш вибір → випадковий наслідок', 'Нові ресурси: літій, деревина, ліки, водень, графен, гелій-3 — з будівлями й технологіями', 'Космічна зброя: орбітальні кінетичні удари й лазери, супутники-перехоплювачі', 'Дороги прокладаються суходолом, морські лінії — морем'];
+  ? ['Campaign "Lord of the Atlas": 11 chapters with a built-in tutorial', 'UN 2.0: Security Council, vetoes, 9 resolution types', 'Moon and Mars colonies: zones, modules, seizures', 'Hybrid war: bot farms, fakes, leaks, meme wars', '13 new interactive events; routes now clearly follow land and sea']
+  : ['Кампанія «Володар Атласу»: 11 розділів із вбудованим навчанням', 'ООН 2.0: Радбез, вето, 9 типів резолюцій', 'Колонії на Місяці й Марсі: зони, модулі, захоплення', 'Гібридна війна: бот-ферми, фейки, зливи, мем-війни', '13 нових інтерактивних подій; маршрути видно суходолом і морем']
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }
   $('#start').style.display = 'none'; $('#start').classList.remove('modern'); el.classList.remove('behind'); el.style.display = 'block';
-  const B = [hasSaveGame() ? ['cont', '▶', 'Продовжити', 'останнє збереження'] : null, ['single', '🎮', 'Нова гра', 'персонаж, партія, компанія чи президент'], ['multi', '🌐', 'Мультиплеєр', 'хост, гравець або глядач'],
+  const B = [hasSaveGame() ? ['cont', '▶', 'Продовжити', 'останнє збереження'] : null, ['camp', '📖', 'Кампанія', 'сюжет «Володар Атласу» з навчанням'], ['single', '🎮', 'Нова гра', 'персонаж, партія, компанія чи президент'], ['multi', '🌐', 'Мультиплеєр', 'хост, гравець або глядач'],
     ['rada', '🏛', 'Президент і Рада', 'ви — президент, чат Twitch — парламент'], ['load', '📂', 'Завантажити', 'збереження з цього компʼютера'], ['set', '⚙', 'Налаштування', 'звук, озвучка, гра, Twitch, стрім'],
     ['help', '❓', 'Як грати', 'основи й гарячі клавіші'], ['credits', '✨', 'Автори', 'Mi_Miracle і бібліотеки'], ['quit', '⏻', 'Вихід', '']].filter(Boolean);
   el.innerHTML = `<canvas id="mmcv"></canvas><div class="mm-shade"></div>
@@ -27,6 +27,7 @@ function mmGo(k) {
   if (k === 'rada') { netMode = 'solo'; startMode = 'rada'; startTab = 'game'; }
   if (k === 'set') { settingsScreen(); return; } if (k === 'help') { help(); return; }
   if (k === 'credits') { credits(); return; }
+  if (k === 'camp') { campaignStart(); return; }
   if (k === 'quit') { try { window.close(); } catch (e) { } setTimeout(() => hint(t_('Закрийте вкладку браузера'), 2500), 200); return; }
   // нова гра / мультиплеєр / Рада — сучасний екран поверх анімованого фону меню
   const el = document.getElementById('mm'); if (el) el.classList.add('behind');

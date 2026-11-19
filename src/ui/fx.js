@@ -58,7 +58,23 @@ const FX = (() => {
     shield: { bg: ['#051a2a', '#02080f'], items: [['🛡', 'pulse', 1, 160], ['✨', 'orbit', 12, 26], ['☄', 'rain', 10, 30]] },
     orbital: { bg: ['#05081a', '#000'], items: [['🛰', 'fly', 3, 60], ['⚡', 'rain', 20, 40], ['💥', 'burst', 30, 34]], flash: 1, laser: 1 },
     offline: { bg: ['#1a2a1a', '#050a05'], items: [['📖', 'float', 10, 36], ['🌳', 'march', 8, 60], ['🧺', 'pulse', 1, 100]] },
-    fax: { bg: ['#2a2a24', '#0a0a08'], items: [['📠', 'pulse', 1, 130], ['📄', 'rain', 40, 28], ['👴', 'float', 4, 46]] }
+    fax: { bg: ['#2a2a24', '#0a0a08'], items: [['📠', 'pulse', 1, 130], ['📄', 'rain', 40, 28], ['👴', 'float', 4, 46]] },
+    handshake: { bg: ['#0a2a2a', '#020a0a'], items: [['🤝', 'pulse', 1, 140], ['❤', 'burst', 30, 28], ['🕊', 'fly', 4, 40]] },
+    stream: { bg: ['#2a0a3a', '#0a0210'], items: [['🎮', 'pulse', 1, 130], ['💜', 'rise', 30, 28], ['💬', 'float', 14, 34], ['🎉', 'burst', 20, 26]] },
+    song: { bg: ['#2a0a3a', '#0a0210'], items: [['🎤', 'pulse', 1, 130], ['🎶', 'burst', 30, 30], ['🏆', 'float', 3, 50], ['💡', 'rain', 20, 24]] },
+    whale: { bg: ['#0d3b66', '#05182a'], items: [['🐋', 'stomp', 1, 230], ['🚢', 'march', 4, 50], ['💦', 'burst', 20, 28]] },
+    whalefree: { bg: ['#0d3b66', '#05182a'], items: [['🐋', 'flyL', 1, 160], ['💦', 'rise', 30, 26], ['👋', 'float', 6, 40]] },
+    catvote: { bg: ['#2a1a2a', '#0a050a'], items: [['🐈', 'pulse', 1, 170], ['🗳', 'rain', 20, 34], ['🎉', 'burst', 20, 26], ['🐟', 'float', 6, 34]] },
+    football: { bg: ['#0a3a0a', '#021002'], items: [['⚽', 'orbit', 3, 50], ['🏟', 'pulse', 1, 130], ['🎉', 'burst', 30, 26], ['📣', 'march', 8, 40]] },
+    hole: { bg: ['#1a140a', '#050302'], items: [['🕳', 'pulse', 1, 220], ['🚧', 'march', 6, 46], ['😮', 'float', 6, 40]], shake: 1 },
+    treasure: { bg: ['#2a2005', '#0a0802'], items: [['🏺', 'pulse', 1, 120], ['💎', 'burst', 30, 30], ['📜', 'float', 8, 34], ['🪙', 'rain', 30, 26]] },
+    droneshow: { bg: ['#05081a', '#000'], items: [['✨', 'orbit', 40, 16], ['🛸', 'float', 10, 30], ['🐈', 'pulse', 1, 120]] },
+    monolith: { bg: ['#2a2010', '#0a0805'], items: [['🗿', 'pulse', 1, 200], ['🧑‍🔬', 'march', 5, 40], ['❓', 'float', 10, 36]] },
+    satfall: { bg: ['#05081a', '#000'], items: [['🛰', 'fly', 1, 90], ['🔥', 'fly', 6, 30], ['😬', 'float', 6, 40]] },
+    banana: { bg: ['#2a2a05', '#0a0a02'], items: [['🍌', 'rain', 40, 34], ['🐒', 'march', 6, 50], ['📈', 'pulse', 1, 110]] },
+    pigeons: { bg: ['#2a2a2a', '#0a0a0a'], items: [['🕊', 'rain', 50, 30], ['🚗', 'march', 3, 50], ['🏛', 'pulse', 1, 110]] },
+    penguins: { bg: ['#a8d8ff', '#3a6a9a'], items: [['🐧', 'march', 14, 44], ['🧊', 'float', 6, 50], ['🪧', 'pulse', 1, 90]] },
+    un: { bg: ['#0a2a4a', '#020a14'], items: [['🇺🇳', 'pulse', 1, 140], ['🗳', 'orbit', 10, 34], ['🕊', 'fly', 4, 40]] }
   };
   const SCN_T = {};
   function drawScene(cx, W, H, u, t, S, P) {

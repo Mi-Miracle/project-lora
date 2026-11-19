@@ -92,24 +92,44 @@ function draw() {
   }
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   unitHit = [];
-  for (const sh of shifts) { drawCities(sh); drawLabels(sh); drawBuildings(sh); drawCompanyLayer(sh); drawUnits(sh); drawStrikes(sh); drawLeader(sh); if (window.drawAgents) drawAgents(sh); }
+  for (const sh of shifts) { drawCities(sh); drawLabels(sh); if (!(mode === 'trade' || mode === 'supply' || mode === 'res')) { drawBuildings(sh); drawCompanyLayer(sh); } drawUnits(sh); drawStrikes(sh); drawLeader(sh); if (window.drawAgents) drawAgents(sh); }
 }
 
+// торгові потоки: суходолом — через регіони (суцільна коричнева лінія), морем — морськими шляхами (блакитний пунктир)
+const _rByCC = {}; function regionsOf(cc) { if (_rByCC[cc]) return _rByCC[cc]; const L = []; D.regions.forEach((r, i) => { if (r.cc === cc) L.push(i); }); return (_rByCC[cc] = L); }
+function nearestReg(cc, lon, lat) { let best = -1, bd = 1e9; for (const i of regionsOf(cc)) { const c = D.regions[i].c; let dx = c[0] - lon; if (dx > 180) dx -= 360; if (dx < -180) dx += 360; const d = dx * dx + (c[1] - lat) ** 2; if (d < bd) { bd = d; best = i; } } return best; }
+const _lp2 = new Map(); let _lpBudget = 0;
+function landSeg(p0, p1) { const cc0 = p0.cc, cc1 = p1.cc; if (!cc0 || !cc1) return null; const a = nearestReg(cc0, p0.x, p0.y), b = nearestReg(cc1, p1.x, p1.y); if (a < 0 || b < 0) return null; const k = a + '>' + b; if (_lp2.has(k)) return _lp2.get(k); if (_lpBudget-- <= 0) return null; const p = landPath(a, b); _lp2.set(k, p); return p; }
+function flowSegs(f) {
+  if (f._segs && f._segs.full) return f._segs; const C = D.cells, SN = D.sea.nodes, NC = C.length, path = f.path; const segs = []; let full = true;
+  const pt = (u, k) => u < NC ? { x: C[u].c[0], y: C[u].c[1], cc: C[u].a3, land: 1 } : { x: SN[u - NC].lon, y: SN[u - NC].lat, land: 0 };
+  for (let k = 1; k < path.length; k++) { const u = path[k - 1], v = path[k]; const A = pt(u), B = pt(v);
+    if (A.land && B.land) { const p = landSeg(A, B); if (!p) full = false; segs.push({ sea: 0, pts: p || [[A.x, A.y], [B.x, B.y]] }); }
+    else if (A.land && !B.land) { const pr = C[u].p.find(q => q[0] === v - NC); const port = pr ? [pr[1], pr[2]] : [B.x, B.y]; const r = pr ? landSeg(A, { x: port[0], y: port[1], cc: A.cc }) : null; if (pr && !r) full = false; if (r && r.length > 1) segs.push({ sea: 0, pts: r.concat([port]) }); segs.push({ sea: 1, pts: [port, [B.x, B.y]] }); }
+    else if (!A.land && B.land) { const pr = C[v].p.find(q => q[0] === u - NC); const port = pr ? [pr[1], pr[2]] : [A.x, A.y]; segs.push({ sea: 1, pts: [[A.x, A.y], port] }); const r = pr ? landSeg({ x: port[0], y: port[1], cc: B.cc }, B) : null; if (pr && !r) full = false; if (r && r.length > 1) segs.push({ sea: 0, pts: [port].concat(r) }); }
+    else segs.push({ sea: 1, pts: [[A.x, A.y], [B.x, B.y]] }); }
+  // безперервність довготи
+  let last = null; segs.forEach(sg => sg.pts = sg.pts.map(p => { p = p.slice(); if (last) { while (p[0] - last[0] > 180) p[0] -= 360; while (last[0] - p[0] > 180) p[0] += 360; } last = p; return p; }));
+  segs.full = full; f._segs = segs; f.line = segs.flatMap(s => s.pts); f.len = 0; return segs;
+}
+function smoothPath(pts) { ctx.moveTo(pts[0][0], -pts[0][1]); if (pts.length === 2) { ctx.lineTo(pts[1][0], -pts[1][1]); return; } for (let i = 1; i < pts.length - 1; i++) { const mx = (pts[i][0] + pts[i + 1][0]) / 2, my = (pts[i][1] + pts[i + 1][1]) / 2; ctx.quadraticCurveTo(pts[i][0], -pts[i][1], mx, -my); } const z = pts[pts.length - 1]; ctx.lineTo(z[0], -z[1]); }
 function drawFlows() {
-  const P = G.pv(); let list;
+  const P = G.pv(); let list; _lpBudget = 25;
   if (mode === 'trade') list = G.flows.filter(f => f.from === P || f.to === P || f.val > 40);
   else if (mode === 'res') list = G.flows.filter(f => f.r === modeRes && f.val > 1);
   else list = G.flows.filter(f => (f.from === P || f.to === P) && f.val > 0.5);
   if (list.length > 450) list = list.sort((a, b) => b.val - a.val).slice(0, 450);
-  const lw = 1 / view.s; ctx.lineCap = 'round';
+  const lw = 1 / view.s; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   list.forEach(f => {
-    if (!f.line) f.line = G.routeLine(f.path);
-    const mine = f.from === P || f.to === P;
-    ctx.strokeStyle = mine ? (f.from === P ? 'rgba(40,200,120,0.6)' : 'rgba(60,150,255,0.6)') : resColor(f.r, 0.4); ctx.lineWidth = Math.max(0.6, Math.min(5, Math.log10(f.val + 1) * 1.6)) * lw;
-    ctx.beginPath(); f.line.forEach((p, k) => k ? ctx.lineTo(p[0], -p[1]) : ctx.moveTo(p[0], -p[1])); ctx.stroke();
-    if (!f.len) { f.cum = [0]; for (let k = 1; k < f.line.length; k++) f.cum.push(f.cum[k - 1] + Math.hypot(f.line[k][0] - f.line[k - 1][0], f.line[k][1] - f.line[k - 1][1])); f.len = f.cum[f.cum.length - 1] || 1; f.off = Math.random(); }
-    const cnt = Math.min(6, 1 + Math.floor(f.len / 25)); ctx.fillStyle = resColor(f.r, 1);
-    for (let c = 0; c < cnt; c++) { const d = ((animT * 6 + f.off * f.len + c * f.len / cnt) % f.len); let k = 1; while (k < f.cum.length - 1 && f.cum[k] < d) k++; const a = f.line[k - 1], b = f.line[k] || a, seg = (f.cum[k] - f.cum[k - 1]) || 1, u = (d - f.cum[k - 1]) / seg; ctx.beginPath(); ctx.arc(a[0] + (b[0] - a[0]) * u, -(a[1] + (b[1] - a[1]) * u), 2.6 * lw, 0, 6.283); ctx.fill(); }
+    const segs = flowSegs(f); const mine = f.from === P || f.to === P; const w = Math.max(1.3, Math.min(5.5, Math.log10(f.val + 1) * 1.8)) * lw;
+    segs.forEach(sg => { ctx.beginPath(); smoothPath(sg.pts);
+      if (sg.sea) { ctx.setLineDash([5 * lw, 4 * lw]); ctx.strokeStyle = mine ? 'rgba(110,200,255,0.95)' : 'rgba(110,190,255,0.7)'; ctx.lineWidth = w * 1.2; ctx.stroke(); }
+      else { ctx.setLineDash([]); ctx.strokeStyle = 'rgba(40,25,10,0.55)'; ctx.lineWidth = w + 1.6 * lw; ctx.stroke(); ctx.strokeStyle = mine ? (f.from === P ? 'rgba(80,220,120,0.9)' : 'rgba(255,190,90,0.9)') : resColor(f.r, 0.55); ctx.lineWidth = w; ctx.stroke(); } });
+    ctx.setLineDash([]);
+    if (!f.len) { f.cum = [0]; for (let k = 1; k < f.line.length; k++) f.cum.push(f.cum[k - 1] + Math.hypot(f.line[k][0] - f.line[k - 1][0], f.line[k][1] - f.line[k - 1][1])); f.len = f.cum[f.cum.length - 1] || 1; f.off = f.off || Math.random(); }
+    const cnt = Math.min(6, 1 + Math.floor(f.len / 25));
+    for (let c = 0; c < cnt; c++) { const d = ((animT * 6 + f.off * f.len + c * f.len / cnt) % f.len); let k = 1; while (k < f.cum.length - 1 && f.cum[k] < d) k++; const a = f.line[k - 1], b = f.line[k] || a, seg = (f.cum[k] - f.cum[k - 1]) || 1, u = (d - f.cum[k - 1]) / seg;
+      const x = a[0] + (b[0] - a[0]) * u, y = a[1] + (b[1] - a[1]) * u; const onSea = segs.some(sg => sg.sea && sg.pts.includes(a)); ctx.fillStyle = onSea ? '#bfe6ff' : resColor(f.r, 1); ctx.beginPath(); if (onSea) ctx.rect(x - 1.6 * lw, -y - 1.6 * lw, 3.2 * lw, 3.2 * lw); else ctx.arc(x, -y, 1.9 * lw, 0, 7); ctx.fill(); }
   });
 }
 function cityMin() { const s = view.s; return s < 3 ? 1e9 : s < 5 ? 5000 : s < 8 ? 2000 : s < 14 ? 800 : s < 25 ? 300 : 0; }
@@ -197,9 +217,10 @@ const _linkPath = new Map();
 function landPath(a, b) {
   const R = D.regions, n = R.length; const dist = new Float64Array(n).fill(Infinity), prev = new Int32Array(n).fill(-1), done = new Uint8Array(n);
   const d2 = (i, j) => { let dx = R[i].c[0] - R[j].c[0]; if (dx > 180) dx -= 360; if (dx < -180) dx += 360; return Math.hypot(dx * Math.cos(R[i].c[1] * Math.PI / 180), R[i].c[1] - R[j].c[1]); };
-  dist[a] = 0; const Q = [a]; let guard = 0;
-  while (Q.length && guard++ < 20000) { let bi = 0; for (let k = 1; k < Q.length; k++) if (dist[Q[k]] < dist[Q[bi]]) bi = k; const u = Q.splice(bi, 1)[0]; if (done[u]) continue; done[u] = 1; if (u === b) break;
-    for (const v of R[u].nb) { if (done[v]) continue; const w = dist[u] + d2(u, v) * (R[v].t === 'mountain' ? 1.6 : 1); if (w < dist[v]) { dist[v] = w; prev[v] = u; Q.push(v); } } }
+  const H = [], push = (d, v) => { H.push([d, v]); let k = H.length - 1; while (k) { const q = (k - 1) >> 1; if (H[q][0] <= H[k][0]) break; [H[q], H[k]] = [H[k], H[q]]; k = q; } };
+  const pop = () => { const top = H[0], last = H.pop(); if (H.length) { H[0] = last; let k = 0; for (;;) { let m = k; const l = 2 * k + 1, r = l + 1; if (l < H.length && H[l][0] < H[m][0]) m = l; if (r < H.length && H[r][0] < H[m][0]) m = r; if (m === k) break; [H[m], H[k]] = [H[k], H[m]]; k = m; } } return top; };
+  dist[a] = 0; push(0, a);
+  while (H.length) { const [du, u] = pop(); if (done[u]) continue; done[u] = 1; if (u === b) break; for (const v of R[u].nb) { if (done[v]) continue; const w = du + d2(u, v) * (R[v].t === 'mountain' ? 1.6 : 1); if (w < dist[v]) { dist[v] = w; prev[v] = u; push(w, v); } } }
   if (prev[b] < 0 && a !== b) return null; const out = []; for (let v = b; v >= 0; v = prev[v]) { out.push(R[v].c.slice()); if (v === a) break; } return out.reverse();
 }
 function seaPath(a, b) {
@@ -221,7 +242,9 @@ function linkPath(l) {
 }
 function drawLinks(lw) {
   if (!G.links || !G.links.length) return;
+  const fvL = window.fogVis ? fogVis() : null, me = G.player >= 0 ? G.player : (G.leader ? G.leader.home : -1);
   for (const l of G.links) {
+    if (fvL && l.n !== me && !(G.allied && me >= 0 && G.allied(me, l.n)) && !(fvL[l.a] && fvL[l.b])) continue;
     const L = D.linkTypes[l.type]; const a = D.regions[l.a].c, b = D.regions[l.b].c; let bx = b[0]; if (bx - a[0] > 180) bx -= 360; else if (a[0] - bx > 180) bx += 360;
     const st = G.linkVisible(l); ctx.globalAlpha = st === 'build' ? 0.45 : 1;
     ctx.strokeStyle = st === 'cut' ? '#ff3b3b' : L.col; ctx.lineWidth = lw * (l.type === 'air' ? 1.5 : 3); ctx.setLineDash(L.dash.map(x => x * lw * 1.5)); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
