@@ -60,17 +60,22 @@ function citySide() {
   const P = PL[k]; let h = `<h3>${P.ic} ${esc(t_(P.n))}</h3>` + (P.open ? `<div class="mut small">${t_('Працює')}: ${P.open[0]}:00–${P.open[1] % 24}:00 · ${locOpen(k, S.h) ? `<span class="g">${t_('відчинено')}</span>` : `<span class="r">${t_('зачинено')}</span>`}</div>` : '');
   if (k === 'court' && G.courtCases) { const cs = G.courtCases(); h += `<div class="small">${cs.length ? cs.map(c => `⚖ «${esc(t_(c.t))}» — ${esc(t_(c.k))}`).join('<br>') : t_('Резонансних справ немає')}</div>`; }
   if (k === 'sb' && L.agent) h += `<div class="small">🕵 ${esc(t_(G.AGENT_RANKS[L.agent.rank]))} · ${t_('досвід')} ${L.agent.xp}</div>`;
-  h += Object.entries(P.acts).map(([a, A]) => { const e = G.locCan(locUI.loc, k, a); const nm = locUI.loc === 'city' ? G.cityActName(k, a) : A.n; return `<button class="city-act" ${e ? 'disabled' : ''} data-tip="${esc(e ? t_(e) : '')}" onclick="cityDo('${k}','${a}')"><b>${esc(t_(nm))}</b><span class="mut">${A.h} ${t_('год')} · ${A.c ? money(A.c) : t_('безкоштовно')}${e && A.need ? ' · ' + esc(t_(e)) : ''}</span></button>`; }).join('');
+  let AE = Object.entries(P.acts); const tabs = [...new Set(AE.map(([, A]) => A.tab).filter(Boolean))];
+  if (tabs.length > 1) { locUI.tabs = locUI.tabs || {}; const cur = tabs.includes(locUI.tabs[k]) ? locUI.tabs[k] : tabs[0]; const TN = Object.assign({}, G.LUX_TABS || {}, G.JOB_TABS || {});
+    h += `<div class="btns city-tabs">${tabs.map(t => `<button class="small ${t === cur ? 'on' : ''}" onclick="locUI.tabs['${k}']='${t}';citySide()">${esc(t_(TN[t] || (G.LUX_CAT && G.LUX_CAT[t] ? G.LUX_CAT[t][1] : t)))}</button>`).join('')}</div>`;
+    AE = AE.filter(([, A]) => (A.tab || tabs[0]) === cur); }
+  h += AE.map(([a, A]) => { const e = G.locCan(locUI.loc, k, a); const nm = locUI.loc === 'city' ? G.cityActName(k, a) : A.n; return `<button class="city-act" ${e ? 'disabled' : ''} data-tip="${esc(e ? t_(e) : '')}" onclick="cityDo('${k}','${a}')"><b>${esc(t_(nm))}</b><span class="mut">${A.h} ${t_('год')} · ${A.c ? money(A.c) : t_('безкоштовно')}${e && A.need ? ' · ' + esc(t_(e)) : ''}</span></button>`; }).join('');
   if (k === 'agency') h += estateBlock();
   h += `<div class="btns"><button class="small" onclick="locUI.place=null;citySide()">← ${t_('Усі місця')}</button></div>`; el.innerHTML = h;
 }
 function estateBlock() { const L = G.leader; if (!L.estate || !L.estate.length) return ''; return `<div class="grp">🏠 ${t_('Ваша нерухомість')}</div>` + L.estate.map(p => { const E = G.ESTATE[p.k]; return `<div class="row small"><span>${E.ic} ${esc(t_(E.n))} ${esc(p.name)} · ${t_('рів.')} ${p.lvl}<span class="mut"> · ${esc(G.cityName(p.reg))}</span></span><span><button class="small" onclick="locEst(G.act.estateUp(${p.id}))">⬆</button><button class="small" onclick="locEst(G.act.estateSell(${p.id}))">💲</button></span></div>`; }).join(''); }
 function locEst(r) { hint((r && r.ok ? '✅ ' : '⚠ ') + t_(r && (r.msg || r.err) || ''), 3000); cityTop(); citySide(); }
+const CITY_BIG_FX = ['jackpot', 'paparazzi', 'busted', 'court', 'spyop', 'council', 'tvshow', 'disco'];
 function cityDo(k, a) { const r = G.act.locDo(locUI.loc, k, a); if (!r || r.ok === false) { hint('⚠ ' + t_((r && r.err) || 'Помилка'), 2500); return; }
   const p = locUI.pos[k]; const d = r.d || {}; const good = (d.mood || 0) + (d.popu || 0) + (d.fame || 0) + (d.stab || 0) * 4 + (d.coRep || 0) >= 0;
   const FE = { jackpot: '🪙', paparazzi: '📸', heart: '❤', busted: '🚨', song: '🎵', football: '⚽', disco: '✨', pigeons: '🕊', spyop: '🕶', court: '⚖', council: '📜', speech: '📣', tvshow: '📺', leaflets: '📄', handshake: '🤝', meeting: '📈', party: '🎉', build: '🌱', gym: '💪', exercise: '🚨' };
   locUI.fx.push({ x: p.x, y: p.y, t0: performance.now(), e: FE[r.fx] || (good ? '✨' : '💢') });
-  if (['jackpot', 'paparazzi', 'busted', 'court', 'spyop', 'council', 'tvshow', 'disco'].includes(r.fx)) LORA.bus.emit('fx', { kind: r.fx, sub: r.msg });
+  if (CITY_BIG_FX.includes(r.fx)) LORA.bus.emit('fx', { kind: r.fx, sub: r.msg });
   AUD.sfx(good ? 'good' : 'bad'); hint((good ? '😊 ' : '😬 ') + t_(r.msg), 4500); cityTop(); citySide(); }
 function cityEncounter() { if (!G.cityEnc) return; const e = G.cityEnc(); openModal(`<h2>🚶 ${t_('На вулиці')}</h2><div>${esc(t_(e.t))}</div><div class="btns">${e.o.map((o, j) => `<button class="${j ? '' : 'pri'}" onclick="closeModal();const r=G.act.cityEncDo(${e.i},${j});if(r&&r.ok){hint('🚶 '+t_(r.msg),4500);cityTop();citySide();}">${esc(t_(o))}</button>`).join('')}</div>`); }
 function cityLoop() {

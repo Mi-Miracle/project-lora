@@ -32,7 +32,7 @@ LORA.sim.register('arsenal', 59, function (G) {
   G.flushStrikes = function () {
     for (const k in G.strikeAgg) {
       const A = G.strikeAgg[k]; if (!N[A.a] || !N[A.v]) continue;
-      const ws = Object.entries(A.w).map(([w, c]) => `${(WP[w] || WP.missiles).ic}${Math.round(c)}`).join(' ');
+      const ws = Object.entries(A.w).filter(([w, c]) => c >= 1).map(([w, c]) => `${(WP[w] || WP.missiles).ic} ${Math.round(c)} ${(WP[w] || WP.missiles).noun}`).join(', ');
       const top = Object.entries(A.reg).sort((x, y) => y[1] - x[1]).slice(0, 3).map(([i]) => T[i].n).join(', ');
       const P = G.player, mine = A.v === P || G.isHuman(A.v), my = A.a === P || G.isHuman(A.a);
       G.say(`💥 Авіаудари за тиждень: ${N[A.a].name} → ${N[A.v].name}: ${ws} · влучань ${Math.round(A.hits)}, збито ${Math.round(A.intc)}${A.lost >= 1 ? ` · втрачено літаків ${A.lost.toFixed(0)}` : ''}${top ? ' · найбільше: ' + top : ''}`, mine ? 'bad' : my ? 'good' : 'war', [A.a, A.v]);
@@ -125,7 +125,10 @@ LORA.sim.register('arsenal', 59, function (G) {
     const ftr = wp.air ? clamp((d.air ? d.air.ftr || 0 : 0) / Math.max(1, (n.air ? n.air.ftr || 0 : 0) + 20), 0, 2) * 0.12 : 0;
     const ikT = wp.ik * ((w === 'ballistic' && G.has(d, 'bmd')) ? 2.2 : (w === 'hyper' && G.has(d, 'bmd')) ? 1.6 : 1) * (w === 'bombing' && G.has(n, 'stealth_bmb') ? 0.5 : 1);
     const pInt = clamp((G.strikeDefBonus ? G.strikeDefBonus(t.ctrl, i, w) : 0) + (0.15 + shield) * (0.35 + 0.65 * samCov) * ikT + ((t.bld.laser_battery || 0) && w !== 'hyper' ? 0.15 * wp.ik : 0) + ftr * (w === 'bombing' && G.has(n, 'stealth_bmb') ? 0.4 : 1), 0, 0.92);
-    const intc = Math.round(cnt * pInt), hits = cnt - intc; d.ars.sam = Math.max(0, d.ars.sam - intc * wp.sc);
+    // базове ППО: держава із запасом перехоплювачів збиває більшість дронів і частину ракет (як у реальних звітах)
+    const floorP = d.ars.sam > cnt * 0.2 ? ({ strike: 0.82, missiles: 0.7, ballistic: 0.3, hyper: 0.08, glide: 0.05, bombing: 0.25 }[w] || 0) * (0.5 + 0.5 * samCov) : 0;
+    const pIntF = Math.max(pInt, floorP);
+    const intc = Math.round(cnt * pIntF), hits = cnt - intc; d.ars.sam = Math.max(0, d.ars.sam - intc * wp.sc);
     let airLost = 0;
     if (wp.sortie) { airLost = Math.min(n.air.bmb, intc * 0.35); n.air.bmb -= airLost; }
     else if (wp.air === 'atk') { airLost = Math.min(n.air.atk, cnt * 0.0015 * (0.3 + shield * 3) * (1 + ftr * 4)); n.air.atk -= airLost; }
@@ -191,7 +194,7 @@ LORA.sim.register('arsenal', 59, function (G) {
       const wp = WP[w]; let cnt;
       if (w === 'bombing') { const b = n.air ? n.air.bmb || 0 : 0; if (b < 8 || (n.airEdge || 1) < 1.02 || G.rnd() > 0.35 || (n._raidT || 0) > G.day) return; cnt = Math.floor(b * 0.3); }
       else { const stock = n.ars[w] || 0; const minS = { missiles: 20, strike: 80, ballistic: 15, hyper: 6, glide: 60, orbital: 2, laser: 10 }[w]; if (stock < minS) return;
-        if (w === 'glide' && !(n.air && n.air.atk >= 4)) return; cnt = Math.floor(stock * { missiles: 0.025, strike: 0.1, ballistic: 0.03, hyper: 0.12, glide: 0.18, orbital: 0.5, laser: 0.3 }[w]); if (w === 'glide') cnt = Math.min(cnt, Math.floor(n.air.atk * 1.5)); }
+        if (w === 'glide' && !(n.air && n.air.atk >= 4)) return; cnt = Math.min(Math.floor(stock * { missiles: 0.02, strike: 0.06, ballistic: 0.02, hyper: 0.1, glide: 0.12, orbital: 0.5, laser: 0.3 }[w]), Math.round({ missiles: 30, strike: 260, ballistic: 8, hyper: 3, glide: 90, orbital: 4, laser: 20 }[w] * (0.6 + G.rnd() * 0.8))); if (w === 'glide') cnt = Math.min(cnt, Math.floor(n.air.atk * 1.5)); }
       if (cnt < (w === 'hyper' || w === 'orbital' ? 1 : w === 'bombing' ? 3 : 5)) return;
       const rr = G.rnd(); const goal = w === 'glide' ? (rr < 0.7 ? 'military' : 'rail') : w === 'missiles' || w === 'ballistic' || w === 'hyper' || w === 'bombing' || w === 'orbital' ? (rr < 0.4 ? 'energy' : rr < 0.7 ? 'industry' : rr < 0.85 ? 'airfields' : 'ports') : (rr < 0.45 ? 'energy' : rr < 0.7 ? 'military' : 'rail');
       const want = { energy: ENERGY, industry: INDUSTRY, military: MILT, rail: ['rail_hub', 'depot'], ports: ['port', 'lng_terminal', 'shipyard'], airfields: ['airport', 'military_base'] }[goal];

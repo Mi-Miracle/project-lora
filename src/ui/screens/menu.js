@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['Realistic money: salaries, prices and businesses in real dollars', 'Dacha garden: 13 crops, seeds, pests, market sales', 'Your own house (5 levels), pets, rivals and 18 holidays', 'City jobs, car dealership, yacht club, auction, airport and spaceport', 'Mini-games for speeches, debates and rallies (toggle in Settings)']
-  : ['Реалістичні гроші: зарплати, ціни й бізнес у справжніх доларах', 'Город на дачі: 13 культур, насіння, шкідники, продаж на ринку', 'Власний дім (5 рівнів), улюбленці, суперники й 18 свят', 'Підробітки в місті, автосалон, яхт-клуб, аукціон, аеропорт і космодром', 'Мініігри для виступів, дебатів і агітації (вмикаються в Налаштуваннях)']
+  ? ['Installer for testers: LORA-Installer.exe downloads the game from GitHub', 'Shops with tabs: used cars to limousines, flats, gadgets, clothes', '20+ city jobs, karaoke, stand-up, escape room, Ashot\'s shawarma', 'Dacha: pantry, preserves, barn with animals, neighbour Petrovych', 'Airport with real procedures and fines; spaceport with rockets and satellites']
+  : ['Інсталятор для тестерів: LORA-Installer.exe завантажує гру з GitHub', 'Магазини з вкладками: від вживаних авто до лімузинів, квартири, гаджети, одяг', '20+ підробітків, караоке, стендап, квест-кімната, шаурмична «У Ашота»', 'Дача: комора, консервація, хлів із тваринами, сусід Петрович', 'Аеропорт із порядком проходження й штрафами; космодром з ракетами й супутниками']
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }

@@ -6,10 +6,10 @@ LORA.sim.register('leader', 92, function (G) {
   const hav = (a, b) => { const r = Math.PI / 180, [lo1, la1] = T[a].c, [lo2, la2] = T[b].c; const s = Math.sin((la2 - la1) * r / 2) ** 2 + Math.cos(la1 * r) * Math.cos(la2 * r) * Math.sin((lo2 - lo1) * r / 2) ** 2; return 12742 * Math.asin(Math.min(1, Math.sqrt(s))); };
   G.D.charTypes = {
     ordinary: { n: 'Звичайна людина', ic: '🧑', d: 'Скромні заощадження, але все попереду', cash: 0.000015, k: { contacts: 1, pop: 1, money: 1 } },
-    diplomat: { n: 'Дипломат', ic: '🎩', d: 'Зв\'язки з елітами ростуть удвічі швидше', cash: 0.0003, k: { contacts: 2, pop: 1, money: 1 } },
-    tycoon:   { n: 'Бізнесмен', ic: '💼', d: 'Більше грошей з консультацій і угод', cash: 0.004, k: { contacts: 1, pop: 0.8, money: 2.2 } },
-    star:     { n: 'Медійна зірка', ic: '🎤', d: 'Популярність серед виборців росте вдвічі швидше', cash: 0.0012, k: { contacts: 0.8, pop: 2.2, money: 1.2 } },
-    general:  { n: 'Генерал у відставці', ic: '🎖', d: 'Повага у країнах, що воюють: звʼязки й популярність там ×2', cash: 0.00025, k: { contacts: 1.2, pop: 1.2, money: 0.8 } }
+    diplomat: { n: 'Дипломат', ic: '🎩', d: 'Зв\'язки з елітами ростуть удвічі швидше', cash: 0.00005, k: { contacts: 2, pop: 1, money: 1 } },
+    tycoon:   { n: 'Бізнесмен', ic: '💼', d: 'Більше грошей з консультацій і угод', cash: 0.0008, k: { contacts: 1, pop: 0.8, money: 2.2 } },
+    star:     { n: 'Медійна зірка', ic: '🎤', d: 'Популярність серед виборців росте вдвічі швидше', cash: 0.00012, k: { contacts: 0.8, pop: 2.2, money: 1.2 } },
+    general:  { n: 'Генерал у відставці', ic: '🎖', d: 'Повага у країнах, що воюють: звʼязки й популярність там ×2', cash: 0.00004, k: { contacts: 1.2, pop: 1.2, money: 0.8 } }
   };
   // кожен гравець-людина має свого лідера; G.leader — лідер «поточного» гравця (G.player або 'me' для персонажа/CEO)
   G.leaders = {}; const lkey = () => G._lk != null ? G._lk : G.player >= 0 ? G.player : 'me';

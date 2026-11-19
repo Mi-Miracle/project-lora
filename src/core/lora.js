@@ -3,7 +3,7 @@
 // LORA.ai (агенти), LORA.ui (інтерфейс), LORA.stream (інтеграція зі стрімом).
 (function (root) {
   const L = root.LORA = root.LORA || {};
-  L.version = '3.1.0';
+  L.version = '3.2.0';
   L.data = L.data || {};
   L.core = L.core || {};
   L.sim = L.sim || { modules: [] };
