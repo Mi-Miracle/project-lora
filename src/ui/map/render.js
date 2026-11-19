@@ -41,6 +41,7 @@ function drawBase() {
       c.fillStyle = terrColor(i); c.fill(GEO.paths[i]);
     }
     c.globalAlpha = 1;
+    if (window.drawBase29) drawBase29(c, lw, sh, lonL, lonR);
     // окуповані регіони — штрихування кольором власника
     for (let i = 0; i < GEO.paths.length; i++) { const t = G.ter[i]; if (t.ctrl === t.owner) continue; c.globalAlpha = 0.6; c.fillStyle = stripePattern(c, mode === 'pol' ? G.N[t.owner].color : '#000'); c.fill(GEO.paths[i]); c.globalAlpha = 1; }
     const fv = window.fogVis ? fogVis() : null; if (fv) { c.fillStyle = 'rgba(12,18,28,0.42)'; for (let i = 0; i < GEO.paths.length; i++) { if (fv[i]) continue; const bb = GEO.bbox[i]; if (bb[2] + sh < lonL - 2 || bb[0] + sh > lonR + 2) continue; c.fill(GEO.paths[i]); } }

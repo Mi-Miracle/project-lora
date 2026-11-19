@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['Secret services: security and intelligence chiefs, 16 operations, moles and double agents', 'Public opinion by region: protests and local heroes', 'Go out into the city: 16 venues and ~40 actions', 'Rising seas, dams, orbital debris and Kessler syndrome', 'Animated cabinet meetings, votes, lectures and lots of new jokes']
-  : ['Спецслужби: керівники СБ і розвідки, 16 операцій, кроти й подвійні агенти', 'Громадська думка по регіонах: протести й місцеві герої', 'Вихід у місто: 16 закладів і ~40 дій', 'Море наступає, дамби, орбітальне сміття й синдром Кесслера', 'Анімації засідань, голосувань, лекцій і купа нових приколів']
+  ? ['Become a secret agent, prosecutor or lawyer in high-profile trials', 'Buy property: from a shawarma stand to a skyscraper', 'New maps: residence, dacha and company office; 26 city venues', 'Unions and strikes, seasons, snow, mud and wildfires', 'Animations for almost every action and memes on the intro']
+  : ['Станьте агентом спецслужби, прокурором чи адвокатом у гучних судах', 'Купуйте нерухомість: від шаурмичної до хмарочоса', 'Нові мапи: резиденція, дача й офіс; 26 закладів у місті', 'Профспілки й страйки, сезони, сніг, бездоріжжя й пожежі', 'Анімації майже на всі дії й меми на заставці']
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }

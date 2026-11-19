@@ -109,7 +109,7 @@ LORA.sim.register('military', 50, function (G) {
       if (m.sea) { m.left--; if (m.left <= 0) { const c = ter[m.dst].ctrl; if (!G.friendlyTo(a.n, c) && !G.atWar(a.n, c)) { a.mv = null; continue; } a.t = m.dst; a.mv = null; if (G.atWar(a.n, c)) { a.org *= 0.6; a.stance = 'attack'; G.say(`⚓ ${G.nm(a.n)}: морський десант — ${T[a.t].n}`, 'war', [a.n, c]); } } continue; }
       const v = m.path[m.step]; const c = ter[v].ctrl;
       if (!(G.friendlyTo(a.n, c) || G.atWar(a.n, c))) { a.mv = null; continue; }
-      m.left--;
+      m.left -= G.seasonSpeed ? G.seasonSpeed(a.t) : 1;
       if (m.left <= 0) {
         a.t = v; m.step++;
         if (G.atWar(a.n, c)) { a.mv = null; a.stance = 'attack'; } else if (m.step >= m.path.length) { a.mv = null; }

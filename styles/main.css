@@ -504,3 +504,6 @@ body.lhide #campCard { left: 82px; }
 #city .city-act:hover:not([disabled]){border-color:#ffd34d;background:#1d2b3b}#city .city-act[disabled]{opacity:.45;cursor:not-allowed}
 #city .city-log{padding:6px 14px;background:#0a1018;border-top:1px solid #22344a;font-size:13px;max-height:90px;overflow:auto}
 #city .city-log div:first-child{color:#ffd34d}
+
+#city .city-top button.on{border-color:#ffd34d;background:#2a3a10}
+#locSw{display:flex;gap:6px}
