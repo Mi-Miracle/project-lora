@@ -87,7 +87,7 @@ function draw() {
     G.ter.forEach((t, i) => { if (t.occ && t.occ.p > 0) { ctx.strokeStyle = '#ff5d5d'; ctx.lineWidth = lw * (1.4 + Math.sin(animT * 4) * 0.6); ctx.stroke(GEO.paths[i]); } });
     G.ter.forEach((t, i) => { if (t.rad > G.day) { ctx.fillStyle = `rgba(170,255,40,${0.18 + Math.sin(animT * 3 + i) * 0.06})`; ctx.fill(GEO.paths[i]); ctx.strokeStyle = '#b5ff2a'; ctx.lineWidth = lw * 1.2; ctx.stroke(GEO.paths[i]); } });
     drawLinks(lw);
-    drawFlows();
+    drawFlows(); if (window.drawOverlay29) drawOverlay29(lw);
     G.chokeIdx.forEach(ci => { const s = D.sea.nodes[ci]; const blk = G._blkP && G._blkP[ci]; const r = 3.4 / Math.sqrt(view.s); ctx.save(); ctx.translate(s.lon, -s.lat); ctx.rotate(Math.PI / 4); ctx.fillStyle = blk ? '#ff5d5d' : '#ffd34d'; ctx.strokeStyle = '#000'; ctx.lineWidth = lw; ctx.fillRect(-r / 2, -r / 2, r, r); ctx.strokeRect(-r / 2, -r / 2, r, r); ctx.restore(); });
   }
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);

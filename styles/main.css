@@ -490,3 +490,17 @@ body.lhide #campCard { left: 82px; }
 .tut-hl { position: fixed; z-index: 9650; border: 3px solid #ffd34d; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0,0,0,.35), 0 0 24px #ffd34d; pointer-events: none; animation: tutP 1.2s infinite; }
 @keyframes tutP { 50% { box-shadow: 0 0 0 9999px rgba(0,0,0,.35), 0 0 40px #ffd34d; } }
 .tut-tip { position: fixed; z-index: 9660; width: 340px; background: #0f1a28; border: 1px solid #ffd34d; border-radius: 10px; padding: 12px; color: #e8f0f8; font: 14px system-ui; box-shadow: 0 10px 40px #000a; }
+
+/* v2.9: місто */
+#city{position:fixed;inset:0;z-index:9250;background:#05080d;display:none;flex-direction:column;color:#e8f0f8;font-family:system-ui}
+#city .city-top{display:flex;gap:14px;align-items:center;padding:8px 14px;background:#0d1520;border-bottom:2px solid #ffd34d33}
+#city .city-top b{font-size:18px}#city .city-top button{background:#1b2633;color:#e8f0f8;border:1px solid #33465c;border-radius:6px;padding:6px 10px;cursor:pointer}
+#city .city-top button:hover{border-color:#ffd34d}
+#city .city-body{flex:1;display:flex;min-height:0}
+#citycv{flex:1;min-width:0;height:100%;display:block}
+#city .city-side{width:330px;overflow:auto;padding:12px;background:#0d1520;border-left:1px solid #22344a}
+#city .city-side h3{margin:4px 0 6px}
+#city .city-act{display:flex;flex-direction:column;align-items:flex-start;width:100%;margin:6px 0;padding:8px 10px;background:#16212e;color:#e8f0f8;border:1px solid #2c3e54;border-radius:8px;cursor:pointer;text-align:left}
+#city .city-act:hover:not([disabled]){border-color:#ffd34d;background:#1d2b3b}#city .city-act[disabled]{opacity:.45;cursor:not-allowed}
+#city .city-log{padding:6px 14px;background:#0a1018;border-top:1px solid #22344a;font-size:13px;max-height:90px;overflow:auto}
+#city .city-log div:first-child{color:#ffd34d}

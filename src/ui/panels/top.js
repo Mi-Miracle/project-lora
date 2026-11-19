@@ -27,9 +27,9 @@ function renderLegend() {
   const L = { pol: 'Кольори держав поверх рельєфу. Штрихування з червоним контуром — регіон під чужим контролем. Біла межа — ваші кордони. ◆ — стратегічні протоки (червоні — закриті для вас).',
     terrain: 'Рельєф регіонів: <span style="color:#9bc46a">■</span> рівнина <span style="color:#d8c77a">■</span> степ <span style="color:#3f8a4a">■</span> ліс <span style="color:#a58a5a">■</span> пагорби <span style="color:#8a7a6e">■</span> гори <span style="color:#e3c58a">■</span> пустеля. Гори й ліс дають бонус обороні та сповільнюють наступ.',
     rel: '<span style="color:#3dbd6e">■</span> друзі · <span style="color:#999">■</span> нейтрали · <span style="color:#cd3737">■</span> вороже · <span style="color:#2f6fb0">■</span> союзники · <span style="color:#8a1c1c">■</span> війна',
-    trade: 'Обсяг торгівлі з вами. Лінії — торгові маршрути: <span class="g">■</span> ваш експорт, <span style="color:#4fb3ff">■</span> імпорт. Крапки — конвої.',
+    trade: 'Обсяг торгівлі з вами. Суцільні лінії — суходолом (<span class="g">■</span> ваш експорт, <span style="color:#ffbe5a">■</span> імпорт), блакитний пунктир — морем. Кружки — вантажі на суші, квадрати — у морі.',
     res: `${ico(RI[modeRes].ic)} ${RI[modeRes].n}: <span class="g">зелений</span> — регіон виробляє більше, ніж споживає; <span class="r">червоний</span> — дефіцит. Лінії — світові потоки.`,
-    gdp: 'ВВП на душу в регіоні.', growth: 'Темп зростання ВВП держав.', stab: 'Внутрішня стабільність.', mil: 'Бойова сила армій.',
+    gdp: 'ВВП на душу в регіоні.', growth: 'Темп зростання ВВП держав.', stab: 'Внутрішня стабільність.', mil: 'Бойова сила армій.', op: 'Громадська думка у ваших регіонах: <span class="g">■</span> задоволені · <span class="r">■</span> незадоволені. 📢 — протести, 🦸 — місцеві герої.', flood: 'Море й клімат: <span style="color:#2a5cb0">■</span> затоплено · <span style="color:#ebbe50">■</span> ризик підтоплення. 🧱 — дамби.',
     supply: 'Фронти: <span style="color:#7a2323">■</span> ворог, <span style="color:#2e6aa6">■</span> ви, <span style="color:#2e5a6e">■</span> дружні. Пунктир — морські шляхи. Смужка біля армії — постачання; ➤ — наступ.' };
   $('#legend').innerHTML = L[mode] + '<div class="mut small" style="margin-top:4px">ЛКМ — вибір · ПКМ — наказ · Shift+ПКМ — морем · колесо — масштаб · пробіл — пауза</div>';
 }

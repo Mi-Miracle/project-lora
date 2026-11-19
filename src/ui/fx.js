@@ -81,7 +81,7 @@ const FX = (() => {
     const g = cx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, S.bg[0]); g.addColorStop(1, S.bg[1]); cx.fillStyle = g; cx.fillRect(0, 0, W, H);
     if (S.shake) cx.translate((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 8);
     if (S.laser) for (let i = 0; i < 4; i++) { if (Math.random() < 0.5) { cx.strokeStyle = i % 2 ? '#ff3b6b' : '#3bffb0'; cx.lineWidth = 4; cx.beginPath(); cx.moveTo(Math.random() * W, 0); cx.lineTo(Math.random() * W, H); cx.stroke(); } }
-    const mx = W / 2, my = H * 0.5; cx.textAlign = 'center'; cx.textBaseline = 'middle'; let pi = 0;
+    if (S.draw) { cx.save(); S.draw(cx, W, H, u, t); cx.restore(); } const mx = W / 2, my = H * 0.5; cx.textAlign = 'center'; cx.textBaseline = 'middle'; let pi = 0;
     S.items.forEach(([e, mode, n, sz]) => { cx.font = `${sz}px serif`; for (let i = 0; i < n; i++) { const p = P[(pi++) % P.length]; let x = mx, y = my, sc = 1, rot = 0;
       if (mode === 'rain') { x = p.x; y = (p.y + u * 140 * p.v) % (H + 60) - 30; rot = Math.sin(u * 2 + i) * 0.4; }
       else if (mode === 'rise') { x = p.x; y = H + 30 - ((p.y + u * 120 * p.v) % (H + 60)); }
@@ -111,7 +111,7 @@ const FX = (() => {
     const tr = x => (en && typeof t_ === 'function') ? t_(x) : x; const title = e.title ? tr(e.title) : (TXT[e.kind] || ['', ''])[en ? 1 : 0] + (e.where ? ' · ' + (en && typeof t_ === 'function' ? t_(e.where) : e.where) : '') + (e.who ? ' · ' + e.who : '') + (e.win ? ' · ' + e.win : '');
     const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
     function frame(now) {
-      if (done) return; const t = (now - T0) / DUR, u = (now - T0) / 1000; if (t > 1) { end(); return; }
+      if (done) return; const t = Math.max(0, (now - T0) / DUR), u = Math.max(0, (now - T0) / 1000); if (t > 1) { end(); return; }
       const fade = Math.min(1, t * 6, (1 - t) * 6); cx.clearRect(0, 0, W, H); cx.globalAlpha = fade;
       cx.fillStyle = 'rgba(3,6,12,0.55)'; cx.fillRect(0, 0, W, H);
       const k = e.kind, mx = W / 2, my = H * 0.45; if (SCN[k]) { drawScene(cx, W, H, u, t, SCN[k], P); cx.globalAlpha = fade; }
@@ -152,5 +152,5 @@ const FX = (() => {
   }
   LORA.bus.on('fx', play);
   LORA.bus.on('disaster', d => { if (d && /метеорит/.test(d.label || '')) play({ kind: 'impact', where: '' }); });
-  return { play, busy: isBusy, scenes: () => Object.keys(SCN) };
+  return { play, busy: isBusy, scenes: () => Object.keys(SCN), add: (k, sc, txt) => { SCN[k] = sc; if (txt) TXT[k] = txt; }, qlen: () => Q.length };
 })();

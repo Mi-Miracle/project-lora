@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['Campaign "Lord of the Atlas": 11 chapters with a built-in tutorial', 'UN 2.0: Security Council, vetoes, 9 resolution types', 'Moon and Mars colonies: zones, modules, seizures', 'Hybrid war: bot farms, fakes, leaks, meme wars', '13 new interactive events; routes now clearly follow land and sea']
-  : ['Кампанія «Володар Атласу»: 11 розділів із вбудованим навчанням', 'ООН 2.0: Радбез, вето, 9 типів резолюцій', 'Колонії на Місяці й Марсі: зони, модулі, захоплення', 'Гібридна війна: бот-ферми, фейки, зливи, мем-війни', '13 нових інтерактивних подій; маршрути видно суходолом і морем']
+  ? ['Secret services: security and intelligence chiefs, 16 operations, moles and double agents', 'Public opinion by region: protests and local heroes', 'Go out into the city: 16 venues and ~40 actions', 'Rising seas, dams, orbital debris and Kessler syndrome', 'Animated cabinet meetings, votes, lectures and lots of new jokes']
+  : ['Спецслужби: керівники СБ і розвідки, 16 операцій, кроти й подвійні агенти', 'Громадська думка по регіонах: протести й місцеві герої', 'Вихід у місто: 16 закладів і ~40 дій', 'Море наступає, дамби, орбітальне сміття й синдром Кесслера', 'Анімації засідань, голосувань, лекцій і купа нових приколів']
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }
