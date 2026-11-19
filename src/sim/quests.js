@@ -16,7 +16,7 @@ LORA.sim.register('quests', 99.72, function (G) {
     ['war', q => `Звільнити або захопити регіон`, (n, q) => { q.v = 1; return ter.filter(t => t.ctrl === n.id).length; }, (n, b, q) => ter.filter(t => t.ctrl === n.id).length > b ? 1 : 0, 'cash', n => G.enemiesOf(n.id).length > 0]
   ];
   const QC = [
-    ['cprof', q => `Заробити $${(q.v * 1000).toFixed(0)} млн чистими`, (c, q) => { q.v = Math.max(0.05, Math.abs(c.profitY || 0) * 0.3 + 0.05); return c.cash; }, (c, b, q) => (c.cash - b) / q.v, 'rep'],
+    ['cprof', q => `Заробити ${G.fmt$(q.v)} чистими`, (c, q) => { q.v = Math.max(0.05, Math.abs(c.profitY || 0) * 0.3 + 0.05); return c.cash; }, (c, b, q) => (c.cash - b) / q.v, 'rep'],
     ['cbld', q => `Збудувати ${q.v} нові активи`, (c, q) => { q.v = 1 + Math.floor(G.rnd() * 2); return c.assets.reduce((s, a) => s + a.lvl, 0); }, (c, b, q) => (c.assets.reduce((s, a) => s + a.lvl, 0) - b) / q.v, 'ccash'],
     ['coff', q => `Відкрити офіс у новій країні`, (c, q) => new Set(c.offices.map(o => o.n)).size, (c, b) => new Set(c.offices.map(o => o.n)).size > b ? 1 : 0, 'ccash'],
     ['cinf', q => `Підняти вплив у ${N[q.x].name} до ${q.v}`, (c, q) => { q.x = c.home; q.v = Math.min(95, Math.round((c.infl[c.home] || 0) + 10)); return c.infl[c.home] || 0; }, (c, b, q) => ((c.infl[q.x] || 0) - b) / Math.max(1, q.v - b), 'rep'],
@@ -25,12 +25,12 @@ LORA.sim.register('quests', 99.72, function (G) {
   ];
   const QL = [
     ['lpop', q => `Популярність у ${N[q.x].name} ≥ ${q.v}`, (L, q) => { q.x = L.home; q.v = Math.min(95, Math.round((L.popu[L.home] || 0) + 8)); return L.popu[L.home] || 0; }, (L, b, q) => ((L.popu[q.x] || 0) - b) / Math.max(1, q.v - b), 'fame'],
-    ['lmon', q => `Заробити $${(q.v * 1000).toFixed(1)} млн`, (L, q) => { q.v = Math.max(0.002, (L.money || 0) * 0.25 + 0.002); return L.money; }, (L, b, q) => ((L.money || 0) - b) / q.v, 'fame'],
+    ['lmon', q => `Заробити ${G.fmt$(q.v)}`, (L, q) => { q.v = Math.max(0.002, (L.money || 0) * 0.25 + 0.002); return L.money; }, (L, b, q) => ((L.money || 0) - b) / q.v, 'fame'],
     ['lvis', q => `Відвідати ${q.v} різні країни`, (L, q) => { q.v = 2; return Object.keys(L.lastVisit || {}).length; }, (L, b, q) => (Object.keys(L.lastVisit || {}).length - b) / q.v, 'money'],
     ['lsk', q => `Підвищити будь-яку навичку`, (L, q) => Object.values(L.sk || {}).reduce((a, v) => a + v, 0), (L, b) => Object.values(L.sk || {}).reduce((a, v) => a + v, 0) > b ? 1 : 0, 'money'],
     ['lcon', q => `Звʼязки ≥ ${q.v} у ${N[q.x].name}`, (L, q) => { q.x = L.home; q.v = Math.min(95, Math.round((L.cont[L.home] || 0) + 10)); return L.cont[L.home] || 0; }, (L, b, q) => ((L.cont[q.x] || 0) - b) / Math.max(1, q.v - b), 'fame']
   ];
-  function rewardText(q) { return { cash: `+${(q.rv * 1000 >= 1000 ? (q.rv).toFixed(1) + ' млрд' : (q.rv * 1000).toFixed(0) + ' млн')} $ до бюджету`, sci: `+${Math.round(q.rv)} очок науки`, stab: `+${q.rv.toFixed(0)} стабільності`, rep: `репутація +${q.rv.toFixed(0)}`, ccash: `+$${(q.rv * 1000).toFixed(0)} млн (держгрант)`, fame: `слава +${q.rv.toFixed(0)}`, money: `+$${(q.rv * 1000).toFixed(1)} млн` }[q.rew]; }
+  function rewardText(q) { return { cash: `+${(q.rv * 1000 >= 1000 ? (q.rv).toFixed(1) + ' млрд' : (q.rv * 1000).toFixed(0) + ' млн')} $ до бюджету`, sci: `+${Math.round(q.rv)} очок науки`, stab: `+${q.rv.toFixed(0)} стабільності`, rep: `репутація +${q.rv.toFixed(0)}`, ccash: `+${G.fmt$(q.rv)} (держгрант)`, fame: `слава +${q.rv.toFixed(0)}`, money: `+${G.fmt$(q.rv)}` }[q.rew]; }
   function mk(tpl, subj, kind) { const [id, txt, start, , rew] = tpl; const q = { id, kind, d: G.day, until: G.day + 270 + Math.floor(G.rnd() * 180), rew }; q.base = start(subj, q); q.text = txt(q);
     const n = kind === 'n' ? subj : null; q.rv = rew === 'cash' ? Math.max(0.2, n.agg.gdp * 0.003) : rew === 'sci' ? 150 + (n ? n.res.pts || 0 : 0) * 0.3 : rew === 'stab' ? 4 : rew === 'rep' ? 6 : rew === 'ccash' ? Math.max(0.05, (subj.cash || 0) * 0.05) : rew === 'fame' ? 4 : Math.max(0.002, (subj.money || 0) * 0.1); q.rt = rewardText(q); return q; }
   function fill(list, T, subj, kind) { const have = new Set(list.map(q => q.id)); let g = 0; while (list.length < 3 && g++ < 20) { const tpl = pick(T); if (have.has(tpl[0]) || (tpl[5] && !tpl[5](subj))) continue; list.push(mk(tpl, subj, kind)); have.add(tpl[0]); } }

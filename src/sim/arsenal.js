@@ -32,10 +32,10 @@ LORA.sim.register('arsenal', 59, function (G) {
   G.flushStrikes = function () {
     for (const k in G.strikeAgg) {
       const A = G.strikeAgg[k]; if (!N[A.a] || !N[A.v]) continue;
-      const ws = Object.entries(A.w).map(([w, c]) => `${(WP[w] || WP.missiles).ic}${c}`).join(' ');
+      const ws = Object.entries(A.w).map(([w, c]) => `${(WP[w] || WP.missiles).ic}${Math.round(c)}`).join(' ');
       const top = Object.entries(A.reg).sort((x, y) => y[1] - x[1]).slice(0, 3).map(([i]) => T[i].n).join(', ');
       const P = G.player, mine = A.v === P || G.isHuman(A.v), my = A.a === P || G.isHuman(A.a);
-      G.say(`💥 Авіаудари за тиждень: ${N[A.a].name} → ${N[A.v].name}: ${ws} · влучань ${A.hits}, збито ${A.intc}${A.lost >= 1 ? ` · втрачено літаків ${A.lost.toFixed(0)}` : ''}${top ? ' · найбільше: ' + top : ''}`, mine ? 'bad' : my ? 'good' : 'war', [A.a, A.v]);
+      G.say(`💥 Авіаудари за тиждень: ${N[A.a].name} → ${N[A.v].name}: ${ws} · влучань ${Math.round(A.hits)}, збито ${Math.round(A.intc)}${A.lost >= 1 ? ` · втрачено літаків ${A.lost.toFixed(0)}` : ''}${top ? ' · найбільше: ' + top : ''}`, mine ? 'bad' : my ? 'good' : 'war', [A.a, A.v]);
     }
     G.strikeAgg = {};
   };
@@ -163,7 +163,7 @@ LORA.sim.register('arsenal', 59, function (G) {
     if (G.strikes.length > 60) G.strikes.shift();
     const P = G.pv ? G.pv() : G.player;
     const lostTxt = airLost >= 0.5 ? ` · втрачено літаків: ${airLost.toFixed(0)}` : '';
-    if (!quiet) G.say(`${wp.ic} ${N[nid].name} → ${T[i].n}: ${cnt} ${wp.noun}, ${wp.sortie ? 'збито/повернули' : 'збито'} ${intc}, влучань ${hits}${hits ? ' · ' + res : ''}${lostTxt}`, 'war', [nid, t.ctrl]);
+    if (!quiet) G.say(`${wp.ic} ${N[nid].name} → ${T[i].n}: ${Math.round(cnt)} ${wp.noun}, ${wp.sortie ? 'збито/повернули' : 'збито'} ${Math.round(intc)}, влучань ${Math.round(hits)}${hits ? ' · ' + res : ''}${lostTxt}`, 'war', [nid, t.ctrl]);
     else { // удари ШІ збираються в одне зведення на тиждень для кожної пари «хто → кого»
       const key = nid + '>' + t.ctrl; const A = G.strikeAgg[key] || (G.strikeAgg[key] = { a: nid, v: t.ctrl, w: {}, hits: 0, intc: 0, lost: 0, reg: {}, gdp: 0, n: 0 });
       A.w[w] = (A.w[w] || 0) + cnt; A.hits += hits; A.intc += intc; A.lost += airLost; A.reg[i] = (A.reg[i] || 0) + hits; A.n++;
@@ -181,7 +181,7 @@ LORA.sim.register('arsenal', 59, function (G) {
     if (goal === 'rail') { ar.forEach(a => { a.sup = Math.max(0.25, (a.sup || 1) - pow * 0.006); }); N[en].milStock = Math.max(0, N[en].milStock - pow * 0.02); res = `постачання ворожого угруповання зірвано (−${Math.round(pow * 0.6)}%)`; }
     else { ar.forEach(a => { a.org = Math.max(0.1, a.org - pow * 0.005); const l = Math.min(a.k * 0.025, pow * 0.06); a.k -= l; lost += l; N[a.n].casualties += l; a.sup = Math.max(0.3, (a.sup || 1) - pow * 0.002); }); res = `ворожі війська дезорганізовано, втрати ${lost.toFixed(1)} тис.`; }
     G.strikes = G.strikes || []; G.strikes.push({ d: G.day, from: nid, i, w, cnt, hits, intc, home: 1 }); if (G.strikes.length > 60) G.strikes.shift();
-    if (!quiet) G.say(`${wp.ic} ${n.name} → ворог у ${T[i].n}: ${cnt} ${wp.noun}, збито ${intc}, влучань ${hits}${hits ? ' · ' + res : ''}`, 'war', [nid, en]);
+    if (!quiet) G.say(`${wp.ic} ${n.name} → ворог у ${T[i].n}: ${Math.round(cnt)} ${wp.noun}, збито ${Math.round(intc)}, влучань ${Math.round(hits)}${hits ? ' · ' + res : ''}`, 'war', [nid, en]);
     return { ok: true, hits, intc, res, airLost };
   }
   // ---- ШІ: ударні кампанії (раз на тиждень)

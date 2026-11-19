@@ -41,7 +41,7 @@ LORA.sim.register('future', 99.8, function (G) {
   // ---------- особисте життя президента / CEO
   G.persona = function (L, role) {
     if (!L || L.money != null) return; const pres = role === 'president';
-    Object.assign(L, { type: L.type || 'diplomat', money: pres ? 0.03 : 0.08, fame: pres ? 40 : 15, cont: {}, popu: {}, busy: 0, log: [], sk: Object.assign({ orat: pres ? 1 : 0, diplo: pres ? 1 : 0, biz: pres ? 0 : 2, eco: 1 }, L.sk || {}) });
+    Object.assign(L, { type: L.type || 'diplomat', money: pres ? 0.0006 : 0.003, fame: pres ? 40 : 15, cont: {}, popu: {}, busy: 0, log: [], sk: Object.assign({ orat: pres ? 1 : 0, diplo: pres ? 1 : 0, biz: pres ? 0 : 2, eco: 1 }, L.sk || {}) });
     L.cont[L.home] = pres ? 55 : 25; L.popu[L.home] = pres ? Math.round(N[L.home] ? N[L.home].stab * 0.8 : 40) : 10;
   };
   { const b = G.initLeader; G.initLeader = function (o) { b.apply(this, arguments); if (o.role === 'president' || o.role === 'ceo') G.persona(G.leader, o.role); }; }
@@ -69,7 +69,7 @@ LORA.sim.register('future', 99.8, function (G) {
     ['awards', 'Вручення державних нагород', '🎖', n => gdpC(n, 0.00003), 90, 'стабільність +1, армії й міністри лояльніші', n => { n.stab = clamp(n.stab + 1, 0, 100); if (n.min) Object.values(n.min).forEach(m => { m.loyal = clamp(m.loyal + 4, 0, 100); }); G.armies.forEach(a => { if (a.n === n.id) a.org = Math.min(1, a.org + 0.05); }); return 'медалей вистачило всім'; }],
     ['forum', 'Інвестиційний форум', '💼', n => gdpC(n, 0.0005), 120, 'іноземні інвестиції → зростання', n => { n.fdiG = Math.min(0.01, (n.fdiG || 0) + 0.0015); return 'інвестори підписали меморандуми (і забрали ручки)'; }],
     ['jog', 'Ранкова пробіжка з журналістами', '🏃', n => 0, 30, 'популярність +, іноді кумедний конфуз', n => { const L = G.leader; if (L && L.popu) L.popu[n.id] = clamp((L.popu[n.id] || 0) + 3, 0, 100); if (G.rnd() < 0.3) { n.stab = clamp(n.stab + 0.5, 0, 100); return 'президент упав у калюжу — рейтинг виріс: «він такий, як ми»'; } return 'журналісти задихалися вже на першому кілометрі'; }],
-    ['telethon', 'Благодійний телемарафон', '📺', n => 0, 180, 'пожертви в бюджет, стабільність +1', n => { const v = gdpC(n, 0.0004) * (0.6 + n.stab / 100); n.cash += v; n.stab = clamp(n.stab + 1, 0, 100); return `зібрано $${(v * 1000).toFixed(0)} млн`; }],
+    ['telethon', 'Благодійний телемарафон', '📺', n => 0, 180, 'пожертви в бюджет, стабільність +1', n => { const v = gdpC(n, 0.0004) * (0.6 + n.stab / 100); n.cash += v; n.stab = clamp(n.stab + 1, 0, 100); return `зібрано ${G.fmt$(v)}`; }],
     ['lab', 'Візит до лабораторії', '🔬', n => gdpC(n, 0.00005), 90, 'поточне дослідження +10%', n => { if (G.resBoost) G.resBoost(n, 0.1); return 'президент натиснув не ту кнопку, але експеримент вдався'; }],
     ['summit', 'Скликати міжнародний саміт', '🌐', n => gdpC(n, 0.001), 365, 'відносини з усіма мирними країнами +2, престиж', n => { N.forEach(x => { if (x.alive && x.id !== n.id && !G.atWar(x.id, n.id)) G.rel[x.id][n.id] = clamp(G.rel[x.id][n.id] + 2, -100, 100); }); n.stab = clamp(n.stab + 1, 0, 100); return 'усі приїхали, круасанів вистачило'; }],
     ['reshuffle', 'Кадрова перезавантаження', '🔄', n => 0, 365, 'усі міністри: компетентність +5, лояльність −5', n => { if (n.min) Object.values(n.min).forEach(m => { m.comp = clamp(m.comp + 5, 0, 100); m.loyal = clamp(m.loyal - 5, 0, 100); }); return 'кабінет нервово перевіряє телефони'; }]

@@ -12,6 +12,7 @@ LORA.sim.register('helpers', 20, function (G) {
   G.friendlyTo = (nat, ctrl) => ctrl === nat || G.allied(nat, ctrl) || G.hasAccess(nat, ctrl) || (G.coBelligerent(nat, ctrl) && !G.atWar(nat, ctrl));
   G.nm = i => N[i] ? N[i].name : '?';
   G.dateStr = d => { const dt = new Date(G.startDate + (d == null ? G.day : d) * 86400000); return dt.toLocaleDateString(LORA.lang === 'en' ? 'en-GB' : 'uk-UA', { day: 'numeric', month: 'long', year: 'numeric' }); };
+  G.fmt$ = v => { const a = Math.abs(v), s = v < 0 ? '−' : ''; if (a >= 1) return s + '$' + a.toFixed(a >= 100 ? 0 : 1) + ' млрд'; if (a >= 0.001) return s + '$' + (a * 1000).toFixed(a >= 0.1 ? 0 : 1) + ' млн'; if (a >= 0.000001) return s + '$' + (a * 1e6).toFixed(a >= 0.0001 ? 0 : 1) + ' тис.'; return s + '$' + Math.round(a * 1e9); };
   G.news = G.news || [];
   G.say = function (text, kind, nats) {
     const item = { d: G.day, text, kind: kind || 'info', nats: nats || [] };

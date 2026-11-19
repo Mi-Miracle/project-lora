@@ -29,7 +29,7 @@ TAB_FN.party = function () {
   h += `<div class="grp">🧭 ${t_('Ідеологія')}</div><div class="btns">${Object.entries(G.IDEOS).map(([k, v]) => `<button class="small ${P.ideo === k ? 'on' : ''}" ${P.ideo === k || G.partyCan('p_ideo', k) ? 'disabled' : ''} onclick="lifeRes(G.act.partyDo('p_ideo','${k}'))">${v.ic} ${esc(t_(v.n))}</button>`).join('')}</div>`;
   return h;
 };
-let luxCat = 'home', invAmt = 0.01;
+let luxCat = 'home', invAmt = 0.00001;
 function lspark(a) { if (a.length < 2) return ''; const w = 90, h = 18, mx = Math.max(...a), mn = Math.min(...a), d = Math.max(1e-9, mx - mn); return `<svg width="${w}" height="${h}" style="vertical-align:middle"><polyline fill="none" stroke="#4fb3ff" stroke-width="1.5" points="${a.map((v, i) => (i / (a.length - 1) * w).toFixed(1) + ',' + (h - 1 - (v - mn) / d * (h - 2)).toFixed(1)).join(' ')}"/></svg>`; }
 TAB_FN.life = function () {
   const L = G.leader; if (!L || (L.role !== 'char' && L.money == null)) return ''; G.lifeInit(); const V = G.invValue(L), nid = G.leaderNation();
@@ -37,11 +37,7 @@ TAB_FN.life = function () {
   h += subnav('life', [['lux', '💎 ' + t_('Розкіш')], ['own', '🗝 ' + t_('Моє майно')], ['inv', '📈 ' + t_('Інвестиції')], ['sec', '🛡 ' + t_('Охорона')]]); const sub = curSub('life', 'lux');
   if (sub === 'sec') return h + secBlock('L', L.home);
   if (sub === 'lux') {
-    h += `<div class="mut small">${t_('Купівля — у країні, де зараз персонаж (нерухомість дорожча в багатих країнах). Розкіш дає славу, звʼязки, швидші перельоти, охорону, оренду — але й утримання; показна розкіш у бідних країнах шкодить популярності.')}</div>`;
-    h += `<div class="sub">${Object.entries(G.LUX_CAT).map(([k, [ic, n]]) => `<button class="${luxCat === k ? 'on' : ''}" onclick="luxCat='${k}';renderTab(true)">${ic} ${esc(t_(n))}</button>`).join('')}</div>`;
-    h += Object.entries(G.LUX).filter(([, A]) => A.c === luxCat).map(([k, A]) => { const e = G.luxCan(k), p = nid >= 0 ? G.luxPrice(k, nid) : A.p;
-      const fx = [A.fame ? `⭐ +${A.fame}` : '', A.pop ? `🎤 ${A.pop > 0 ? '+' : ''}${A.pop}${A.once ? '' : '/' + t_('міс.')}` : '', A.cont ? `🤝 +${A.cont}${A.once ? '' : '/' + t_('міс.')}` : '', A.trav ? `✈ ×${A.trav}` : '', A.sec ? `🛡 ${A.sec}` : '', A.media ? `📺 +${A.media}` : '', A.rent ? `💵 ${(A.rent * 100).toFixed(1)}%/${t_('рік')}` : '', A.apr ? '📈' : '', A.upk ? `🔧 ${(A.upk * 100).toFixed(0)}%/${t_('рік')}` : '', A.once ? t_('разово') : ''].filter(Boolean).join(' · ');
-      return `<div class="row small"><span>${esc(t_(A.n))}<br><span class="mut">${fx}</span></span><span><b>${money(p)}</b> <button ${e ? `disabled data-tip="${esc(t_(e))}"` : ''} onclick="lifeRes(G.act.luxBuy('${k}'))">${t_('Купити')}</button></span></div>`; }).join('');
+    h += `<div class="card">${t_('Купівля майна тепер — у місті: автосалон, яхт-клуб і авіасалон, аукціонний дім, агенція нерухомості, спортивна агенція, медіахолдинг, турагенція. Тут — список того, що вже є, і продаж.')}<div class="btns"><button class="pri" onclick="openLoc('city')">🏙 ${t_('Вийти в місто')}</button><button onclick="subtab['life']='own';renderTab(true)">🗝 ${t_('Моє майно')}</button></div></div>`;
   } else if (sub === 'own') {
     if (!(L.own || []).length) h += `<div class="mut">${t_('Майна ще немає.')}</div>`;
     h += (L.own || []).map((o, i) => { const A = G.LUX[o.k]; const ch = o.v / o.p0 - 1;
@@ -49,7 +45,7 @@ TAB_FN.life = function () {
     const tm = G.lifeTravelMul(L); h += `<div class="card small">${t_('Перельоти')}: ×${tm} · ${t_('охорона')} ${G.lifeSec(L)} · ${t_('медіа')} ${G.lifeMedia(L)}</div>`;
   } else {
     const M = G.mkt; h += `<div class="card small"><div class="row"><span>🪙 ${t_('Крипта')} ${lspark(M.cryptoH.slice(-24))}</span><b>×${M.crypto.toFixed(2)}</b></div><div class="row"><span>🥇 ${t_('Золото')} ${lspark(M.goldH.slice(-24))}</span><b>×${M.gold.toFixed(2)}</b></div>${nid >= 0 ? `<div class="row"><span>🏛 ${t_('Облігації')} ${esc(nat(nid).name)}</span><b>${(G.bondYield(nid) * 100).toFixed(1)}%</b></div>` : ''}</div>`;
-    h += `<div class="row small"><span>${t_('Сума')}: <b>${money(invAmt)}</b></span><input type="range" min="0.001" max="${Math.max(0.0011, L.money).toFixed(4)}" step="0.001" value="${Math.min(invAmt, L.money)}" onchange="invAmt=+this.value;renderTab(true)"></div>`;
+    h += `<div class="row small"><span>${t_('Сума')}: <b>${money(invAmt)}</b></span>${[0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1].filter(v => v <= Math.max(0.000001, L.money)).map(v => `<button class="small ${invAmt === v ? 'on' : ''}" onclick="invAmt=${v};renderTab(true)">${money(v)}</button>`).join('')}</div>`;
     h += Object.entries(G.INV).map(([k, A]) => { const e = G.invCan(k, invAmt); return `<div class="row small"><span>${A.ic} ${esc(t_(A.n))}<br><span class="mut">${esc(t_(A.d))}</span></span><button ${e ? `disabled data-tip="${esc(t_(e))}"` : ''} onclick="lifeRes(G.act.invest('${k}',invAmt))">${t_('Вкласти')}</button></div>`; }).join('');
     const I = L.pf; if (I) { h += `<div class="grp">📊 ${t_('Портфель')}</div>`;
       Object.entries(I.b).forEach(([k, v]) => { h += `<div class="row small"><span>🏛 ${esc(nat(+k).name)} · ${(G.bondYield(+k) * 100).toFixed(1)}%</span><span>${money(v)} <button onclick="lifeRes(G.act.invSell('bond',${k}))">${t_('Продати')}</button></span></div>`; });

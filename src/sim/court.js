@@ -35,8 +35,8 @@ LORA.sim.register('court', 99.988, function (G) {
     const note = v > 1.4 ? pick(['присяжні кивають', 'суддя навіть відклав телефон', 'зал аплодує (суддя стукає молотком)']) : v > 0.8 ? pick(['непогано, але опонент тримається', 'присяжні задумались']) : pick(['кіт-свідок заснув', 'суддя позіхнув', 'опонент посміхається']);
     if (cu.st < 3) { push(cu.st); return note; }
     const win = cu.sc > cu.opp * 1.6; P.cur = null; P.hist.unshift({ t: cu.t, role: cu.role, win, d: G.day }); P.hist.length = Math.min(P.hist.length, 20);
-    if (win) { L.fame += 4; L.popu = L.popu || {}; L.popu[L.home] = clamp((L.popu[L.home] || 0) + 4, 0, 100); const fee = 0.0002 + G.skill(L, 'law') * 0.0002; L.money += fee; LORA.bus.emit('fx', { kind: 'court', title: '⚖ ПЕРЕМОГА В СУДІ', sub: cu.t });
-      return `${note}. ВЕРДИКТ НА ВАШУ КОРИСТЬ! Слава +4, гонорар $${(fee * 1e6).toFixed(0)} тис.`; }
+    if (win) { L.fame += 4; L.popu = L.popu || {}; L.popu[L.home] = clamp((L.popu[L.home] || 0) + 4, 0, 100); const fee = 0.000004 + G.skill(L, 'law') * 0.000004; L.money += fee; LORA.bus.emit('fx', { kind: 'court', title: '⚖ ПЕРЕМОГА В СУДІ', sub: cu.t });
+      return `${note}. ВЕРДИКТ НА ВАШУ КОРИСТЬ! Слава +4, гонорар ${G.fmt$(fee)}`; }
     L.fame += 1; return `${note}. Вердикт не на вашу користь. ${pick(['Але про вас написали всі газети', 'Апеляція? Може, наступного разу', 'Опонент купив яхту. Ви — морозиво'])}`;
   }]) }));
   G.courtHist = () => S().hist;

@@ -25,14 +25,14 @@ LORA.sim.register('dynasty', 99.9, function (G) {
   const busy = L => L.busy > G.day ? `Зайняті ще ${L.busy - G.day} дн.` : '';
   // ---------- дії родини
   G.FAM_ACT = {
-    meet:    { n: 'Знайомства', ic: '💘', cost: L => 0.001, days: 3, d: '3 кандидати для стосунків з різними професіями' },
-    date:    { n: 'Побачення', ic: '🌹', cost: L => 0.002 + (L.fame || 0) * 0.00003, days: 2, d: 'кохання +15…25' },
-    propose: { n: 'Освідчитися', ic: '💍', cost: L => 0.01, days: 1, d: 'шанс = кохання; далі весілля' },
-    wedding: { n: 'Пишне весілля', ic: '💒', cost: L => 0.02 + (L.fame || 0) * 0.0008, days: 7, d: 'популярність +5, слава +3' },
+    meet:    { n: 'Знайомства', ic: '💘', cost: L => 0.00000005, days: 3, d: '3 кандидати для стосунків з різними професіями' },
+    date:    { n: 'Побачення', ic: '🌹', cost: L => 0.00000012 + (L.fame || 0) * 0.00000001, days: 2, d: 'кохання +15…25' },
+    propose: { n: 'Освідчитися', ic: '💍', cost: L => 0.000003, days: 1, d: 'шанс = кохання; далі весілля' },
+    wedding: { n: 'Пишне весілля', ic: '💒', cost: L => 0.000015 + (L.fame || 0) * 0.000003, days: 7, d: 'популярність +5, слава +3' },
     family:  { n: 'Час із родиною', ic: '🏡', cost: L => 0, days: 3, d: 'кохання +10, діти щасливіші' },
-    trip:    { n: 'Сімейна відпустка', ic: '🏝', cost: L => 0.008 + (L.fame || 0) * 0.0002, days: 12, d: 'кохання +25, популярність +1' },
-    baby:    { n: 'Дитина', ic: '👶', cost: L => 0.003, days: 5, d: 'шанс поповнення в родині (вік до 52)' },
-    adopt:   { n: 'Усиновити дитину', ic: '🧸', cost: L => 0.01, days: 30, d: 'будь-який вік; популярність +2' },
+    trip:    { n: 'Сімейна відпустка', ic: '🏝', cost: L => 0.000004 + (L.fame || 0) * 0.0000004, days: 12, d: 'кохання +25, популярність +1' },
+    baby:    { n: 'Дитина', ic: '👶', cost: L => 0.000002, days: 5, d: 'шанс поповнення в родині (вік до 52)' },
+    adopt:   { n: 'Усиновити дитину', ic: '🧸', cost: L => 0.00001, days: 30, d: 'будь-який вік; популярність +2' },
     divorce: { n: 'Розлучення', ic: '💔', cost: L => 0, days: 30, d: 'втрата 40% статків, популярність −5' },
     retire:  { n: 'Передати справу спадкоємцю', ic: '👑', cost: L => 0, days: 0, d: 'граєте за спадкоємця вже зараз' }
   };
@@ -60,14 +60,14 @@ LORA.sim.register('dynasty', 99.9, function (G) {
     if (k === 'trip') { if (F.spouse) F.spouse.love = clamp(F.spouse.love + 25, 0, 100); F.kids.forEach(c => { c.happy = clamp((c.happy || 60) + 20, 0, 100); }); L.popu[home] = clamp((L.popu[home] || 0) + 1, 0, 100); msg = 'фото з пляжу зібрали мільйон лайків'; }
     if (k === 'baby') { if (G.rnd() < 0.45) { const c = Object.assign(person(G.rnd() < 0.5, surname(L)), { born: G.day, edu: 0, sk: {}, happy: 70 }); F.kids.push(c); msg = `народився(лась) ${c.name}! 🍼`; } else msg = 'поки що ні — спробуйте пізніше'; }
     if (k === 'adopt') { const c = Object.assign(person(G.rnd() < 0.5, surname(L)), { born: G.day - Math.floor(365 * (2 + G.rnd() * 8)), edu: 0, sk: {}, happy: 60 }); F.kids.push(c); L.popu[home] = clamp((L.popu[home] || 0) + 2, 0, 100); msg = `${c.name} тепер у вашій родині`; }
-    if (k === 'divorce') { const lost = L.money * 0.4; L.money -= lost; L.popu[home] = clamp((L.popu[home] || 0) - 5, 0, 100); msg = `розлучення з ${F.spouse.name}: −$${(lost * 1000).toFixed(1)} млн`; F.spouse = null; }
+    if (k === 'divorce') { const lost = L.money * 0.4; L.money -= lost; L.popu[home] = clamp((L.popu[home] || 0) - 5, 0, 100); msg = `розлучення з ${F.spouse.name}: −${G.fmt$(lost)}`; F.spouse = null; }
     if (k === 'retire') { const h = G.heirOf(L); G.succession(L, 'retire'); return { ok: true, msg: `${h.name} очолює династію` }; }
     G.say(`${A.ic} ${L.name}: ${A.n.toLowerCase()} — ${msg}`, 'good', [home]); return { ok: true, msg };
   };
   G.famPick = function (i) { const L = G.leader, F = G.famEnsure(L); if (!F || !F.cands || !F.cands[i]) return { ok: false, err: '?' }; F.date = Object.assign(F.cands[i], { love: 20 }); F.cands = null; return { ok: true, msg: `ви зустрічаєтесь з ${F.date.name}` }; };
   G.kidEdu = function (i, kind) {
     const L = G.leader, F = G.famEnsure(L), c = F && F.kids[i]; if (!c) return { ok: false, err: '?' }; const a = kAge(c); if (a < 6) return { ok: false, err: 'Ще замалий(а)' }; if (c.edu >= 5) return { ok: false, err: 'Освіта завершена' };
-    const cost = [0.001, 0.003, 0.008, 0.02, 0.05][c.edu] * (kind === 'elite' ? 2.5 : 1); if (L.money < cost) return { ok: false, err: 'Бракує грошей' }; if ((c.eduT || 0) > G.day) return { ok: false, err: `Навчання ще ${c.eduT - G.day} дн.` };
+    const cost = [0.000002, 0.000005, 0.00001, 0.00004, 0.00008][c.edu] * (kind === 'elite' ? 2.5 : 1); if (L.money < cost) return { ok: false, err: 'Бракує грошей' }; if ((c.eduT || 0) > G.day) return { ok: false, err: `Навчання ще ${c.eduT - G.day} дн.` };
     L.money -= cost; c.edu++; c.eduT = G.day + 365; const sk = pick(Object.keys(G.SKILLS || { eco: 1 })); c.sk[sk] = Math.min(5, (c.sk[sk] || 0) + (kind === 'elite' ? 2 : 1));
     return { ok: true, msg: `${c.name}: ${['школа', 'гімназія', 'університет', 'магістратура', 'стажування за кордоном'][c.edu - 1]}, ${G.SKILLS ? G.SKILLS[sk].n.toLowerCase() : sk} +` };
   };
@@ -82,7 +82,7 @@ LORA.sim.register('dynasty', 99.9, function (G) {
     const F = L.fam, h = G.heirOf(L), home = L.home, old = L.name;
     if (!h) {
       if (L.role === 'char') { G.gameOver = { win: false, text: `${old} пішов(ла) з життя, не залишивши спадкоємця. Династія обірвалася.` }; return; }
-      L.name = (LORA.lang === 'en' ? 'Successor ' : 'Наступник ') + surname(L); L.age0 = 48; L.d0 = G.day; L.fam = null; G.famEnsure(L); L.money = Math.max(0.01, L.money * 0.3); L.fame = (L.fame || 0) * 0.4; L.sk = { orat: 1 };
+      L.name = (LORA.lang === 'en' ? 'Successor ' : 'Наступник ') + surname(L); L.age0 = 48; L.d0 = G.day; L.fam = null; G.famEnsure(L); L.money = Math.max(0.00001, L.money * 0.3); L.fame = (L.fame || 0) * 0.4; L.sk = { orat: 1 };
       G.say(`🕯 ${old} ${why === 'retire' ? 'іде у відставку' : 'помирає'}. Владу перебирає наступник: ${L.name}`, 'big', [home]); LORA.bus.emit('succession', { name: L.name }); return;
     }
     const spouseHeir = h === F.spouse; const tax = L.money * 0.3; L.money -= tax;
@@ -92,25 +92,25 @@ LORA.sim.register('dynasty', 99.9, function (G) {
     const kids = F.kids.filter(c => c !== h && !c.dead); F.spouse = spouseHeir ? null : F.spouse && Object.assign(F.spouse, { name: F.spouse.name, widow: true });
     L.fam = { spouse: null, date: null, kids: spouseHeir ? kids : [], heir: null, gen: (F.gen || 1) + 1, heat: 0, ban: {}, cands: null, health: 100, siblings: spouseHeir ? [] : kids.map(c => c.name) };
     if (L.role === 'president' && G.player >= 0) N[G.player].stab = clamp(N[G.player].stab - (why === 'retire' ? 2 : 6), 0, 100);
-    G.say(`👑 ${why === 'retire' ? `${old} передає справу` : `🕯 ${old} пішов(ла) з життя. Спадщину отримує`} ${h.name} — покоління ${L.fam.gen}. Податок на спадщину $${(tax * 1000).toFixed(0)} млн`, 'big', [home]);
+    G.say(`👑 ${why === 'retire' ? `${old} передає справу` : `🕯 ${old} пішов(ла) з життя. Спадщину отримує`} ${h.name} — покоління ${L.fam.gen}. Податок на спадщину ${G.fmt$(tax)}`, 'big', [home]);
     LORA.bus.emit('succession', { name: L.name });
   };
   // ---------- тіньовий світ (лише для персонажа)
   G.SHADOW = {
-    smuggle: { n: 'Контрабанда', ic: '📦', cost: 0.004, days: 10, risk: 0.18, heat: 18, d: 'швидкі гроші; ризик спіймання' },
-    bribe:   { n: 'Хабар чиновнику', ic: '💵', cost: 0.01, days: 3, risk: 0.14, heat: 14, d: 'звʼязки +10 у країні; ризик' },
-    kompro:  { n: 'Компромат на конкурента', ic: '🗂', cost: 0.006, days: 8, risk: 0.12, heat: 12, d: 'популярність +4 (конкуренти слабшають); ризик' },
-    offshore:{ n: 'Офшорна схема', ic: '🏝', cost: 0.002, days: 5, risk: 0.1, heat: 10, d: 'частина статків захищена від податків і штрафів; ризик' },
+    smuggle: { n: 'Контрабанда', ic: '📦', cost: 0.000006, days: 10, risk: 0.18, heat: 18, d: 'швидкі гроші; ризик спіймання' },
+    bribe:   { n: 'Хабар чиновнику', ic: '💵', cost: 0.000005, days: 3, risk: 0.14, heat: 14, d: 'звʼязки +10 у країні; ризик' },
+    kompro:  { n: 'Компромат на конкурента', ic: '🗂', cost: 0.000003, days: 8, risk: 0.12, heat: 12, d: 'популярність +4 (конкуренти слабшають); ризик' },
+    offshore:{ n: 'Офшорна схема', ic: '🏝', cost: 0.000004, days: 5, risk: 0.1, heat: 10, d: 'частина статків захищена від податків і штрафів; ризик' },
     lay:     { n: 'Залягти на дно', ic: '🕶', cost: 0, days: 30, risk: 0, heat: -40, d: 'підозра −40, але місяць без справ' }
   };
   G.shadowCan = function (k) { const L = G.leader; if (!L || L.role !== 'char') return 'Лише для персонажа'; const F = G.famEnsure(L), A = G.SHADOW[k]; if (!A) return '?'; if (busy(L)) return busy(L); if (L.money < A.cost) return 'Бракує грошей'; if (L.mv) return 'Персонаж у дорозі'; return ''; };
   G.shadowDo = function (k) {
     const e = G.shadowCan(k); if (e) return { ok: false, err: e }; const L = G.leader, F = L.fam, A = G.SHADOW[k], nid = G.leaderNation(); L.money -= A.cost; L.busy = G.day + A.days;
     F.heat = clamp(F.heat + A.heat, 0, 100); const caught = A.risk && G.rnd() < A.risk * (0.5 + F.heat / 100) * (L.lawShield > G.day ? 0.6 : 1) * (1 - Math.min(0.4, (G.lifeSec ? G.lifeSec(L) : 0) * 0.05));
-    if (caught) { const fine = Math.max(0.005, L.money * (F.off ? 0.15 : 0.35)); L.money -= fine; L.popu[nid] = clamp((L.popu[nid] || 0) - 15, 0, 100); L.cont[nid] = clamp((L.cont[nid] || 0) - 10, 0, 100); L.busy = G.day + 90; F.ban[nid] = G.day + 365; F.heat = 30;
-      G.say(`🚔 ${L.name}: справу «${A.n.toLowerCase()}» розкрито! Штраф $${(fine * 1000).toFixed(1)} млн, суд 3 місяці, вʼїзд до ${N[nid].name} заборонено на рік`, 'bad', [nid]); return { ok: true, msg: 'вас спіймали' }; }
+    if (caught) { const fine = Math.max(0.000005, L.money * (F.off ? 0.15 : 0.35)); L.money -= fine; L.popu[nid] = clamp((L.popu[nid] || 0) - 15, 0, 100); L.cont[nid] = clamp((L.cont[nid] || 0) - 10, 0, 100); L.busy = G.day + 90; F.ban[nid] = G.day + 365; F.heat = 30;
+      G.say(`🚔 ${L.name}: справу «${A.n.toLowerCase()}» розкрито! Штраф ${G.fmt$(fine)}, суд 3 місяці, вʼїзд до ${N[nid].name} заборонено на рік`, 'bad', [nid]); return { ok: true, msg: 'вас спіймали' }; }
     let msg = '';
-    if (k === 'smuggle') { const g = 0.012 + G.rnd() * 0.02 + (L.fame || 0) * 0.0001; L.money += g; msg = `+$${(g * 1000).toFixed(1)} млн`; }
+    if (k === 'smuggle') { const g = 0.000012 + G.rnd() * 0.00002 + (L.fame || 0) * 0.0000003; L.money += g; msg = `+${G.fmt$(g)}`; }
     if (k === 'bribe') { L.cont[nid] = clamp((L.cont[nid] || 0) + 10, 0, 100); msg = `звʼязки в ${N[nid].name} +10`; }
     if (k === 'kompro') { L.popu[nid] = clamp((L.popu[nid] || 0) + 4, 0, 100); msg = 'конкурент пояснюється в ефірі'; }
     if (k === 'offshore') { F.off = true; msg = 'штрафи надалі менші'; }
@@ -136,8 +136,8 @@ LORA.sim.register('dynasty', 99.9, function (G) {
   function famMonth() {
     const L = G.leader; if (!L || L.money == null) return; const F = G.famEnsure(L); const home = L.home;
     if (F.spouse) { const s = F.spouse; s.love = clamp(s.love - (s.perk === 'chef' ? 0.3 : 1.2) - (L.abroad ? 0.6 : 0), 0, 100);
-      if (s.wed && s.love < 12) { const lost = L.money * 0.3; L.money -= lost; G.say(`💔 ${s.name} подає на розлучення: «Тебе ніколи немає вдома». −$${(lost * 1000).toFixed(1)} млн`, 'bad', [home]); F.spouse = null; }
-      else if (s.wed) { const p = s.perk; if (p === 'biz') L.money += 0.0006; if (p === 'star') L.popu[home] = clamp((L.popu[home] || 0) + 0.4, 0, 100); if (p === 'dipl') L.cont[home] = clamp((L.cont[home] || 0) + 0.4, 0, 100);
+      if (s.wed && s.love < 12) { const lost = L.money * 0.3; L.money -= lost; G.say(`💔 ${s.name} подає на розлучення: «Тебе ніколи немає вдома». −${G.fmt$(lost)}`, 'bad', [home]); F.spouse = null; }
+      else if (s.wed) { const p = s.perk; if (p === 'biz') L.money += 0.000003; if (p === 'star') L.popu[home] = clamp((L.popu[home] || 0) + 0.4, 0, 100); if (p === 'dipl') L.cont[home] = clamp((L.cont[home] || 0) + 0.4, 0, 100);
         if (p === 'art') L.fame = clamp((L.fame || 0) + 0.15, 0, 100); if (p === 'sci' || p === 'mil') { L.skx = L.skx || {}; const k = p === 'mil' ? 'mil' : pick(['sci', 'tech', 'eco']); L.skx[k] = (L.skx[k] || 0) + 1; }
         if (p === 'mil' && L.role === 'president') G.armies.forEach(a => { if (a.n === home) a.org = Math.min(1, a.org + 0.003); }); } }
     if (F.date && !F.spouse) { F.date.love = clamp(F.date.love - 2, 0, 100); if (F.date.love < 5) { G.say(`💨 ${F.date.name} більше не відповідає на повідомлення`, 'info', [home]); F.date = null; } }

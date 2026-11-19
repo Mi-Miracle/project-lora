@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['Become a secret agent, prosecutor or lawyer in high-profile trials', 'Buy property: from a shawarma stand to a skyscraper', 'New maps: residence, dacha and company office; 26 city venues', 'Unions and strikes, seasons, snow, mud and wildfires', 'Animations for almost every action and memes on the intro']
-  : ['Станьте агентом спецслужби, прокурором чи адвокатом у гучних судах', 'Купуйте нерухомість: від шаурмичної до хмарочоса', 'Нові мапи: резиденція, дача й офіс; 26 закладів у місті', 'Профспілки й страйки, сезони, сніг, бездоріжжя й пожежі', 'Анімації майже на всі дії й меми на заставці']
+  ? ['Realistic money: salaries, prices and businesses in real dollars', 'Dacha garden: 13 crops, seeds, pests, market sales', 'Your own house (5 levels), pets, rivals and 18 holidays', 'City jobs, car dealership, yacht club, auction, airport and spaceport', 'Mini-games for speeches, debates and rallies (toggle in Settings)']
+  : ['Реалістичні гроші: зарплати, ціни й бізнес у справжніх доларах', 'Город на дачі: 13 культур, насіння, шкідники, продаж на ринку', 'Власний дім (5 рівнів), улюбленці, суперники й 18 свят', 'Підробітки в місті, автосалон, яхт-клуб, аукціон, аеропорт і космодром', 'Мініігри для виступів, дебатів і агітації (вмикаються в Налаштуваннях)']
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }
@@ -85,7 +85,8 @@ function settingsScreen() {
     <label class="row"><span>${t_('Заставка при запуску')}</span><input type="checkbox" ${localStorage.getItem('lora_intro') === 'off' ? '' : 'checked'} onchange="localStorage.setItem('lora_intro',this.checked?'on':'off')"></label>
     <label class="row"><span>${t_('Гумористичні новини й події')}</span><input type="checkbox" ${S.humor !== false ? 'checked' : ''} onchange="AUD.set('humor',this.checked);LORA.tickerRefresh&&LORA.tickerRefresh()"></label>
     <label class="row"><span>${t_('Анімації світових подій (прибульці, катаклізми)')}</span><input type="checkbox" ${S.fx !== false ? 'checked' : ''} onchange="AUD.set('fx',this.checked)"></label>
-    <label class="row"><span>${t_('Стрічка кумедних новин унизу екрана')}</span><input type="checkbox" ${S.ticker !== false ? 'checked' : ''} onchange="AUD.set('ticker',this.checked);LORA.tickerRefresh&&LORA.tickerRefresh()"></label>
+    <label class="row"><span>${t_('Бігучий рядок новин унизу екрана')}</span><input type="checkbox" ${S.ticker !== false ? 'checked' : ''} onchange="AUD.set('ticker',this.checked);LORA.tickerRefresh&&LORA.tickerRefresh()"></label>
+    <label class="row"><span>🎮 ${t_('Мініігри (виступи, дебати, агітація)')}</span><input type="checkbox" ${S.minigames !== false ? 'checked' : ''} onchange="AUD.set('minigames',this.checked)"></label>
     <div class="row"><span>${t_('Мова')}</span>${typeof langSwitch === 'function' ? langSwitch() : ''}</div>
     <div class="card small"><b>${t_('Гарячі клавіші')}</b><div class="mut" style="line-height:1.7">Esc — ${t_('пауза / меню')} · ${t_('Пробіл — стоп/старт часу')} · 1–4 — ${t_('швидкість')} · Alt+1–8 — ${t_('вкладки')} · L — ${t_('до лідера')} · F9 — ${t_('режим стріму')} · F11 — ${t_('повний екран')}</div></div>`;
   else if (setTab === 'twitch') body = typeof twitchBlock === 'function' ? twitchBlock() : '';

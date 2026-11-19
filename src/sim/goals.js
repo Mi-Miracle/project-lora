@@ -47,11 +47,11 @@ LORA.sim.register('goals', 97.5, function (G) {
       { id: 'profit', n: 'Мільярдний прибуток', d: 'прибуток ≥ $1 млрд/рік', r: { cash: 1 }, ok: c => (c.profitY || 0) >= 1 }
     ],
     char: [
-      { id: 'cont3', n: 'Свій у трьох столицях', d: 'звʼязки ≥ 50 у 3 країнах', r: { money: 0.05 }, ok: L => Object.values(L.cont).filter(v => v >= 50).length >= 3 },
-      { id: 'fame50', n: 'Світова знаменитість', d: 'слава ≥ 50', r: { money: 0.05 }, ok: L => L.fame >= 50 },
-      { id: 'rich', n: 'Статок', d: '$0.5 млрд особистих коштів', r: { money: 0 }, ok: L => L.money >= 0.5 },
-      { id: 'cand', n: 'У великій політиці', d: 'стати кандидатом на виборах', r: { money: 0.02 }, ok: L => L.cand != null },
-      { id: 'pres', n: 'Президент', d: 'очолити державу', r: { money: 0.1 }, ok: () => G.player >= 0 }
+      { id: 'cont3', n: 'Свій у трьох столицях', d: 'звʼязки ≥ 50 у 3 країнах', r: { money: 0.00005 }, ok: L => Object.values(L.cont).filter(v => v >= 50).length >= 3 },
+      { id: 'fame50', n: 'Світова знаменитість', d: 'слава ≥ 50', r: { money: 0.0001 }, ok: L => L.fame >= 50 },
+      { id: 'rich', n: 'Мільйонер', d: '$1 млн особистих коштів', r: { money: 0 }, ok: L => L.money >= 0.001 },
+      { id: 'cand', n: 'У великій політиці', d: 'стати кандидатом на виборах', r: { money: 0.00002 }, ok: L => L.cand != null },
+      { id: 'pres', n: 'Президент', d: 'очолити державу', r: { money: 0.0005 }, ok: () => G.player >= 0 }
     ]
   };
   G.goalsMode = () => G.player >= 0 ? 'nation' : G.pc >= 0 && G.companies && G.companies[G.pc] ? 'company' : 'char';

@@ -13,7 +13,7 @@ LORA.sim.register('worldev', 99.95, function (G) {
   function journalists() {
     alive().forEach(n => { if (!n.min) return; Object.values(n.min).forEach(m => { if ((m.stolen || 0) > Math.max(0.05, n.agg.gdp * 0.0015) && G.rnd() < 0.08) {
       const v = m.stolen; m.stolen = 0; n.stab = clamp(n.stab - 5, 0, 100); alive().forEach(x => { if (x.id !== n.id) G.rel[x.id][n.id] = clamp(G.rel[x.id][n.id] - 2, -100, 100); });
-      G.say(`📰 Розслідування журналістів: ${m.name} (${n.name}) вивів $${(v * 1000).toFixed(0)} млн через офшори й кіпрські кавʼярні. Стабільність −5, репутація країни у світі падає`, 'big', [n.id]);
+      G.say(`📰 Розслідування журналістів: ${m.name} (${n.name}) вивів ${G.fmt$(v)} через офшори й кіпрські кавʼярні. Стабільність −5, репутація країни у світі падає`, 'big', [n.id]);
       if (isH(n.id)) G.decisions.push({ id: G.nextId++, ev: 'scandal_min', nid: n.id, ctx: { text: `Журналісти оприлюднили розслідування про ${m.name}. Суспільство вимагає реакції.`, k: m.k }, d: G.day }); } }); });
   }
   // ---------- Олімпіади й чемпіонати світу
@@ -114,7 +114,7 @@ LORA.sim.register('worldev', 99.95, function (G) {
   }
   G.inter = function (a, b, k) {
     const e = G.interCan(a, b, k); if (e) return { ok: false, err: e }; const na = N[a], nb = N[b], A = G.INTER[k]; na.icd[k + b] = G.day + CD[k];
-    if (k === 'gift') { const v = na.agg.gdp * 0.0005; na.cash -= v; nb.cash += v; rel(a, b, 8); G.say(`🎁 ${na.name} дарує ${nb.name} $${(v * 1000).toFixed(0)} млн «просто так»`, 'good', [a, b]); return { ok: true, msg: 'подарунок вручено' }; }
+    if (k === 'gift') { const v = na.agg.gdp * 0.0005; na.cash -= v; nb.cash += v; rel(a, b, 8); G.say(`🎁 ${na.name} дарує ${nb.name} ${G.fmt$(v)} «просто так»`, 'good', [a, b]); return { ok: true, msg: 'подарунок вручено' }; }
     if (k === 'troll') { na.stab = clamp(na.stab + 1, 0, 100); rel(a, b, -8); const J = ['назвав(ла) їхню армію «музеєм під відкритим небом»', 'запропонував(ла) їм курси економіки для початківців', 'надіслав(ла) в подарунок мапу з підписом «ви тут»', 'виклав(ла) мем із їхнім лідером на тракторі']; G.say(`🤡 ${na.name} публічно ${pick(J)} (${nb.name}). Інтернет у захваті, дипломати — ні`, 'info', [a, b]); return { ok: true, msg: 'світ сміється' }; }
     if (isH(b) && b !== a) { G.pendingPeace.push({ type: 'i_' + k, from: a, to: b }); G.say(`✉ ${na.name} пропонує ${nb.name}: ${A.n.toLowerCase()}`, 'info', [a, b]); return { ok: true, msg: 'пропозицію надіслано гравцю' }; }
     const r = G.rel[b][a]; const yes = k === 'ultimatum' ? (na.agg.gdp > nb.agg.gdp * 2.5 && !G.allied(b, G.enemiesOf(a)[0] ?? -1) && G.rnd() < 0.6) : k === 'secret' ? r > 15 : k === 'techx' ? r > 25 : r > -10;

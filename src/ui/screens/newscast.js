@@ -12,7 +12,7 @@ const NEWSCAST = (() => {
     const isMine = n => n.nats.includes(P) || (L0 && L0.name && n.text.includes(L0.name)) || (co && n.text.includes(co.name));
     const mine = [], world = [];
     L.filter(n => !/^(✈|🚀|😄) /.test(n.text)).map(n => ({ n, s: sc(n) + (isMine(n) ? 3 : 0) })).filter(x => x.s > 0).sort((a, b) => b.s - a.s).forEach(({ n }) => { const k = clean(n.text).slice(0, 40); if (seen.has(k)) return; seen.add(k); const m = isMine(n); if (m && mine.length < 4) mine.push(clean(n.text)); else if (!m && world.length < 4) world.push(clean(n.text)); });
-    if (onMe.length) { let cnt = 0, hit = 0; onMe.forEach(n => { const m = n.text.match(/: (\d+) .*?(\d+).*?(\d+)/); if (m) { cnt += +m[1]; hit += +m[3]; } });
+    if (onMe.length) { let cnt = 0, hit = 0; onMe.forEach(n => { const m = n.text.match(/: (\d+(?:\.\d+)?) [^,]*, [^0-9]*(\d+(?:\.\d+)?), влучань (\d+(?:\.\d+)?)/); if (m) { cnt += Math.round(+m[1]); hit += Math.round(+m[3]); } });
       mine.splice(Math.min(1, mine.length), 0, LORA.lang === 'en' ? `${onMe.length} strike waves hit ${nat(P).name} this month: ${cnt} missiles and drones, ${hit} hits.` : `Цього місяця по ${nat(P).name} завдано ${onMe.length} хвиль ударів: ${cnt} ракет і дронів, ${hit} влучань.`); }
     const stor = mine.concat(world);
     return { stories: stor, mine, world, ticker: L.slice(0, 30).map(n => clean(n.text)) };

@@ -74,7 +74,7 @@ LORA.sim.register('ministers', 99.7, function (G) {
         m.loyal = clamp(m.loyal - (m.trait === 'honest' ? 0.2 : 0.6) + (n.stab - 50) / 100, 0, 100); if (m.comp < 95) m.comp += 0.1;
         if (n._sciUntil && n._sciUntil < G.day) { n.sciK = Math.max(1, (n.sciK || 1) / 1.15); n._sciUntil = 0; }
         const thief = m.trait === 'honest' ? 0 : (m.trait === 'greedy' ? 0.08 : 0.03) * (1 - m.loyal / 100) * 2;
-        if (G.rnd() < thief) { const v = Math.min(n.cash * 0.01, gdpC(n, 0.0008)); n.cash -= v; m.stolen = (m.stolen || 0) + v; if (G.rnd() < 0.5) G.say(`🤡 Скандал: ${m.name} (${G.MIN[k].n.toLowerCase()}) ${fun(m)}. Зникло ~$${(v * 1000).toFixed(0)} млн`, 'bad', [n.id]); }
+        if (G.rnd() < thief) { const v = Math.min(n.cash * 0.01, gdpC(n, 0.0008)); n.cash -= v; m.stolen = (m.stolen || 0) + v; if (G.rnd() < 0.5) G.say(`🤡 Скандал: ${m.name} (${G.MIN[k].n.toLowerCase()}) ${fun(m)}. Зникло ~${G.fmt$(v)}`, 'bad', [n.id]); }
         if (m.auto) { // автокерування: ШІ-міністр користується своїми діями
           if (k === 'state' && (G.day + n.id) % 60 === 0 && G.aiPolicy) { const keep = { mil: n.pol.mil, mob: n.pol.mob }; G.aiPolicy(n); Object.assign(n.pol, keep); }
           if (k === 'dipl' && (G.day + n.id) % 60 === 0 && G.aiDiplomacy && !G.enemiesOf(n.id).length) { try { G.aiDiplomacy(n); } catch (e) { } }

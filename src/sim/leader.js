@@ -5,10 +5,11 @@ LORA.sim.register('leader', 92, function (G) {
   const { N, ter, T } = G; const U = LORA.core, clamp = U.clamp;
   const hav = (a, b) => { const r = Math.PI / 180, [lo1, la1] = T[a].c, [lo2, la2] = T[b].c; const s = Math.sin((la2 - la1) * r / 2) ** 2 + Math.cos(la1 * r) * Math.cos(la2 * r) * Math.sin((lo2 - lo1) * r / 2) ** 2; return 12742 * Math.asin(Math.min(1, Math.sqrt(s))); };
   G.D.charTypes = {
-    diplomat: { n: 'Дипломат', ic: '🎩', d: 'Зв\'язки з елітами ростуть удвічі швидше', cash: 0.08, k: { contacts: 2, pop: 1, money: 1 } },
-    tycoon:   { n: 'Бізнесмен', ic: '💼', d: 'Більше грошей з консультацій і угод', cash: 0.4, k: { contacts: 1, pop: 0.8, money: 2.2 } },
-    star:     { n: 'Медійна зірка', ic: '🎤', d: 'Популярність серед виборців росте вдвічі швидше', cash: 0.15, k: { contacts: 0.8, pop: 2.2, money: 1.2 } },
-    general:  { n: 'Генерал у відставці', ic: '🎖', d: 'Повага у країнах, що воюють: звʼязки й популярність там ×2', cash: 0.06, k: { contacts: 1.2, pop: 1.2, money: 0.8 } }
+    ordinary: { n: 'Звичайна людина', ic: '🧑', d: 'Скромні заощадження, але все попереду', cash: 0.000015, k: { contacts: 1, pop: 1, money: 1 } },
+    diplomat: { n: 'Дипломат', ic: '🎩', d: 'Зв\'язки з елітами ростуть удвічі швидше', cash: 0.0003, k: { contacts: 2, pop: 1, money: 1 } },
+    tycoon:   { n: 'Бізнесмен', ic: '💼', d: 'Більше грошей з консультацій і угод', cash: 0.004, k: { contacts: 1, pop: 0.8, money: 2.2 } },
+    star:     { n: 'Медійна зірка', ic: '🎤', d: 'Популярність серед виборців росте вдвічі швидше', cash: 0.0012, k: { contacts: 0.8, pop: 2.2, money: 1.2 } },
+    general:  { n: 'Генерал у відставці', ic: '🎖', d: 'Повага у країнах, що воюють: звʼязки й популярність там ×2', cash: 0.00025, k: { contacts: 1.2, pop: 1.2, money: 0.8 } }
   };
   // кожен гравець-людина має свого лідера; G.leader — лідер «поточного» гравця (G.player або 'me' для персонажа/CEO)
   G.leaders = {}; const lkey = () => G._lk != null ? G._lk : G.player >= 0 ? G.player : 'me';
@@ -26,7 +27,7 @@ LORA.sim.register('leader', 92, function (G) {
     const c = ter[to].ctrl, me = G.player >= 0 ? G.player : L.home;
     if (c !== me && G.atWar(me, c)) return { ok: false, err: 'Не можна летіти до ворожої держави' };
     if (L.role === 'char' && L.money < 0.002) return { ok: false, err: 'Немає грошей на переліт' };
-    const days = G.travelTime(to); L.mv = { from: L.at, to, start: G.day, arrive: G.day + days }; if (L.role === 'char') L.money -= 0.001 + days * 0.0005;
+    const days = G.travelTime(to); L.mv = { from: L.at, to, start: G.day, arrive: G.day + days }; if (L.role === 'char') L.money = Math.max(0, L.money - (0.0000004 + days * 0.00000015));
     return { ok: true, days };
   };
   function arrive(L) {
@@ -58,17 +59,17 @@ LORA.sim.register('leader', 92, function (G) {
 
   // ---- геймплей персонажа
   G.charActions = {
-    meet:    { n: 'Зустрічі з елітами', ic: '🤝', days: 5, cost: 0.004, d: '+звʼязки в країні' },
-    speech:  { n: 'Публічний виступ', ic: '🎤', days: 3, cost: 0.002, d: '+популярність серед виборців' },
+    meet:    { n: 'Зустрічі з елітами', ic: '🤝', days: 5, cost: 0.000003, d: '+звʼязки в країні' },
+    speech:  { n: 'Публічний виступ', ic: '🎤', days: 3, cost: 0.0000008, d: '+популярність серед виборців' },
     social:  { n: 'Соцмережі й стріми', ic: '📱', days: 5, cost: 0, d: 'популярність тим вища, чим кращий інтернет у країні' },
-    charity: { n: 'Благодійний фонд', ic: '💝', days: 10, cost: 0.03, d: 'популярність і слава; відносини з урядом' },
+    charity: { n: 'Благодійний фонд', ic: '💝', days: 10, cost: 0.00002, d: 'популярність і слава; відносини з урядом' },
     book:    { n: 'Написати книгу', ic: '📖', days: 60, cost: 0, d: 'довго, але дає гроші й славу по всьому світу' },
     lecture: { n: 'Лекції й інтервʼю', ic: '🎓', days: 7, cost: 0, d: 'невеликий заробіток будь-де (без звʼязків); трохи популярності' },
     consult: { n: 'Консультувати уряд', ic: '📊', days: 10, cost: 0, d: 'заробіток, потрібні звʼязки ≥ 20' },
-    broker:  { n: 'Посередництво в угоді', ic: '📑', days: 14, cost: 0.003, d: 'зблизити дві країни, де маєте звʼязки ≥ 30: гроші й слава' },
-    invest:  { n: 'Інвестувати в місцевий бізнес', ic: '🏦', days: 2, cost: 0.05, d: 'пасивний дохід і звʼязки' },
-    run:     { n: 'Балотуватися на виборах', ic: '🗳', days: 0, cost: 0.03, d: 'потрібні популярність ≥ 45 і звʼязки ≥ 40; вибори — за графіком парламенту' },
-    snap:    { n: 'Вимагати дострокових виборів', ic: '📣', days: 20, cost: 0.06, d: 'ви кандидат, популярність ≥ 55 і звʼязки ≥ 55: мітинги й тиск на парламент; що нижча стабільність, то вищий шанс' }
+    broker:  { n: 'Посередництво в угоді', ic: '📑', days: 14, cost: 0.000004, d: 'зблизити дві країни, де маєте звʼязки ≥ 30: гроші й слава' },
+    invest:  { n: 'Інвестувати в місцевий бізнес', ic: '🏦', days: 2, cost: 0.00002, d: 'пасивний дохід і звʼязки' },
+    run:     { n: 'Балотуватися на виборах', ic: '🗳', days: 0, cost: 0.0002, d: 'потрібні популярність ≥ 45 і звʼязки ≥ 40; вибори — за графіком парламенту' },
+    snap:    { n: 'Вимагати дострокових виборів', ic: '📣', days: 20, cost: 0.00015, d: 'ви кандидат, популярність ≥ 55 і звʼязки ≥ 55: мітинги й тиск на парламент; що нижча стабільність, то вищий шанс' }
   };
   G.charCan = function (k, partner) {
     const L = G.leader; if (!L || L.role !== 'char') return 'Немає персонажа'; if (L.mv) return 'Персонаж у дорозі'; if (L.busy > G.day) return `Зайнятий ще ${L.busy - G.day} дн.`;
@@ -90,19 +91,19 @@ LORA.sim.register('leader', 92, function (G) {
     if (k === 'speech') { add(L.popu, 6 * km('pop')); L.fame = clamp(L.fame + 0.5, 0, 100); msg = `популярність: ${L.popu[nid].toFixed(0)}`; }
     if (k === 'social') { add(L.popu, (2 + 4 * (N[nid].net || 0.4)) * km('pop')); L.fame = clamp(L.fame + 0.3, 0, 100); msg = `популярність: ${L.popu[nid].toFixed(0)} (інтернет ${Math.round((N[nid].net || 0) * 100)}%)`; }
     if (k === 'charity') { add(L.popu, 5); add(L.cont, 2); L.fame = clamp(L.fame + 2, 0, 100); msg = `популярність: ${L.popu[nid].toFixed(0)}, слава +2`; }
-    if (k === 'book') { const pay = 0.02 + L.fame * 0.0015; L.money += pay; L.fame = clamp(L.fame + 4, 0, 100); for (const q in L.popu) L.popu[q] = Math.min(100, L.popu[q] + 1.5); msg = `наклад розійшовся: +$${(pay * 1000).toFixed(0)} млн, слава +4`; }
-    if (k === 'lecture') { const pay = (0.003 + L.fame * 0.00008) * km('money'); L.money += pay; add(L.popu, 1); msg = `гонорар $${(pay * 1000).toFixed(0)} млн`; }
-    if (k === 'consult') { const pay = (0.004 + N[nid].agg.gdp * 0.00002) * km('money'); L.money += pay; add(L.cont, 2); msg = `гонорар $${(pay * 1000).toFixed(0)} млн`; }
-    if (k === 'broker') { const pay = (0.01 + (N[nid].agg.gdp + N[partner].agg.gdp) * 0.000015) * km('money'); L.money += pay; L.fame = clamp(L.fame + 3, 0, 100); G.rel[nid][partner] = clamp(G.rel[nid][partner] + 8, -100, 100); G.rel[partner][nid] = clamp(G.rel[partner][nid] + 8, -100, 100);
-      L.brk = L.brk || {}; L.brk[G.warKey(nid, partner)] = G.day + 90; add(L.popu, 3); msg = `угода ${N[nid].name} — ${N[partner].name}: відносини +8, гонорар $${(pay * 1000).toFixed(0)} млн`; }
-    if (k === 'invest') { L.inv = L.inv || {}; L.inv[nid] = (L.inv[nid] || 0) + A.cost; add(L.cont, 3); msg = `вкладено $${(A.cost * 1000).toFixed(0)} млн`; }
+    if (k === 'book') { const pay = 0.000008 + L.fame * 0.000002; L.money += pay; L.fame = clamp(L.fame + 4, 0, 100); for (const q in L.popu) L.popu[q] = Math.min(100, L.popu[q] + 1.5); msg = `наклад розійшовся: +${G.fmt$(pay)}, слава +4`; }
+    if (k === 'lecture') { const pay = (0.000002 + L.fame * 0.0000004) * km('money'); L.money += pay; add(L.popu, 1); msg = `гонорар ${G.fmt$(pay)}`; }
+    if (k === 'consult') { const pay = (0.000005 + N[nid].agg.gdp * 0.00000002) * km('money'); L.money += pay; add(L.cont, 2); msg = `гонорар ${G.fmt$(pay)}`; }
+    if (k === 'broker') { const pay = (0.00002 + (N[nid].agg.gdp + N[partner].agg.gdp) * 0.00000002) * km('money'); L.money += pay; L.fame = clamp(L.fame + 3, 0, 100); G.rel[nid][partner] = clamp(G.rel[nid][partner] + 8, -100, 100); G.rel[partner][nid] = clamp(G.rel[partner][nid] + 8, -100, 100);
+      L.brk = L.brk || {}; L.brk[G.warKey(nid, partner)] = G.day + 90; add(L.popu, 3); msg = `угода ${N[nid].name} — ${N[partner].name}: відносини +8, гонорар ${G.fmt$(pay)}`; }
+    if (k === 'invest') { L.inv = L.inv || {}; L.inv[nid] = (L.inv[nid] || 0) + A.cost; add(L.cont, 3); msg = `вкладено ${G.fmt$(A.cost)}`; }
     if (k === 'snap') { L.snapP = L.snapP || {}; const pr = N[nid].parl, ch = clamp(0.15 + (60 - N[nid].stab) / 80 + (L.popu[nid] - 55) / 60 + (L.snapP[nid] || 0), 0.15, 0.85); if (G.rnd() < ch) { pr.next = G.day + 75; L.snapP[nid] = 0; msg = `парламент призначив дострокові вибори: ${G.dateStr(pr.next)}`; } else { L.popu[nid] = Math.max(0, L.popu[nid] - 3); L.snapP[nid] = (L.snapP[nid] || 0) + 0.06; msg = `влада вистояла (шанс був ${(ch * 100).toFixed(0)}%), популярність −3; тиск на владу росте`; } }
     if (k === 'run') { L.cand = nid; const p = N[nid].parl; msg = `ви — кандидат у ${N[nid].name}. Вибори: ${p ? G.dateStr(p.next) : 'скоро'}`; }
     G.say(`${A.ic} ${L.name}: ${A.n.toLowerCase()} — ${msg}`, 'good', [nid]);
     return { ok: true, msg };
   };
   function charDaily(L) {
-    if (G.day % 30 === 0) { let inc = 0; for (const k in (L.inv || {})) if (N[k].alive) inc += L.inv[k] * 0.012 * (0.6 + N[k].stab / 150); L.money += inc;
+    if (G.day % 30 === 0) { let inc = 0; for (const k in (L.inv || {})) if (N[k].alive) inc += L.inv[k] * 0.008 * (0.6 + N[k].stab / 150); L.money += inc;
       for (const k in L.popu) L.popu[k] = Math.max(0, L.popu[k] - 0.6); for (const k in L.cont) L.cont[k] = Math.max(0, L.cont[k] - 0.3); }
   }
   // вибори (кличе парламент): чи переміг персонаж

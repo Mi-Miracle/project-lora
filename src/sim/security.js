@@ -5,10 +5,10 @@ LORA.sim.register('security', 99.68, function (G) {
   const human = c => c && !c.ai && c.alive;
   G.SEC_LV = [
     { n: 'Без охорони', k: 0 },
-    { n: 'Особистий охоронець', k: 0.25, base: 0.0004 },
-    { n: 'Група охорони', k: 0.45, base: 0.0012 },
-    { n: 'Броньований кортеж і група', k: 0.65, base: 0.003 },
-    { n: 'Приватна армія (ПВК)', k: 0.82, base: 0.008 }
+    { n: 'Особистий охоронець', k: 0.25, base: 0.000004 },
+    { n: 'Група охорони', k: 0.45, base: 0.000015 },
+    { n: 'Броньований кортеж і група', k: 0.65, base: 0.00006 },
+    { n: 'Приватна армія (ПВК)', k: 0.82, base: 0.0004 }
   ];
   G.secContracts = G.secContracts || [];
   // постачальники: компанії ВПК; ціна залежить від репутації та розробок якості, місткість — від заводів
@@ -31,8 +31,8 @@ LORA.sim.register('security', 99.68, function (G) {
     const old = G.secOf(key); const free = P.cap - P.used + (old && old.prov === provId ? old.lvl : 0); if (free < lvl) return { ok: false, err: `У «${c.name}» немає вільних людей (вільно ${free})` };
     G.secContracts = G.secContracts.filter(k => k.cl !== key);
     const fee = G.secFee(P, lvl, who === 'co'); G.secContracts.push({ cl: key, prov: provId, lvl, fee, d: G.day });
-    if (human(c)) G.say(`🛡 «${c.name}»: новий клієнт охорони — ${G.SEC_LV[lvl].n}, $${(fee * 1000).toFixed(2)} млн/міс.`, 'good', [c.home]);
-    return { ok: true, msg: `${G.SEC_LV[lvl].n} від «${c.name}»: $${(fee * 1000).toFixed(2)} млн/міс.` };
+    if (human(c)) G.say(`🛡 «${c.name}»: новий клієнт охорони — ${G.SEC_LV[lvl].n}, ${G.fmt$(fee)}/міс.`, 'good', [c.home]);
+    return { ok: true, msg: `${G.SEC_LV[lvl].n} від «${c.name}»: ${G.fmt$(fee)}/міс.` };
   };
   G.secFire = function (who) { const key = who === 'co' ? 'co' + G.pc : clientKey(); const n0 = G.secContracts.length; G.secContracts = G.secContracts.filter(k => k.cl !== key); return n0 !== G.secContracts.length ? { ok: true, msg: 'Контракт розірвано' } : { ok: false, err: 'Охорони немає' }; };
   G.secSetPrice = function (mul) { const c = G.pc >= 0 && G.companies[G.pc]; if (!c || c.sector !== 'military') return { ok: false, err: 'Лише для компаній ВПК' }; c.secMul = clamp(+mul, 0.5, 3); return { ok: true }; };
@@ -49,9 +49,9 @@ LORA.sim.register('security', 99.68, function (G) {
       const danger = (n.stab < 40 ? 0.6 : 0.2) + (G.enemiesOf(nid).length ? 0.6 : 0) + (n.pc < 8000 ? 0.4 : 0) + (L.mp != null || L.party || L.cand != null ? 0.3 : 0);
       const risk = clamp((0.004 + Math.min(0.03, wealth * 0.01) + L.fame * 0.0004) * danger * (1 - sec), 0, 0.15);
       if (G.rnd() > risk) return; const me = G.leader === L || lk === String(G._lk); const tell = (m, k) => G.say(m, k || 'bad', [nid]); const r = G.rnd();
-      if (r < 0.4) { const v = Math.min(L.money * 0.08, 0.002 + wealth * 0.01); L.money -= v; tell(`🦹 ${L.name}: пограбування в ${n.name} — втрачено $${(v * 1000).toFixed(1)} млн`); }
-      else if (r < 0.65) { const v = Math.min(L.money * 0.15, 0.003 + wealth * 0.02); if (G.rnd() < 0.5 + sec) tell(`🕵 ${L.name}: спроба шантажу — охорона й юристи відбилися`, 'info'); else { L.money -= v; tell(`🕵 ${L.name}: шантаж компроматом — заплачено $${(v * 1000).toFixed(1)} млн`); } }
-      else if (r < 0.85) { const v = Math.min(L.money * 0.3, 0.01 + wealth * 0.05); L.money -= v; L.busy = Math.max(L.busy || 0, G.day + 14); L.fame += 1; tell(`🚐 ${L.name} викрадено в ${n.name}! Викуп $${(v * 1000).toFixed(1)} млн, 2 тижні на відновлення`); }
+      if (r < 0.4) { const v = Math.min(L.money * 0.08, 0.000002 + wealth * 0.01); L.money -= v; tell(`🦹 ${L.name}: пограбування в ${n.name} — втрачено ${G.fmt$(v)}`); }
+      else if (r < 0.65) { const v = Math.min(L.money * 0.15, 0.000005 + wealth * 0.02); if (G.rnd() < 0.5 + sec) tell(`🕵 ${L.name}: спроба шантажу — охорона й юристи відбилися`, 'info'); else { L.money -= v; tell(`🕵 ${L.name}: шантаж компроматом — заплачено ${G.fmt$(v)}`); } }
+      else if (r < 0.85) { const v = Math.min(L.money * 0.3, 0.00002 + wealth * 0.05); L.money -= v; L.busy = Math.max(L.busy || 0, G.day + 14); L.fame += 1; tell(`🚐 ${L.name} викрадено в ${n.name}! Викуп ${G.fmt$(v)}, 2 тижні на відновлення`); }
       else { const hurt = G.rnd() > 0.35 + sec; L.busy = Math.max(L.busy || 0, G.day + (hurt ? 60 : 3)); L.popu[nid] = clamp((L.popu[nid] || 0) + 6, 0, 100); L.fame += 3;
         tell(hurt ? `🔫 Замах на ${L.name} в ${n.name}: тяжке поранення, 2 місяці лікування. Хвиля співчуття: популярність +6` : `🔫 Замах на ${L.name} в ${n.name} зірвано охороною! Популярність +6`, 'big'); }
     });
@@ -64,7 +64,7 @@ LORA.sim.register('security', 99.68, function (G) {
       if (r < 0.35) { t.dmg = Math.min(0.5, t.dmg + 0.12); G.say(`💥 Диверсія на активі «${c.name}»: ${G.D.buildings[a.type].n} (${T[a.t].n}) пошкоджено`, 'bad', [c.home]); }
       else if (r < 0.6) { const k = Object.keys(c.res || {}).filter(x => c.res[x] > 1e-6)[0]; if (k) { const q = c.res[k] * 0.3; c.res[k] -= q; G.say(`📦 «${c.name}»: розкрадання складу — втрачено 30% ${G.D.resources[k] ? G.D.resources[k].n.toLowerCase() : k}`, 'bad', [c.home]); } }
       else if (r < 0.8) { if (c.rd) { const v = c.rd.pts * 0.4; c.rd.pts -= v; G.say(`🕵 Промислове шпигунство: «${c.name}» втрачає ${v.toFixed(0)} очок R&D`, 'bad', [c.home]); } }
-      else { const v = Math.min(c.cash * 0.05, 0.05 + G.coValue(c) * 0.003); c.cash -= v; G.say(`⚖ Рейдерська атака на «${c.name}»: судові витрати $${(v * 1000).toFixed(0)} млн`, 'bad', [c.home]); }
+      else { const v = Math.min(c.cash * 0.05, 0.05 + G.coValue(c) * 0.003); c.cash -= v; G.say(`⚖ Рейдерська атака на «${c.name}»: судові витрати ${G.fmt$(v)}`, 'bad', [c.home]); }
     });
   };
   G.act.secHire = (who, p, l) => G.secHire(who, p, l);

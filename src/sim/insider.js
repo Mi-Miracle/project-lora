@@ -33,9 +33,9 @@ LORA.sim.register('insider', 99.984, function (G) {
   }
   const pay = (w, v) => { if (w === 'L') G.leader.money = Math.max(0, G.leader.money - v); else if (w[0] === 'n') N[+w.slice(1)].cash -= v; else { const c = G.companies[+w.slice(1)]; if (c) c.cash -= v; } };
   const EV = G.DEC_EV; if (EV) EV.push({ id: 'ins_case', adv: 'econ', ok: () => false, t: () => null, o: [
-    ['Заплатити штраф', (n, c) => { const f = Math.max(0.002, c.vol * 0.5); pay(c.w, f); return `штраф $${(f * 1000).toFixed(0)} млн. Слідчий побажав «успішних інвестицій»`; }],
-    ['Звинуватити стажера', (n, c) => { if (G.rnd() < 0.5) return 'стажер узяв усе на себе. Тепер він легенда офісу'; const f = Math.max(0.003, c.vol); pay(c.w, f); if (G.leader && c.w === 'L') G.leader.fame = Math.max(0, G.leader.fame - 3); else n.stab = Math.max(0, n.stab - 2); return `стажер мав алібі (був у відпустці). Подвійний штраф і ганьба в новинах`; }],
-    ['Найняти адвокатів', (n, c) => { pay(c.w, 0.002); return G.rnd() < 0.7 ? 'адвокати знайшли кому в протоколі. Справу закрито' : 'адвокати програли, але виставили рахунок. Все одно штраф'; }]] });
+    ['Заплатити штраф', (n, c) => { const f = Math.max(0.000005, c.vol * 0.5); pay(c.w, f); return `штраф ${G.fmt$(f)}. Слідчий побажав «успішних інвестицій»`; }],
+    ['Звинуватити стажера', (n, c) => { if (G.rnd() < 0.5) return 'стажер узяв усе на себе. Тепер він легенда офісу'; const f = Math.max(0.00001, c.vol); pay(c.w, f); if (G.leader && c.w === 'L') G.leader.fame = Math.max(0, G.leader.fame - 3); else n.stab = Math.max(0, n.stab - 2); return `стажер мав алібі (був у відпустці). Подвійний штраф і ганьба в новинах`; }],
+    ['Найняти адвокатів', (n, c) => { pay(c.w, 0.00001); return G.rnd() < 0.7 ? 'адвокати знайшли кому в протоколі. Справу закрито' : 'адвокати програли, але виставили рахунок. Все одно штраф'; }]] });
   // відстежуємо торги гравця
   if (G.act && G.act.stockTrade) { const b = G.act.stockTrade; G.act.stockTrade = function (cid, pct) { const r = b.apply(this, arguments); try { if (!(r && r.ok === false) && G.stock) S().tr.push({ w: G.wallet(), cid, pct, px: G.stock.px[cid] || 0, d: G.day }); } catch (e) { } return r; }; }
   // біржові приколи

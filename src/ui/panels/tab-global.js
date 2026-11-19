@@ -105,6 +105,6 @@ function campaignStart() {
 function G0name(a3) { const c = (D.cells || []).find(x => x.a3 === a3); const n = c && (c.n || c.name); return n ? (LORA.lang === 'en' ? t_(n) : n) : null; }
 function campaignGo() {
   const name = (document.getElementById('cmpN').value || '').trim() || t_('Олена Коваль'), home = document.getElementById('cmpC').value; closeModal();
-  G = LORA.createGame({ seed: (Date.now() % 1e9) | 0 }); G.init(null, 'world2026', { char: { name, type: 'diplomat', home, stage: null } }); G.campStart();
+  G = LORA.createGame({ seed: (Date.now() % 1e9) | 0 }); G.init(null, 'world2026', { char: { name, type: 'ordinary', home, stage: null } }); G.campStart();
   $('#start').style.display = 'none'; startUI();
 }

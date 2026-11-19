@@ -19,7 +19,7 @@ LORA.sim.register('life', 99.67, function (G) {
     mil:   { n: 'Військова справа', ic: '🎖', d: 'офіцерська карʼєра; у війну популярність вища' }
   };
   G.skill = (L, k) => (L && L.sk && L.sk[k]) || 0;
-  const studyCost = lv => 0.0015 * (lv + 1) * (lv + 1), studyDays = lv => 15 + lv * 12;
+  const studyCost = lv => 0.000004 * (lv + 1) * (lv + 1), studyDays = lv => 15 + lv * 12;
   G.lifeStudyCan = function (k) {
     const L = G.leader; if (!isChar(L)) return 'Лише для персонажа'; if (!G.SKILLS[k]) return '?'; const lv = G.skill(L, k);
     if (lv >= 5) return 'Максимальний рівень'; if (L.mv) return 'Персонаж у дорозі'; if (L.busy > G.day) return `Зайнятий ще ${L.busy - G.day} дн.`;
@@ -34,22 +34,22 @@ LORA.sim.register('life', 99.67, function (G) {
 
   // ---------- ПРОФЕСІЇ (доповнення до career.js)
   Object.assign(G.JOBS, {
-    doctor:     { n: 'Лікар', ic: '🩺', pay: 0.0018, d: 'повага людей: популярність щомісяця +', k: { pop: 1.2 }, req: { sci: 1 }, m: { pop: 0.25 } },
-    engineer:   { n: 'Інженер', ic: '🛠', pay: 0.0016, d: 'стабільний дохід, звʼязки в промисловості', k: { cont: 1.1 }, req: { tech: 1 } },
-    programmer: { n: 'Програміст', ic: '💻', pay: 0.0028, d: 'високий дохід, можна працювати з будь-якої країни', k: { money: 1.3 }, req: { tech: 2 } },
-    banker:     { n: 'Банкір', ic: '🏦', pay: 0.006, d: 'дуже високий дохід, звʼязки з елітами; популярність повільно падає', k: { money: 2, cont: 1.3 }, req: { eco: 2 }, m: { pop: -0.15, cont: 0.3 } },
-    economist:  { n: 'Економіст', ic: '📊', pay: 0.002, d: 'експертні коментарі: слава й звʼязки з урядом', k: { cont: 1.2 }, req: { eco: 1 }, m: { cont: 0.2 } },
-    diplomat:   { n: 'Дипломат', ic: '🕊', pay: 0.0022, d: 'звʼязки за кордоном ростуть самі', k: { cont: 1.6 }, req: { diplo: 2 }, m: { abroad: 0.4 } },
-    actor:      { n: 'Актор', ic: '🎬', pay: 0.0025, d: 'слава й популярність, але нестабільний дохід', k: { pop: 1.6, fame: 1.4 }, req: { media: 1 }, m: { fame: 0.15, pop: 0.2 } },
-    athlete:    { n: 'Спортсмен', ic: '🏅', pay: 0.003, d: 'світова слава; пік карʼєри недовгий', k: { fame: 1.6, pop: 1.3 }, m: { fame: 0.2 } },
-    teacher:    { n: 'Вчитель', ic: '📚', pay: 0.0007, d: 'низька зарплата, але довіра людей', k: { pop: 1.3 }, m: { pop: 0.2 } },
-    farmer:     { n: 'Фермер', ic: '🌾', pay: 0.0015, d: 'дохід залежить від урожаю; популярність у регіонах', k: { pop: 1.2 }, m: { pop: 0.1 } },
-    pilot:      { n: 'Пілот', ic: '🛫', pay: 0.0024, d: 'перельоти вдвічі дешевші й швидші', k: { money: 1.1 }, req: { tech: 1 } },
-    architect:  { n: 'Архітектор', ic: '📐', pay: 0.002, d: 'нерухомість для вас дешевша на 10%', k: { money: 1.2 }, req: { tech: 1 } },
-    blogger:    { n: 'Блогер', ic: '📱', pay: 0.0009, d: 'дохід росте зі славою; популярність +', k: { pop: 1.5 }, m: { pop: 0.2, fameInc: 1 } },
-    judge:      { n: 'Суддя', ic: '🧑‍⚖️', pay: 0.003, d: 'вплив на уряд; слабкий шанс скандалу', k: { cont: 1.5 }, req: { law: 3 }, m: { cont: 0.3 } },
-    professor:  { n: 'Професор', ic: '🎓', pay: 0.0022, d: 'світова слава, навчання вдвічі дешевше', k: { fame: 1.3 }, req: { sci: 3 }, m: { fame: 0.1 } },
-    entrepreneur:{ n: 'Підприємець (малий бізнес)', ic: '🏪', pay: 0.002, d: 'дохід коливається; легше заснувати компанію', k: { money: 1.4 }, req: { biz: 1 }, m: { varPay: 1 } }
+    doctor:     { n: 'Лікар', ic: '🩺', pay: 0.000009, d: 'повага людей: популярність щомісяця +', k: { pop: 1.2 }, req: { sci: 1 }, m: { pop: 0.25 } },
+    engineer:   { n: 'Інженер', ic: '🛠', pay: 0.000006, d: 'стабільний дохід, звʼязки в промисловості', k: { cont: 1.1 }, req: { tech: 1 } },
+    programmer: { n: 'Програміст', ic: '💻', pay: 0.000008, d: 'високий дохід, можна працювати з будь-якої країни', k: { money: 1.3 }, req: { tech: 2 } },
+    banker:     { n: 'Банкір', ic: '🏦', pay: 0.000018, d: 'дуже високий дохід, звʼязки з елітами; популярність повільно падає', k: { money: 2, cont: 1.3 }, req: { eco: 2 }, m: { pop: -0.15, cont: 0.3 } },
+    economist:  { n: 'Економіст', ic: '📊', pay: 0.000006, d: 'експертні коментарі: слава й звʼязки з урядом', k: { cont: 1.2 }, req: { eco: 1 }, m: { cont: 0.2 } },
+    diplomat:   { n: 'Дипломат', ic: '🕊', pay: 0.000007, d: 'звʼязки за кордоном ростуть самі', k: { cont: 1.6 }, req: { diplo: 2 }, m: { abroad: 0.4 } },
+    actor:      { n: 'Актор', ic: '🎬', pay: 0.000005, d: 'слава й популярність, але нестабільний дохід', k: { pop: 1.6, fame: 1.4 }, req: { media: 1 }, m: { fame: 0.15, pop: 0.2 } },
+    athlete:    { n: 'Спортсмен', ic: '🏅', pay: 0.00001, d: 'світова слава; пік карʼєри недовгий', k: { fame: 1.6, pop: 1.3 }, m: { fame: 0.2 } },
+    teacher:    { n: 'Вчитель', ic: '📚', pay: 0.0000022, d: 'низька зарплата, але довіра людей', k: { pop: 1.3 }, m: { pop: 0.2 } },
+    farmer:     { n: 'Фермер', ic: '🌾', pay: 0.0000035, d: 'дохід залежить від урожаю; популярність у регіонах', k: { pop: 1.2 }, m: { pop: 0.1 } },
+    pilot:      { n: 'Пілот', ic: '🛫', pay: 0.000009, d: 'перельоти вдвічі дешевші й швидші', k: { money: 1.1 }, req: { tech: 1 } },
+    architect:  { n: 'Архітектор', ic: '📐', pay: 0.000006, d: 'нерухомість для вас дешевша на 10%', k: { money: 1.2 }, req: { tech: 1 } },
+    blogger:    { n: 'Блогер', ic: '📱', pay: 0.0000015, d: 'дохід росте зі славою; популярність +', k: { pop: 1.5 }, m: { pop: 0.2, fameInc: 1 } },
+    judge:      { n: 'Суддя', ic: '🧑‍⚖️', pay: 0.00001, d: 'вплив на уряд; слабкий шанс скандалу', k: { cont: 1.5 }, req: { law: 3 }, m: { cont: 0.3 } },
+    professor:  { n: 'Професор', ic: '🎓', pay: 0.000007, d: 'світова слава, навчання вдвічі дешевше', k: { fame: 1.3 }, req: { sci: 3 }, m: { fame: 0.1 } },
+    entrepreneur:{ n: 'Підприємець (малий бізнес)', ic: '🏪', pay: 0.000005, d: 'дохід коливається; легше заснувати компанію', k: { money: 1.4 }, req: { biz: 1 }, m: { varPay: 1 } }
   });
   Object.assign(G.JOBS.lawyer, { req: { law: 1 } }); Object.assign(G.JOBS.manager, { req: { biz: 2 } }); Object.assign(G.JOBS.scientist, { req: { sci: 2 } }); Object.assign(G.JOBS.officer, { req: { mil: 1 } });
   G.jobReqErr = (L, k) => { const J = G.JOBS[k]; if (!J || !J.req) return ''; for (const [s, v] of Object.entries(J.req)) if (G.skill(L, s) < v) return `Потрібна навичка «${G.SKILLS[s].n}» рівня ${v}`; return ''; };
@@ -64,13 +64,13 @@ LORA.sim.register('life', 99.67, function (G) {
 
   // ---------- ПІДРОБІТКИ (разові)
   G.GIGS = {
-    lecture:  { n: 'Платна лекція', ic: '🎤', days: 2, need: { fame: 8 }, d: 'гонорар росте зі славою', run: L => { const pay = 0.0002 + L.fame * 0.00004; L.money += pay; return `гонорар ${'$' + (pay * 1000).toFixed(2)} млн`; } },
-    ad:       { n: 'Реклама бренду', ic: '📸', days: 3, need: { fame: 15 }, d: 'великі гроші, але популярність трохи падає', run: (L, nid) => { const pay = 0.0005 + L.fame * 0.0001; L.money += pay; add(L.popu, nid, -1); return `контракт ${'$' + (pay * 1000).toFixed(2)} млн`; } },
-    book:     { n: 'Написати книгу', ic: '📖', days: 45, need: {}, d: 'слава й роялті; бестселер можливий', run: (L, nid) => { const best = G.rnd() < 0.15 + G.skill(L, 'media') * 0.05; L.fame += best ? 6 : 1.5; add(L.popu, nid, best ? 6 : 2); const pay = best ? 0.004 : 0.0003; L.money += pay; return best ? 'бестселер! слава +6' : 'книга вийшла, слава +1.5'; } },
-    consult:  { n: 'Консалтинг для корпорації', ic: '📑', days: 10, need: { cont: 20 }, d: 'потрібні звʼязки', run: (L, nid) => { const pay = 0.0008 + (L.cont[nid] || 0) * 0.00004 + G.skill(L, 'eco') * 0.0003; L.money += pay; add(L.cont, nid, 1); return `${'$' + (pay * 1000).toFixed(2)} млн`; } },
-    stream:   { n: 'Стрим / подкаст', ic: '🎧', days: 1, need: {}, d: 'популярність серед молоді, донати', run: (L, nid) => { add(L.popu, nid, 1 + G.skill(L, 'media') * 0.3); L.money += 0.00003 * (1 + L.fame / 10); return 'аудиторія росте'; } },
+    lecture:  { n: 'Платна лекція', ic: '🎤', days: 2, need: { fame: 8 }, d: 'гонорар росте зі славою', run: L => { const pay = 0.0000015 + L.fame * 0.0000003; L.money += pay; return `гонорар ${G.fmt$(pay)}`; } },
+    ad:       { n: 'Реклама бренду', ic: '📸', days: 3, need: { fame: 15 }, d: 'великі гроші, але популярність трохи падає', run: (L, nid) => { const pay = 0.000003 + L.fame * 0.000002; L.money += pay; add(L.popu, nid, -1); return `контракт ${G.fmt$(pay)}`; } },
+    book:     { n: 'Написати книгу', ic: '📖', days: 45, need: {}, d: 'слава й роялті; бестселер можливий', run: (L, nid) => { const best = G.rnd() < 0.15 + G.skill(L, 'media') * 0.05; L.fame += best ? 6 : 1.5; add(L.popu, nid, best ? 6 : 2); const pay = best ? 0.00008 : 0.000006; L.money += pay; return best ? 'бестселер! слава +6' : 'книга вийшла, слава +1.5'; } },
+    consult:  { n: 'Консалтинг для корпорації', ic: '📑', days: 10, need: { cont: 20 }, d: 'потрібні звʼязки', run: (L, nid) => { const pay = 0.000004 + (L.cont[nid] || 0) * 0.0000002 + G.skill(L, 'eco') * 0.000002; L.money += pay; add(L.cont, nid, 1); return G.fmt$(pay); } },
+    stream:   { n: 'Стрим / подкаст', ic: '🎧', days: 1, need: {}, d: 'популярність серед молоді, донати', run: (L, nid) => { add(L.popu, nid, 1 + G.skill(L, 'media') * 0.3); const don = 0.00000005 * (1 + L.fame * L.fame / 20); L.money += don; return `аудиторія росте, донати ${G.fmt$(don)}`; } },
     tv:       { n: 'Ефір на ТБ (ток-шоу)', ic: '📺', days: 1, need: { fame: 10 }, d: 'популярність; ризик провалу', run: (L, nid) => { const ok = G.rnd() < 0.7 + G.skill(L, 'orat') * 0.05; add(L.popu, nid, ok ? 3 : -2); return ok ? 'вдалий ефір' : 'невдалий виступ, популярність −2'; } },
-    charity:  { n: 'Благодійний аукціон', ic: '🎗', days: 5, need: { money: 0.002 }, d: 'віддаєте 1% статків: популярність і слава', run: (L, nid) => { const g = Math.max(0.0005, G.lifeWealth(L) * 0.01); L.money -= g; add(L.popu, nid, 3 + g * 300); L.fame += 1; return `пожертвувано ${'$' + (g * 1000).toFixed(2)} млн`; } }
+    charity:  { n: 'Благодійний аукціон', ic: '🎗', days: 5, need: { money: 0.000002 }, d: 'віддаєте 1% статків: популярність і слава', run: (L, nid) => { const g = Math.max(0.0000005, G.lifeWealth(L) * 0.01); L.money -= g; add(L.popu, nid, 2 + Math.log10(1 + g * 1e6)); L.fame += 1; return `пожертвувано ${G.fmt$(g)}`; } }
   };
   G.gigCan = function (k) { const L = G.leader, A = G.GIGS[k]; if (!L || L.role !== 'char' || !A) return 'Лише для персонажа'; if (L.mv) return 'Персонаж у дорозі'; if (L.busy > G.day) return `Зайнятий ще ${L.busy - G.day} дн.`;
     const nid = nidOf(); if (A.need.fame && L.fame < A.need.fame) return `Потрібна слава ≥ ${A.need.fame}`; if (A.need.cont && (L.cont[nid] || 0) < A.need.cont) return `Потрібні звʼязки ≥ ${A.need.cont}`; if (A.need.money && L.money < A.need.money) return 'Бракує грошей';
@@ -148,7 +148,7 @@ LORA.sim.register('life', 99.67, function (G) {
   };
   G.luxSell = function (idx) { const L = G.leader; if (!isChar(L) || !L.own || !L.own[idx]) return { ok: false, err: '?' }; const o = L.own[idx], A = G.LUX[o.k];
     const rate = A.c === 'home' || A.c === 'biz' || A.c === 'art' ? 0.95 : A.c === 'sport' || A.c === 'media' ? 0.9 : 0.7; const v = o.v * rate; L.money += v; L.own.splice(idx, 1);
-    return { ok: true, msg: `${A.n}: продано за ${'$' + (v * 1000).toFixed(1)} млн` }; };
+    return { ok: true, msg: `${A.n}: продано за ${G.fmt$(v)}` }; };
 
   // ---------- ІНВЕСТИЦІЇ
   // b: держоблігації {nid: сума}, f: світовий індексний фонд, c: крипта (кількість «монет»), g: золото (унції у млн), v: венчур [], d: прямі інвестиції в регіони []
@@ -164,7 +164,7 @@ LORA.sim.register('life', 99.67, function (G) {
     direct: { n: 'Пряма інвестиція в регіон', ic: '🏗', d: 'ВВП регіону росте, ви отримуєте дивіденди й популярність у країні' }
   };
   G.invCan = function (k, amt) { const L = G.leader; if (!isChar(L)) return 'Лише для персонажа'; if (!(amt > 0)) return 'Вкажіть суму'; if (L.money < amt) return 'Бракує грошей';
-    const nid = nidOf(); if ((k === 'bond' || k === 'direct' || k === 'venture') && nid < 0) return 'Персонаж у дорозі'; if (k === 'venture' && amt < 0.001) return 'Мінімум $1 млн'; if (k === 'direct' && amt < 0.005) return 'Мінімум $5 млн'; return ''; };
+    const nid = nidOf(); if ((k === 'bond' || k === 'direct' || k === 'venture') && nid < 0) return 'Персонаж у дорозі'; if (k === 'venture' && amt < 0.00001) return 'Мінімум $10 тис.'; if (k === 'direct' && amt < 0.0001) return 'Мінімум $100 тис.'; return ''; };
   G.invest = function (k, amt) {
     const e = G.invCan(k, amt); if (e) return { ok: false, err: e }; G.lifeInit(); const L = G.leader, I = inv(L), nid = nidOf(); L.money -= amt; let msg = '';
     if (k === 'bond') { I.b[nid] = (I.b[nid] || 0) + amt; N[nid].cash += amt; N[nid].debt = (N[nid].debt || 0) + amt; msg = `облігації ${N[nid].name}, ${(G.bondYield(nid) * 100).toFixed(1)}% річних`; }
@@ -182,7 +182,7 @@ LORA.sim.register('life', 99.67, function (G) {
     if (k === 'bond') { v = I.b[nid] || 0; delete I.b[nid]; const n = N[nid]; if (n) { n.cash -= v; if (n.cash < 0) { n.debt += -n.cash; n.cash = 0; } } }
     if (k === 'fund') { v = I.f * idxNow(); I.f = 0; } if (k === 'crypto') { v = I.c * G.mkt.crypto * 0.99; G.mkt.cap = Math.max(0, G.mkt.cap - v); I.c = 0; } if (k === 'gold') { v = I.g * G.mkt.gold * 0.99; I.g = 0; }
     if (k === 'direct') { const x = I.d.splice(nid, 1)[0]; if (x) v = x.amt * 0.8; }
-    if (!(v > 0)) return { ok: false, err: 'Нічого продавати' }; L.money += v; return { ok: true, msg: `отримано ${'$' + (v * 1000).toFixed(2)} млн` }; };
+    if (!(v > 0)) return { ok: false, err: 'Нічого продавати' }; L.money += v; return { ok: true, msg: `отримано ${G.fmt$(v)}` }; };
   G.lifeWealth = L => !L ? 0 : (L.money || 0) + (L.own || []).reduce((s, o) => s + o.v, 0) + G.invValue(L).tot;
 
   // ---------- ПАРТІЯ
@@ -207,6 +207,7 @@ LORA.sim.register('life', 99.67, function (G) {
     p_bill:   { n: 'Фракційний законопроєкт', ic: '📜', cost: 0, pc: 0.003, days: 14, d: 'шанс = частка місць + коаліція + ваш вплив' },
     p_primary:{ n: 'Висунути лідера в президенти', ic: '👑', cost: 0, pc: 0.02, days: 0, d: 'ви — кандидат від партії: бонус до популярності на виборах' }
   };
+  Object.values(G.PARTY).forEach(A => { A.pc = +(A.pc / 400).toFixed(9); });
   G.PARTY_BILLS = {
     center: [['Реформа держслужби', n => { n.stab += 2; }], ['Цифрова держава', n => { n.mods.push({ growth: 0.002, until: G.day + 720 }); }]],
     left:   [['Мінімальна зарплата +', n => { n.pol.soc = Math.min(0.35, n.pol.soc + 0.01); n.stab += 2; }], ['Безкоштовна медицина', n => { n.pol.soc = Math.min(0.35, n.pol.soc + 0.015); n.stab += 3; }]],
@@ -221,7 +222,7 @@ LORA.sim.register('life', 99.67, function (G) {
   G.partyCan = function (k, arg) {
     const L = G.leader, A = G.PARTY[k]; if (!isChar(L) || !A) return 'Лише для персонажа'; const P = partyOf(L); if (!P) return 'Спершу заснуйте партію'; const nid = nidOf();
     if (L.mv) return 'Персонаж у дорозі'; if (nid !== P.nid) return 'Партія діє в іншій країні — прилетіть туди'; if (A.days && L.busy > G.day) return `Зайнятий ще ${L.busy - G.day} дн.`;
-    if (P.cash < A.pc) return `Бракує коштів у касі партії (${'$' + (A.pc * 1000).toFixed(0)} млн)`; const parl = N[nid].parl;
+    if (P.cash < A.pc) return `Бракує коштів у касі партії (${G.fmt$(A.pc)})`; const parl = N[nid].parl;
     if (k === 'p_ideo' && !G.IDEOS[arg]) return 'Оберіть ідеологію';
     if (k === 'p_branch') { if (arg == null || ter[arg].ctrl !== nid) return 'Оберіть регіон цієї країни на мапі'; if ((P.br[arg] || 0) >= 3) return 'Осередок уже максимальний'; }
     if (k === 'p_congress' && (P.cong || -999) > G.day - 330) return 'Зʼїзд — раз на рік';
@@ -235,7 +236,7 @@ LORA.sim.register('life', 99.67, function (G) {
     const media = 1 + G.lifeMedia(L) * 0.15 + G.skill(L, 'media') * 0.08, orat = G.skill(L, 'orat');
     if (k === 'p_ideo') { P.ideo = arg; P.r = Math.max(0.5, P.r * 0.85); msg = G.IDEOS[arg].n; }
     if (k === 'p_branch') { P.br[arg] = (P.br[arg] || 0) + 1; P.mem += 1.5; P.r = clamp(P.r + 0.3 + ter[arg].pop / Math.max(1, n.agg.pop) * 4, 0, 45); msg = `${T[arg].n}: осередок рівня ${P.br[arg]}`; }
-    if (k === 'p_fund') { const g = 0.002 + (L.cont[nid] || 0) * 0.0002 + P.r * 0.0004; P.cash += g; if (g > 0.012 && G.rnd() < 0.15 - G.lifeSec(L) * 0.01) { P.r = Math.max(0.5, P.r - 2); add(L.popu, nid, -4); msg = 'скандал через олігархічних донорів! рейтинг −2'; } else msg = `каса +$${(g * 1000).toFixed(1)} млн`; }
+    if (k === 'p_fund') { const g = 0.000005 + (L.cont[nid] || 0) * 0.0000004 + P.r * 0.000002; P.cash += g; if (g > 0.00006 && G.rnd() < 0.15 - G.lifeSec(L) * 0.01) { P.r = Math.max(0.5, P.r - 2); add(L.popu, nid, -4); msg = 'скандал через олігархічних донорів! рейтинг −2'; } else msg = `каса +${G.fmt$(g)}`; }
     if (k === 'p_ads') { P.r = clamp(P.r + 1.2 * media, 0, 45); msg = `рейтинг ${P.r.toFixed(1)}%`; }
     if (k === 'p_rally') { add(L.popu, nid, 2 + orat * 0.5); P.r = clamp(P.r + 0.4 + orat * 0.1, 0, 45); P.mem += 0.5; if (n.stab < 35 && G.rnd() < 0.25) { n.stab -= 1; msg = 'мітинг переріс у сутички, стабільність −1'; } else msg = 'тисячі прихильників на площі'; }
     if (k === 'p_congress') { P.cong = G.day; P.r = clamp(P.r + 1.5, 0, 45); P.mem += 2; msg = 'нова програма, партія згуртована'; }
@@ -246,7 +247,7 @@ LORA.sim.register('life', 99.67, function (G) {
     if (k === 'p_primary') { L.cand = nid; L.popu[nid] = clamp((L.popu[nid] || 0) + P.r * 0.4, 0, 100); msg = `кандидат у президенти, вибори ${n.parl ? G.dateStr(n.parl.next) : ''}`; }
     G.say(`${A.ic} ${P.name}: ${msg}`, k === 'p_bill' || k === 'p_coal' ? 'big' : 'info', [nid]); return { ok: true, msg };
   };
-  G.partyStart = function (L, nid) { L.party = { nid, name: 'Партія «' + (L.name.split(' ')[1] || L.name) + '»', r: 5, cash: 0.03, mem: 15, br: {}, seats: 0, ideo: 'center' }; const cap = N[nid].home != null ? N[nid].home : L.at; L.party.br[cap] = 2; L.popu[nid] = 30; L.cont[nid] = 20; L.fame = 8; L.money = Math.max(L.money, 0.03); };
+  G.partyStart = function (L, nid) { L.party = { nid, name: 'Партія «' + (L.name.split(' ')[1] || L.name) + '»', r: 5, cash: 0.00003, mem: 15, br: {}, seats: 0, ideo: 'center' }; const cap = N[nid].home != null ? N[nid].home : L.at; L.party.br[cap] = 2; L.popu[nid] = 30; L.cont[nid] = 20; L.fame = 8; L.money = Math.max(L.money, 0.03); };
   // місця партії на виборах до парламенту
   { const base = G.careerParlElection; G.careerParlElection = function (nid) { base(nid); const pl = N[nid].parl; if (!pl || pl.next !== G.day + pl.cyc) return; Object.values(G.leaders || {}).forEach(L => { const P = isChar(L) ? partyOf(L) : null; if (!P || P.nid !== nid) return; const parl = N[nid].parl;
       const brB = Object.values(P.br).reduce((s, v) => s + v, 0) * 0.15; const vote = clamp(P.r + brB + (G.rnd() - 0.5) * 2, 0, 60); const brS = Object.values(P.br).reduce((s, v) => s + v, 0); const seats = (vote >= 5 ? Math.round(parl.seats * vote / 100) : 0) + Math.round(brS * (0.6 + G.rnd()) * (1 + (L.popu[nid] || 0) / 60));
@@ -265,7 +266,7 @@ LORA.sim.register('life', 99.67, function (G) {
       if (!isChar(L)) return; const home = L.home; const where = L.mv ? -1 : ter[L.at].ctrl;
       // професія: щомісячні ефекти
       if (L.job) { const J = G.JOBS[L.job.k], m = J.m || {}, jn = L.job.nid; if (m.pop) add(L.popu, jn, m.pop); if (m.cont) add(L.cont, jn, m.cont); if (m.fame) L.fame += m.fame; if (m.abroad) N.forEach(x => { if (x.id !== jn && (L.cont[x.id] || 0) > 5) add(L.cont, x.id, m.abroad * 0.3); });
-        if (m.fameInc) L.money += L.fame * 0.00001; if (m.varPay) L.money += J.pay * (G.rnd() * 2 - 0.6);
+        if (m.fameInc) L.money += L.fame * L.fame * 0.000000004; if (m.varPay) L.money += J.pay * (G.rnd() * 2 - 0.6);
         L.sk = L.sk || {}; L.skx = L.skx || {}; const rk = J.req ? Object.keys(J.req)[0] : null; if (rk) { L.skx[rk] = (L.skx[rk] || 0) + 1; if (L.skx[rk] >= 18 && G.skill(L, rk) < 5) { L.skx[rk] = 0; L.sk[rk] = G.skill(L, rk) + 1; if (G.leader === L) G.say(`🎓 ${L.name}: досвід роботи — ${G.SKILLS[rk].n} рівень ${L.sk[rk]}`, 'good', [jn]); } } }
       if (G.skill(L, 'media')) add(L.popu, home, G.skill(L, 'media') * 0.1);
       // розкіш: утримання, оренда, переоцінка, вплив на популярність і звʼязки
@@ -282,7 +283,7 @@ LORA.sim.register('life', 99.67, function (G) {
           if (mul >= 3 && N[x.nid]) N[x.nid].fdiG = Math.min(0.01, (N[x.nid].fdiG || 0) + got / Math.max(5, N[x.nid].agg.gdp)); if (G.leader === L) G.say(`🚀 Стартап «${x.name}»: ${mul === 0 ? 'збанкрутував' : '×' + mul.toFixed(1) + ' — отримано $' + (got * 1000).toFixed(1) + ' млн'}`, mul >= 3 ? 'big' : mul ? 'info' : 'bad', []); if (mul >= 10) L.fame += 3; return false; });
         I.d.forEach(x => { const n = N[ter[x.t].owner]; const y = clamp(0.06 + (n ? n.growth || 0 : 0), -0.05, 0.2) * eco; L.money += x.amt * y / 12; if (ter[x.t].ctrl !== ter[x.t].owner) x.amt *= 0.97; }); }
       // партія: члени, внески, вплив на політику країни
-      const P = partyOf(L); if (P) { P.r = clamp(P.r + Object.values(P.br).reduce((s, v) => s + v, 0) * 0.015, 0, 45); P.cash += P.mem * 0.00005 + P.seats * 0.00001; P.mem = Math.max(1, P.mem + (P.r - 3) * 0.05); const n = N[P.nid];
+      const P = partyOf(L); if (P) { P.r = clamp(P.r + Object.values(P.br).reduce((s, v) => s + v, 0) * 0.015, 0, 45); P.cash += P.mem * 0.0000003 + P.seats * 0.0000004; P.mem = Math.max(1, P.mem + (P.r - 3) * 0.05); const n = N[P.nid];
         if (P.coal && P.seats > 0 && n) { const I2 = G.IDEOS[P.ideo] || G.IDEOS.center, sh = P.seats / Math.max(1, n.parl.seats); Object.entries(I2.pol).forEach(([k, v]) => { n.pol[k] = clamp((n.pol[k] || 0) + v * sh, k === 'tax' ? 0.05 : 0, k === 'tax' ? 0.6 : k === 'soc' ? 0.35 : k === 'mil' ? 0.25 : 0.12); }); P.r = clamp(P.r - 0.05, 0, 45); add(L.cont, P.nid, 0.5); }
         if (!P.coal && P.seats > 0) P.r = clamp(P.r + 0.05, 0, 45); }
     });

@@ -507,3 +507,17 @@ body.lhide #campCard { left: 82px; }
 
 #city .city-top button.on{border-color:#ffd34d;background:#2a3a10}
 #locSw{display:flex;gap:6px}
+/* v3.1: новини в бігучому рядку, панель — по кліку */
+body:not(.news-open):not(.news-fixed) #news { display: none; }
+body.news-open #news { bottom: 30px; max-height: 46vh; z-index: 6; box-shadow: 0 -6px 24px #000a; }
+#funTk { cursor: pointer; }
+#funTk .tk-x { flex: none; font-style: normal; padding: 0 10px; color: #ffd34d; font-size: 12px; }
+#funTk span.tk-fun { color: #ffd34d; }
+#funTk span.bad, #funTk span.war { color: #ffb3a8; }
+#funTk span.good { color: #a8f0c6; }
+#funTk span.big { color: #fff; font-weight: 600; }
+#funTk span.tk-me { font-weight: 700; }
+
+.mg-opts{display:flex;flex-direction:column;gap:4px;margin:10px 0}
+.mg-opts .city-act{display:block;width:100%;padding:10px 12px;background:#16212e;color:#e8f0f8;border:1px solid #2c3e54;border-radius:8px;cursor:pointer;text-align:left;font-size:14px}
+.mg-opts .city-act:hover{border-color:#ffd34d;background:#1d2b3b}
