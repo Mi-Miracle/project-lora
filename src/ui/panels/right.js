@@ -43,7 +43,7 @@ function terrPanel(i) {
     <div class="btns">${G.atWar(P, t.ctrl) ? `<button class="dang" onclick="tab='army';subtab.army='strike';renderTabs();renderTab(true);$('#left').classList.remove('hide')">🎯 Удар по регіону</button>` : ''}${war ? `<button onclick="peace(${t.owner},'white')">🕊 Запропонувати мир</button>` : `<button class="dang" onclick="confirmWar(${t.owner})">⚔ Оголосити війну</button>`}</div>`;
   } else {
     const p = t.pol; const pr = D.devPriorities;
-    h += `<div class="btns"><button class="pri" onclick="tab='build';subtab.build='new';renderTabs();renderTab(true);$('#left').classList.remove('hide')">🏗 Будувати тут</button><button onclick="tab='army';subtab.army='land';renderTabs();renderTab(true);$('#left').classList.remove('hide')">🪖 Мобілізувати</button><button onclick="startLinkFrom(${i})">🚆 Маршрут звідси</button></div>
+    h += `<div class="btns"><button class="pri" onclick="tab='build';subtab.build='new';renderTabs();renderTab(true);$('#left').classList.remove('hide')">🏗 Будувати тут</button><button onclick="tab='army';subtab.army='land';renderTabs();renderTab(true);$('#left').classList.remove('hide')">🎖 Мобілізувати</button><button onclick="startLinkFrom(${i})">🚆 Маршрут звідси</button></div>
     <div class="grp">Налаштування регіону</div>
     <div class="sl"><div class="lab"><span>Податки регіону (від загальних)</span><b>${p.tax > 0 ? '+' : ''}${(p.tax * 100).toFixed(0)} п.п.</b></div><input type="range" min="-0.1" max="0.1" step="0.01" value="${p.tax}" onchange="G.ter[${i}].pol.tax=+this.value;renderRight()"><div class="mut small">Пільги прискорюють зростання регіону, надбавки — наповнюють бюджет.</div></div>
     <label class="row" style="cursor:pointer"><span>Спеціальна економічна зона (+зростання, −30% податків, будівництво −20%)</span><input type="checkbox" ${p.sez ? 'checked' : ''} onchange="G.ter[${i}].pol.sez=this.checked;renderRight()"></label>
@@ -108,7 +108,7 @@ function genBlock(a, mine) {
   return h;
 }
 function genAssign(aid, v) { const r = G.act.assignGeneral(aid, v === '' ? null : +v); if (r && r.ok === false) hint('⚠ ' + r.err, 2500); renderRight(); }
-function armyTpl(k) { const r = G.setArmyTemplate(sel.id, k); if (r && r.ok === false) hint('⚠ ' + r.err, 2500); else hint('🪖 ' + t_('Переформування почалось (30 дн.)'), 2000); renderRight(); }
+function armyTpl(k) { const r = G.setArmyTemplate(sel.id, k); if (r && r.ok === false) hint('⚠ ' + r.err, 2500); else hint('🎖 ' + t_('Переформування почалось (30 дн.)'), 2000); renderRight(); }
 function armyAct(k) {
   const a = G.armies.find(x => x.id === sel.id); if (!a) return;
   if (k === 'stop') a.mv = null; if (k === 'auto') a.auto = !a.auto; if (k === 'attack') a.stance = 'attack'; if (k === 'hold') a.stance = 'hold';
@@ -137,7 +137,7 @@ function renderCompEditor(focusK) {
   const d = compDraft, a = d && G.armies.find(x => x.id === d.aid); if (!a) { closeModal(); return; }
   const TY = D.armyTypes, MD = D.models || {}, n = nat(a.n), L = G.COMP_LIM, q = G.compQuote(a, d.c), cur = G.armyComp(a);
   const nc = q.c; let sum = 0; for (const k in d.c) sum += d.c[k] || 0;
-  let h = `<h2>🪖 ${esc(a.name)} — ${t_('склад і техніка')}</h2><div class="mut small">${t_('Тягніть повзунки: частки автоматично зводяться до 100%. Переформування займає час і гроші, армія тимчасово слабша (−20%).')} ${t_('Всього бійців')}: ${Math.round(a.k * 1000).toLocaleString()}</div>`;
+  let h = `<h2>🎖 ${esc(a.name)} — ${t_('склад і техніка')}</h2><div class="mut small">${t_('Тягніть повзунки: частки автоматично зводяться до 100%. Переформування займає час і гроші, армія тимчасово слабша (−20%).')} ${t_('Всього бійців')}: ${Math.round(a.k * 1000).toLocaleString()}</div>`;
   h += `<div class="grp">${t_('Шаблони')}</div><div class="btns tplb">${Object.entries(D.armyTemplates).filter(([k]) => k !== 'mech').map(([k, v]) => `<button onclick="compTpl('${k}')" data-tip="${esc(tplTip(v))}">${ico(v.ic)} ${esc(t_(v.n))}</button>`).join('')}</div>`;
   h += `<div class="compbar">${Object.keys(TY).filter(k => nc[k] > 0.004).map(k => `<i style="width:${nc[k] * 100}%;background:${TY[k].col}"></i>`).join('')}</div><table class="compedit">`;
   for (const k of Object.keys(TY)) {
@@ -155,7 +155,7 @@ function renderCompEditor(focusK) {
   h += `<div class="btns">${mine ? `<button class="pri" ${q.ch < 0.02 ? 'disabled' : ''} onclick="applyComp()">✔ ${t_('Переформувати')}</button>` : ''}<button onclick="tab='army';subtab.army='models';renderTabs();renderTab(true);$('#left').classList.remove('hide');closeModal()">⚙ ${t_('Техніка')}</button><button onclick="closeModal()">${t_('Закрити')}</button></div>`;
   openModal(h);
 }
-function applyComp() { const d = compDraft; if (!d) return; const r = G.setArmyComp(d.aid, d.c); if (r && r.ok === false) { hint('⚠ ' + t_(r.err), 3000); return; } closeModal(); hint('🪖 ' + t_('Переформування почалось') + (r && r.days ? ' (' + r.days + ' ' + t_('дн.') + ')' : ''), 2500); renderRight(); }
+function applyComp() { const d = compDraft; if (!d) return; const r = G.setArmyComp(d.aid, d.c); if (r && r.ok === false) { hint('⚠ ' + t_(r.err), 3000); return; } closeModal(); hint('🎖 ' + t_('Переформування почалось') + (r && r.days ? ' (' + r.days + ' ' + t_('дн.') + ')' : ''), 2500); renderRight(); }
 
 // розмінування, відбудова, партизани
 function recoveryBlock(i) {

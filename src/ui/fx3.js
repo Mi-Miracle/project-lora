@@ -3,15 +3,15 @@
 (function () {
   if (typeof FX === 'undefined' || !FX.add) return;
   const tr = s => (LORA.lang === 'en' && typeof t_ === 'function') ? t_(s) : s;
-  FX.add('war', { bg: ['#3a0505', '#0a0101'], items: [['⚔', 'zoom', 1, 160], ['🪖', 'march', 10, 44], ['🚀', 'flyL', 4, 44], ['💥', 'burst', 16, 30]], shake: 1, flash: 1 }, ['⚔ ВІЙНУ ОГОЛОШЕНО', 'WAR DECLARED']);
+  FX.add('war', { bg: ['#3a0505', '#0a0101'], items: [['⚔', 'zoom', 1, 160], ['🎖', 'march', 10, 44], ['🚀', 'flyL', 4, 44], ['💥', 'burst', 16, 30]], shake: 1, flash: 1 }, ['⚔ ВІЙНУ ОГОЛОШЕНО', 'WAR DECLARED']);
   FX.add('treaty', { bg: ['#0a2a1a', '#020a06'], items: [['📜', 'zoom', 1, 150], ['🖋', 'float', 3, 50], ['🤝', 'orbit', 4, 44], ['🕊', 'fly', 3, 40]] }, ['📜 УГОДУ ПІДПИСАНО', 'AGREEMENT SIGNED']);
   FX.add('shopping', { bg: ['#2a0a2a', '#0a020a'], items: [['🛍', 'rain', 20, 36], ['💳', 'orbit', 4, 40], ['🤩', 'pulse', 1, 120]] }, ['🛍 ПОКУПКА', 'NEW PURCHASE']);
-  FX.add('stocks', { bg: ['#06200f', '#010804'], items: [['📈', 'zoom', 1, 150], ['💹', 'float', 6, 36], ['🪙', 'rain', 20, 26]], draw(cx, W, H, u) { cx.strokeStyle = '#3ed06a'; cx.lineWidth = 6; cx.beginPath(); for (let x = 0; x <= W; x += 30) cx.lineTo(x, H * 0.75 - x / W * H * 0.35 + Math.sin(x / 40 + u * 3) * 25); cx.stroke(); } }, ['📈 УГОДА НА БІРЖІ', 'MARKET TRADE']);
+  FX.add('stocks', { bg: ['#06200f', '#010804'], items: [['📈', 'zoom', 1, 150], ['💹', 'float', 6, 36], ['💰', 'rain', 20, 26]], draw(cx, W, H, u) { cx.strokeStyle = '#3ed06a'; cx.lineWidth = 6; cx.beginPath(); for (let x = 0; x <= W; x += 30) cx.lineTo(x, H * 0.75 - x / W * H * 0.35 + Math.sin(x / 40 + u * 3) * 25); cx.stroke(); } }, ['📈 УГОДА НА БІРЖІ', 'MARKET TRADE']);
   FX.add('study', { bg: ['#141a3a', '#04060f'], items: [['📚', 'stomp', 1, 140], ['🎓', 'rise', 8, 40], ['💡', 'burst', 20, 26]] }, ['🎓 НАВЧАННЯ', 'STUDYING']);
   FX.add('wedding', { bg: ['#3a1a2a', '#0f050a'], items: [['💒', 'pulse', 1, 150], ['💍', 'zoom', 1, 60], ['🌸', 'rain', 40, 26], ['🕊', 'fly', 2, 44]] }, ['💒 ВЕСІЛЛЯ', 'WEDDING']);
   FX.add('baby', { bg: ['#1a2a3a', '#05080f'], items: [['👶', 'pulse', 1, 150], ['🍼', 'float', 4, 40], ['🎈', 'rise', 12, 34]] }, ['👶 ПОПОВНЕННЯ В РОДИНІ', 'NEW FAMILY MEMBER']);
   FX.add('hack', { bg: ['#000a00', '#000'], items: [['💻', 'pulse', 1, 130], ['🦠', 'orbit', 8, 30]], draw(cx, W, H, u) { cx.font = '16px monospace'; cx.fillStyle = 'rgba(60,255,120,0.7)'; for (let i = 0; i < 40; i++) { const x = (i * 53) % W, y = ((u * 220 + i * 97) % (H + 40)) - 20; cx.fillText(Math.random() < 0.5 ? '1' : '0', x, y); cx.fillText('ACCESS', x + 10, (y + 140) % H); } } }, ['💻 КІБЕРОПЕРАЦІЯ', 'CYBER OPERATION']);
-  FX.add('army', { bg: ['#1a2a1a', '#050a05'], items: [['🪖', 'march', 14, 46], ['🚩', 'pulse', 1, 110], ['🥁', 'marchL', 3, 40]] }, ['🪖 НОВИЙ ПІДРОЗДІЛ', 'NEW UNIT']);
+  FX.add('army', { bg: ['#1a2a1a', '#050a05'], items: [['🎖', 'march', 14, 46], ['🚩', 'pulse', 1, 110], ['🥁', 'marchL', 3, 40]] }, ['🎖 НОВИЙ ПІДРОЗДІЛ', 'NEW UNIT']);
   FX.add('jets', { bg: ['#0a1a3a', '#02050f'], items: [['✈', 'fly', 6, 56], ['✈', 'flyL', 4, 44], ['☁', 'float', 8, 50]] }, ['✈ АВІАЦІЯ', 'AIR FORCE']);
   FX.add('factory', { bg: ['#2a1a0a', '#0a0602'], items: [['🏭', 'pulse', 1, 150], ['⚙', 'orbit', 6, 40], ['💨', 'rise', 10, 34]] }, ['🏭 ВИРОБНИЦТВО', 'PRODUCTION']);
   FX.add('demolish', { bg: ['#2a2a2a', '#0a0a0a'], items: [['🏚', 'stomp', 1, 150], ['🚜', 'march', 2, 60], ['🧱', 'burst', 20, 30]], shake: 1 }, ['🚜 ЗНЕСЕННЯ', 'DEMOLITION']);

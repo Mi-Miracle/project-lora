@@ -126,7 +126,7 @@ LORA.sim.register('v32', 99.994, function (G) {
   G.farmStock = function () { const L = G.leader; if (!L) return null; const F = farm(L); let veg = 0, kg = 0; for (const k in F.inv) { veg += F.inv[k] * G.cropPx(k); kg += F.inv[k]; } return { kg, veg, prod: prodVal(F), jars: F.jars, jarV: F.jarV || 0, total: veg + prodVal(F) + (F.jarV || 0) }; };
   G.farmSellAll = function (mul, where) { const L = G.leader, F = farm(L); const j = F.jars, jv = (F.jarV || 0) * mul; F.jars = 0; F.jarV = 0; const r = G.farmSell(mul, where); if (j) { L.money += $(jv); if (!r.ok) return { ok: true, msg: `${where}: продано ${j} банок консервації на ${f$($(jv))}` }; r.msg += ` + ${j} банок (${f$($(jv))})`; } return r; };
   D0.pantry = { n: 'Комора', ic: '🧺', acts: {
-    look: { n: 'Подивитися запаси', h: 0.2, c: 0, r: L => { const S = G.farmStock(); const F = farm(L); const veg = Object.entries(F.inv).filter(([, v]) => v > 0).map(([k, v]) => `${G.CROPS[k].ic}${v} кг`).join(' '); return [S.total > 0 ? `у коморі: ${veg || 'овочів нема'}${S.jars ? ` · 🫙${S.jars} банок` : ''}${S.prod ? ` · продукція тварин на ${f$($(S.prod))}` : ''}. Разом ≈ ${f$($(S.total))}` : 'порожньо. Лише миша й банка огірків 2019 року', {}]; } },
+    look: { n: 'Подивитися запаси', h: 0.2, c: 0, r: L => { const S = G.farmStock(); const F = farm(L); const veg = Object.entries(F.inv).filter(([, v]) => v > 0).map(([k, v]) => `${G.CROPS[k].ic}${v} кг`).join(' '); return [S.total > 0 ? `у коморі: ${veg || 'овочів нема'}${S.jars ? ` · 🥫${S.jars} банок` : ''}${S.prod ? ` · продукція тварин на ${f$($(S.prod))}` : ''}. Разом ≈ ${f$($(S.total))}` : 'порожньо. Лише миша й банка огірків 2019 року', {}]; } },
     jars: { n: 'Закрутити консервацію (до 20 кг → банки)', h: 3, c: 0, need: L => Object.values(farm(L).inv).some(v => v > 0) ? '' : 'Нема овочів', r: L => { const F = farm(L); let left = 20, n = 0, val = 0; for (const k of Object.keys(F.inv)) { const t = Math.min(left, F.inv[k]); F.inv[k] -= t; left -= t; n += t; val += t * G.cropPx(k); if (!left) break; } const jars = Math.max(1, Math.floor(n / 1.5)); F.jars += jars; F.jarV = (F.jarV || 0) + val * 1.6; L.money -= Math.min(L.money, $(jars * 0.4)); return [`закрутили банок: ${jars} (дорожчі за свіжі овочі в 1,6 раза). Одна вибухнула вночі — так і має бути`, { mood: 5 }]; } },
     sellall: { n: 'Продати ВСЕ перекупнику (85%)', h: 1, c: 0, r: () => W(G.farmSellAll(0.85, 'Перекупник Толік'), 5) },
     treat: { n: 'Пригостити сусідів урожаєм', h: 1, c: 0, need: L => Object.values(farm(L).inv).some(v => v > 0) ? '' : 'Нема чим', r: L => { const F = farm(L); for (const k in F.inv) F.inv[k] = Math.floor(F.inv[k] * 0.8); return ['сусіди віддячили салом, самогоном (ви відмовились) і голосами на виборах', { popu: 2, cont: 1, mood: 6 }]; } } } };
@@ -143,7 +143,7 @@ LORA.sim.register('v32', 99.994, function (G) {
     talk: { n: 'Поговорити через паркан', h: 1, c: 0, r: () => [pick(['Петрович знає, як закінчити війну, вилікувати економіку й посадити картоплю. Порядок довільний', 'Петрович показав свій кабачок. Ваш менший. Ви засмучені', 'Петрович розповів, що його кіт голосує за вас']), { mood: 3, popu: 0.3 }] },
     borrow: { n: 'Позичити сапу', h: 0.5, c: 0, r: () => ['сапа 1974 року. Ручка відпала, але дух живий', { mood: 2 }] },
     swap: { n: 'Обмінятися розсадою', h: 1, c: 0, r: L => { const F = farm(L); F.fert = Math.max(F.fert || 0, G.day + 30); return ['Петрович дав «секретну» розсаду. Урожай +30% на місяць (каже він)', { mood: 4 }]; } } } };
-  D0.well = { n: 'Криниця', ic: '🪣', acts: {
+  D0.well = { n: 'Криниця', ic: '💧', acts: {
     water: { n: 'Набрати води й полити все', h: 1, c: 0, r: L => { const F = farm(L); F.plots.forEach(p => p.w = Math.min(3, p.w + 2)); return ['вода холодна, як погляд податкової. Город щасливий', { hp: 1 }]; } },
     wish: { n: 'Кинути монетку й загадати бажання', h: 0.2, c: $(0.05), r: () => [pick(['загадали дощ. Пішов дощ. Ви — чарівник', 'з криниці відповіло луною: «вибори… ори… ори»']), { mood: 4 }] } } };
 
@@ -175,7 +175,7 @@ LORA.sim.register('v32', 99.994, function (G) {
     weekend: { n: 'Вікенд у сусідній столиці (3 дні, $700)', h: 1, c: 0, need: L => L.money >= $(700) ? '' : 'Бракує грошей на квиток', r: step(4, 'Посадка', L => { L.money -= $(700); L.busy = Math.max(L.busy || 0, G.day + 3); L.air.s = 0; L.air.back = 1; return [pick(['три дні музеїв, кави й «а в нас дешевше»', 'вікенд вдався: ви навіть знайшли ресторан з нашою кухнею. Гірший']), { mood: 18, hp: 6, cont: 1 }]; }) },
     sleep: { n: 'Задрімати на лавці біля виходу', h: 2, c: 0, r: L => { const A = AIR(L); A.s = 0; return ['ви проспали посадку. Літак помахав крилом. Реєструйтеся знову', { mood: -8, hp: 3 }]; } } };
   AP.bag.acts.wait.r = (w => L => { const A = AIR(L); if (!A.back) return ['ви ще нікуди не літали. Чужі валізи вам не віддають', { mood: -1 }]; A.back = 0; return w(L); })(AP.bag.acts.wait.r);
-  AP.board = { n: 'Табло рейсів', ic: '🪧', acts: {
+  AP.board = { n: 'Табло рейсів', ic: '📋', acts: {
     look: { n: 'Подивитися, де ви зараз', h: 0.1, c: 0, r: L => { const A = AIR(L); return [['ви ще не зареєструвались → «1. Реєстрація»', 'далі — «2. Паспортний контроль»', 'далі — «3. Огляд безпеки»', 'можна в дьюті-фрі, лаунж або «4. Вихід на посадку»', 'ви на посадці'][A.s] || '?', {}]; } },
     photo: { n: 'Сфотографуватися на тлі табло', h: 0.2, c: 0, r: () => ['на фото позаду написано «ЗАТРИМКА». Символічно', { mood: 2 }] } } };
 
@@ -189,7 +189,7 @@ LORA.sim.register('v32', 99.994, function (G) {
       spin: { n: 'Перевантаження 6g', h: 1, c: $(800), r: L => L.hp > 40 ? ['обличчя з’їхало на вуха, але ви тримались як герой', { hp: -6, mood: 8, fame: 0.3 }, 'centri'] : ['лікар зупинив тест на 2g. «Спершу виспіться»', { hp: -2 }] } } },
     tubes: { n: 'Їдальня космонавтів', ic: '🧃', acts: {
       eat: { n: 'Обід із тюбиків', h: 1, c: $(25), r: () => [pick(['борщ із тюбика. На смак — як борщ, на вигляд — як зубна паста', 'котлета в таблетці. Ви відчули майбутнє. Воно прісне']), { mood: 4 }] } } },
-    suit: { n: 'Скафандрова', ic: '🧑‍🚀', acts: {
+    suit: { n: 'Скафандрова', ic: '👨‍🚀', acts: {
       photo: { n: 'Фотосесія в скафандрі', h: 1, c: $(200), r: () => ['фото в скафандрі набрало мільйон лайків. Обличчя не видно, але харизма — так', { fame: 1, popu: 1 }, 'photoshoot'] },
       walk: { n: 'Тренування виходу у відкритий космос (басейн)', h: 3, c: $(1500), r: () => ['3 години у воді в скафандрі. Тепер ви знаєте, як почуваються пельмені', { hp: -3, mood: 10, fame: 0.5 }, 'spacewalk'] } } },
     stars: { n: 'Каталог зірок', ic: '⭐', acts: {

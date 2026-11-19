@@ -24,8 +24,8 @@ const FX = (() => {
     cat: { bg: ['#2a1a2a', '#0a050a'], items: [['🐈', 'stomp', 1, 300], ['🏛', 'march', 5, 60], ['😹', 'float', 8, 40]] },
     catfed: { bg: ['#2a1a2a', '#0a050a'], items: [['🐈', 'pulse', 1, 220], ['🐟', 'rain', 30, 34], ['💤', 'float', 6, 40]] },
     laserdot: { bg: ['#200a0a', '#050202'], items: [['🐈', 'chase', 1, 200], ['🔴', 'dot', 1, 30]] },
-    geese: { bg: ['#1a2a1a', '#050a05'], items: [['🪿', 'march', 30, 40], ['🪧', 'float', 6, 40], ['📢', 'pulse', 1, 70]] },
-    geesepeace: { bg: ['#1a2a1a', '#050a05'], items: [['🪿', 'orbit', 10, 40], ['🍞', 'rain', 30, 30], ['🕊', 'fly', 5, 40]] },
+    geese: { bg: ['#1a2a1a', '#050a05'], items: [['🦢', 'march', 30, 40], ['📋', 'float', 6, 40], ['📢', 'pulse', 1, 70]] },
+    geesepeace: { bg: ['#1a2a1a', '#050a05'], items: [['🦢', 'orbit', 10, 40], ['🍞', 'rain', 30, 30], ['🕊', 'fly', 5, 40]] },
     money: { bg: ['#0a2a0a', '#020a02'], items: [['💸', 'rain', 40, 36], ['💰', 'pulse', 1, 120], ['📈', 'float', 4, 46]] },
     crash: { bg: ['#2a0a0a', '#0a0202'], items: [['📉', 'pulse', 1, 140], ['💸', 'rise', 30, 30], ['😭', 'float', 8, 40]], shake: 1 },
     party: { bg: ['#2a0a2a', '#0a020a'], items: [['🎉', 'burst', 40, 32], ['🕺', 'march', 8, 50], ['💃', 'marchL', 8, 50], ['🎶', 'float', 10, 30]] },
@@ -34,8 +34,8 @@ const FX = (() => {
     reboot: { bg: ['#05080d', '#000'], items: [['💾', 'pulse', 1, 120], ['🔄', 'spin', 1, 90], ['0️⃣', 'rain', 50, 18], ['1️⃣', 'rain', 50, 18]] },
     council: { bg: ['#101a2a', '#05080d'], items: [['🤖', 'orbit', 8, 46], ['🏛', 'pulse', 1, 110], ['📜', 'float', 6, 34]] },
     future: { bg: ['#1a0a3a', '#05020f'], items: [['🔮', 'pulse', 1, 120], ['🚀', 'fly', 4, 46], ['🏙', 'march', 6, 60], ['✨', 'burst', 30, 24]] },
-    jail: { bg: ['#1a1a1a', '#050505'], items: [['🚔', 'march', 3, 70], ['🧑‍🚀', 'pulse', 1, 110], ['⛓', 'float', 6, 40]] },
-    minister: { bg: ['#2a2a0a', '#0a0a02'], items: [['🧑‍🚀', 'pulse', 1, 110], ['🎩', 'float', 6, 40], ['📜', 'rain', 20, 28]] },
+    jail: { bg: ['#1a1a1a', '#050505'], items: [['🚔', 'march', 3, 70], ['👨‍🚀', 'pulse', 1, 110], ['⛓', 'float', 6, 40]] },
+    minister: { bg: ['#2a2a0a', '#0a0a02'], items: [['👨‍🚀', 'pulse', 1, 110], ['🎩', 'float', 6, 40], ['📜', 'rain', 20, 28]] },
     navy: { bg: ['#0d3b66', '#05182a'], items: [['🚢', 'march', 5, 60], ['💥', 'burst', 30, 34], ['🦑', 'stomp', 1, 160]], shake: 1 },
     fish: { bg: ['#0d3b66', '#05182a'], items: [['🦑', 'pulse', 1, 200], ['🐟', 'rain', 40, 30], ['❤', 'float', 8, 34]] },
     tourists: { bg: ['#0d3b66', '#05182a'], items: [['🦑', 'pulse', 1, 160], ['📸', 'float', 12, 34], ['🚤', 'march', 6, 46], ['💰', 'rise', 14, 28]] },
@@ -49,7 +49,7 @@ const FX = (() => {
     portalexp: { bg: ['#1a0a3a', '#020010'], items: [['🌀', 'spin', 1, 200], ['🧑‍🔬', 'rise', 6, 40], ['🦄', 'burst', 10, 40], ['💎', 'rain', 20, 30]] },
     portalbad: { bg: ['#2a0a1a', '#0a0205'], items: [['🌀', 'spin', 1, 200], ['👾', 'burst', 20, 40]], shake: 1 },
     meme: { bg: ['#2a2a2a', '#0a0a0a'], items: [['🐸', 'pulse', 1, 160], ['😂', 'rain', 40, 30], ['📱', 'float', 10, 36]] },
-    meteorgold: { bg: ['#2a2005', '#0a0802'], items: [['☄', 'fly', 1, 90], ['🪙', 'burst', 40, 30], ['🌾', 'march', 10, 36]] },
+    meteorgold: { bg: ['#2a2005', '#0a0802'], items: [['☄', 'fly', 1, 90], ['💰', 'burst', 40, 30], ['🌾', 'march', 10, 36]] },
     auction: { bg: ['#2a2005', '#0a0802'], items: [['🔨', 'pulse', 1, 110], ['💰', 'rain', 30, 30], ['🤵', 'march', 6, 46]] },
     signal: { bg: ['#05081a', '#000'], items: [['📡', 'pulse', 1, 140], ['〰', 'burst', 20, 30], ['⭐', 'rain', 60, 12]] },
     aigov: { bg: ['#051a1a', '#020808'], items: [['🤖', 'stomp', 1, 220], ['🗳', 'float', 8, 40], ['💻', 'march', 6, 46]] },
@@ -67,13 +67,13 @@ const FX = (() => {
     catvote: { bg: ['#2a1a2a', '#0a050a'], items: [['🐈', 'pulse', 1, 170], ['🗳', 'rain', 20, 34], ['🎉', 'burst', 20, 26], ['🐟', 'float', 6, 34]] },
     football: { bg: ['#0a3a0a', '#021002'], items: [['⚽', 'orbit', 3, 50], ['🏟', 'pulse', 1, 130], ['🎉', 'burst', 30, 26], ['📣', 'march', 8, 40]] },
     hole: { bg: ['#1a140a', '#050302'], items: [['🕳', 'pulse', 1, 220], ['🚧', 'march', 6, 46], ['😮', 'float', 6, 40]], shake: 1 },
-    treasure: { bg: ['#2a2005', '#0a0802'], items: [['🏺', 'pulse', 1, 120], ['💎', 'burst', 30, 30], ['📜', 'float', 8, 34], ['🪙', 'rain', 30, 26]] },
+    treasure: { bg: ['#2a2005', '#0a0802'], items: [['🏺', 'pulse', 1, 120], ['💎', 'burst', 30, 30], ['📜', 'float', 8, 34], ['💰', 'rain', 30, 26]] },
     droneshow: { bg: ['#05081a', '#000'], items: [['✨', 'orbit', 40, 16], ['🛸', 'float', 10, 30], ['🐈', 'pulse', 1, 120]] },
     monolith: { bg: ['#2a2010', '#0a0805'], items: [['🗿', 'pulse', 1, 200], ['🧑‍🔬', 'march', 5, 40], ['❓', 'float', 10, 36]] },
     satfall: { bg: ['#05081a', '#000'], items: [['🛰', 'fly', 1, 90], ['🔥', 'fly', 6, 30], ['😬', 'float', 6, 40]] },
     banana: { bg: ['#2a2a05', '#0a0a02'], items: [['🍌', 'rain', 40, 34], ['🐒', 'march', 6, 50], ['📈', 'pulse', 1, 110]] },
     pigeons: { bg: ['#2a2a2a', '#0a0a0a'], items: [['🕊', 'rain', 50, 30], ['🚗', 'march', 3, 50], ['🏛', 'pulse', 1, 110]] },
-    penguins: { bg: ['#a8d8ff', '#3a6a9a'], items: [['🐧', 'march', 14, 44], ['🧊', 'float', 6, 50], ['🪧', 'pulse', 1, 90]] },
+    penguins: { bg: ['#a8d8ff', '#3a6a9a'], items: [['🐧', 'march', 14, 44], ['🧊', 'float', 6, 50], ['📋', 'pulse', 1, 90]] },
     un: { bg: ['#0a2a4a', '#020a14'], items: [['🇺🇳', 'pulse', 1, 140], ['🗳', 'orbit', 10, 34], ['🕊', 'fly', 4, 40]] }
   };
   const SCN_T = {};
@@ -135,13 +135,13 @@ const FX = (() => {
         cx.font = '48px serif'; cx.fillText('🚢', W * 0.62 + Math.sin(u * 3) * 30, H * 0.6 - Math.abs(Math.sin(u * 4)) * 20); }
       if (k === 'blackout') { for (let i = 0; i < 50; i++) { cx.fillStyle = `rgba(${R() * 255},${R() * 255},${R() * 255},0.25)`; cx.fillRect(R() * W, R() * H, R() * 300, 4 + R() * 20); } cx.fillStyle = '#e8f0f8'; cx.font = '700 120px monospace'; cx.textAlign = 'center'; cx.fillText('404', mx + (R() - 0.5) * 12, my + 40); }
       if (k === 'robots') { for (let i = 0; i < 7; i++) { const x = W * 0.12 + i * W * 0.12, y = H * 0.62 + Math.abs(Math.sin(u * 5 + i)) * -20; cx.font = '54px serif'; cx.textAlign = 'center'; cx.fillText('🤖', x, y); cx.fillStyle = '#f4f1e6'; cx.fillRect(x - 40, y - 120, 80, 40); cx.fillStyle = '#1a1a22'; cx.font = '700 13px system-ui'; cx.fillText(en ? 'OIL!' : 'МАСТИЛА!', x, y - 95); cx.fillRect(x - 2, y - 80, 4, 30); } }
-      if (k === 'time') { for (let i = 0; i < 14; i++) { cx.strokeStyle = `hsla(${(u * 120 + i * 25) % 360},90%,65%,0.6)`; cx.lineWidth = 3; cx.beginPath(); cx.arc(mx, my, 20 + i * 22 + (u * 80) % 22, 0, 7); cx.stroke(); } cx.font = '64px serif'; cx.textAlign = 'center'; cx.fillText(t > 0.4 ? '🧑‍🚀' : '⏳', mx, my + 22); cx.fillStyle = '#ffd34d'; cx.font = '700 28px monospace'; cx.fillText(String(2099 - Math.floor(ease(t * 1.5) * 73)), mx, my + 90); }
+      if (k === 'time') { for (let i = 0; i < 14; i++) { cx.strokeStyle = `hsla(${(u * 120 + i * 25) % 360},90%,65%,0.6)`; cx.lineWidth = 3; cx.beginPath(); cx.arc(mx, my, 20 + i * 22 + (u * 80) % 22, 0, 7); cx.stroke(); } cx.font = '64px serif'; cx.textAlign = 'center'; cx.fillText(t > 0.4 ? '👨‍🚀' : '⏳', mx, my + 22); cx.fillStyle = '#ffd34d'; cx.font = '700 28px monospace'; cx.fillText(String(2099 - Math.floor(ease(t * 1.5) * 73)), mx, my + 90); }
       if (k === 'flood') { const lv = H * (0.9 - 0.35 * ease(t * 1.5)); cx.fillStyle = 'rgba(40,120,200,0.75)'; cx.beginPath(); cx.moveTo(0, H); for (let x = 0; x <= W; x += 20) cx.lineTo(x, lv + Math.sin(x / 60 + u * 4) * 10); cx.lineTo(W, H); cx.fill(); cx.font = '40px serif'; ['🏠', '🏢', '🌴', '🚗'].forEach((c, i) => cx.fillText(c, W * (0.2 + i * 0.2), lv - 6 + Math.sin(u * 3 + i) * 6)); }
       if (k === 'rocket') { const y = H * (0.9 - ease(t * 1.3) * 0.9); cx.font = '70px serif'; cx.textAlign = 'center'; cx.fillText('🚀', mx, y); for (let i = 0; i < 30; i++) { cx.fillStyle = `rgba(255,${150 + R() * 100},60,${0.6 * R()})`; cx.beginPath(); cx.arc(mx + (R() - 0.5) * 40, y + 40 + R() * 80, 4 + R() * 10, 0, 7); cx.fill(); } }
       if (k === 'sport' || k === 'rocket' || k === 'asteroid_ok') P.forEach((p, i) => { const y = (p.y + u * 160 * p.v) % H; cx.fillStyle = `hsl(${i * 37 % 360},90%,60%)`; cx.save(); cx.translate(p.x, y); cx.rotate(u * 4 + i); cx.fillRect(-4, -2, 8, 4); cx.restore(); });
       if (k === 'sport') { cx.font = '110px serif'; cx.textAlign = 'center'; cx.fillText(e.sp === 'wc' ? '⚽' : '🏆', mx, my + 30 + Math.sin(u * 4) * 10); }
       if (k === 'leak') P.slice(0, 60).forEach((p, i) => { const y = (p.y + u * 120 * p.v) % H; cx.save(); cx.translate(p.x, y); cx.rotate(Math.sin(u * 2 + i) * 0.8); cx.fillStyle = '#f4f1e6'; cx.fillRect(-18, -24, 36, 48); cx.fillStyle = '#b22'; cx.fillRect(-14, -16, 28, 5); cx.fillStyle = '#999'; for (let l = 0; l < 4; l++) cx.fillRect(-14, -6 + l * 7, 28, 2); cx.restore(); });
-      if (k === 'exercise') { for (let i = 0; i < 8; i++) { const x = (i * W / 8 + u * 140) % (W + 100) - 50; cx.font = '46px serif'; cx.fillText(i % 3 ? '🪖' : '🛡', x, H * 0.7); } for (let i = 0; i < 3; i++) { cx.font = '40px serif'; cx.fillText('✈', (W - (u * 400 + i * 300) % (W + 200)), H * 0.25 + i * 40); } }
+      if (k === 'exercise') { for (let i = 0; i < 8; i++) { const x = (i * W / 8 + u * 140) % (W + 100) - 50; cx.font = '46px serif'; cx.fillText(i % 3 ? '🎖' : '🛡', x, H * 0.7); } for (let i = 0; i < 3; i++) { cx.font = '40px serif'; cx.fillText('✈', (W - (u * 400 + i * 300) % (W + 200)), H * 0.25 + i * 40); } }
       // заголовок
       cx.globalAlpha = fade; cx.textAlign = 'center'; cx.font = `700 ${Math.round(Math.min(W, H) * 0.06)}px Pixelify, system-ui`; cx.lineWidth = 8; cx.strokeStyle = '#05080d'; cx.strokeText(title, mx, H * 0.14); cx.fillStyle = '#ffd34d'; cx.fillText(title, mx, H * 0.14);
       if (e.sub) { cx.font = `600 ${Math.round(Math.min(W, H) * 0.026)}px system-ui`; cx.lineWidth = 6; cx.strokeStyle = '#05080d'; const sub = tr(String(e.sub)).slice(0, 160); cx.strokeText(sub, mx, H * 0.21); cx.fillStyle = '#e8f0f8'; cx.fillText(sub, mx, H * 0.21); }

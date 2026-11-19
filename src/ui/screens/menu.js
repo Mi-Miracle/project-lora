@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['Installer for testers: LORA-Installer.exe downloads the game from GitHub', 'Shops with tabs: used cars to limousines, flats, gadgets, clothes', '20+ city jobs, karaoke, stand-up, escape room, Ashot\'s shawarma', 'Dacha: pantry, preserves, barn with animals, neighbour Petrovych', 'Airport with real procedures and fines; spaceport with rockets and satellites']
-  : ['Інсталятор для тестерів: LORA-Installer.exe завантажує гру з GitHub', 'Магазини з вкладками: від вживаних авто до лімузинів, квартири, гаджети, одяг', '20+ підробітків, караоке, стендап, квест-кімната, шаурмична «У Ашота»', 'Дача: комора, консервація, хлів із тваринами, сусід Петрович', 'Аеропорт із порядком проходження й штрафами; космодром з ракетами й супутниками']
+  ? ['New character: Student, starting with $300', 'Weekly funny news broadcast (toggle in Settings)', 'Stock exchange: all companies, pages and search', 'Installer can now uninstall the game', 'Fixed icons on Windows, the dacha well and the spaceport']
+  : ['Новий персонаж: Студент — старт із $300', 'Щотижневий випуск кумедних новин (вимикається в Налаштуваннях)', 'Біржа: усі компанії, сторінки й пошук', 'Інсталятор тепер уміє видаляти гру', 'Виправлено іконки у Windows, криницю на дачі й космодром']
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }
@@ -79,7 +79,7 @@ function settingsScreen() {
   const rng = (k, n) => `<div class="sl"><div class="lab"><span>${t_(n)}</span><b>${Math.round((S[k] || 0) * 100)}%</b></div><input type="range" min="0" max="1" step="0.05" value="${S[k]}" oninput="AUD.set('${k}',+this.value);this.previousElementSibling.lastElementChild.textContent=Math.round(this.value*100)+'%'"></div>`;
   let body = '';
   if (setTab === 'sound') body = chk('music', 'Музика') + rng('mvol', 'Гучність музики') + `<div class="row"><span>${t_('Стиль музики')}</span><select onchange="AUD.set('style',this.value)"><option value="auto">${t_('Авто: за ситуацією, плейлист змінюється')}</option>${Object.entries(AUD.STY).map(([k, v]) => `<option value="${k}" ${S.style === k ? 'selected' : ''}>${t_(v.n)}</option>`).join('')}</select></div>`
-    + chk('sfx', 'Звукові ефекти') + rng('vol', 'Гучність ефектів') + chk('toasts', 'Спливаючі сповіщення') + chk('advisors', 'Радники з порадами') + chk('newscast', 'Щомісячний випуск новин') + chk('yearcast', 'Підсумки року (щорічний випуск)', true);
+    + chk('sfx', 'Звукові ефекти') + rng('vol', 'Гучність ефектів') + chk('toasts', 'Спливаючі сповіщення') + chk('advisors', 'Радники з порадами') + chk('newscast', 'Щомісячний випуск новин') + chk('yearcast', 'Підсумки року (щорічний випуск)', true) + chk('funcast', 'Щотижневі кумедні новини', true);
   else if (setTab === 'voice') body = chk('tts', 'Озвучка увімкнена') + `<div id="voiceBox">${voiceSettings()}</div>`;
   else if (setTab === 'game') body = `<label class="row"><span>🌫 ${t_('Туман війни')}</span><input type="checkbox" ${LORA.config.fog !== false ? 'checked' : ''} onchange="LORA.config.fog=this.checked;try{localStorage.setItem('lora_fog',this.checked?'1':'0')}catch(e){};if(window.mapDirty!==undefined)mapDirty=true"></label>
     <label class="row"><span>${t_('Заставка при запуску')}</span><input type="checkbox" ${localStorage.getItem('lora_intro') === 'off' ? '' : 'checked'} onchange="localStorage.setItem('lora_intro',this.checked?'on':'off')"></label>
@@ -104,7 +104,7 @@ function pauseMenu(on) {
   if (!on) { el.style.display = 'none'; _paused = false; if (!NET.isGuest() && _pauseSpeed) setSpeed(_pauseSpeed); return; }
   _paused = true; if (!NET.isGuest() && !(G.online && NET.S.role === 'host')) { _pauseSpeed = speedIdx; setSpeed(0); } else _pauseSpeed = 0;
   const B = [['▶', 'Продовжити', 'pauseMenu(false)'], ['💾', 'Зберегти гру', "saveGame();pauseMenu(false)"], ['📂', 'Завантажити', "if(loadGame())pauseMenu(false)"], ['⚙', 'Налаштування', 'settingsScreen()'],
-    ['📺', 'Випуск новин за місяць', "pauseMenu(false);NEWSCAST.open()"], ['📡', 'Вивід на стрім', "pauseMenu(false);streamMenu()"], ['❓', 'Як грати', 'help()'], ['🏠', 'Головне меню', "pauseConfirm(this,'menu')"], ['⏻', 'Вийти з гри', "pauseConfirm(this,'quit')"]];
+    ['📺', 'Випуск новин за місяць', "pauseMenu(false);NEWSCAST.open()"], ['😄', 'Кумедні новини тижня', "pauseMenu(false);NEWSCAST.openFun()"], ['📡', 'Вивід на стрім', "pauseMenu(false);streamMenu()"], ['❓', 'Як грати', 'help()'], ['🏠', 'Головне меню', "pauseConfirm(this,'menu')"], ['⏻', 'Вийти з гри', "pauseConfirm(this,'quit')"]];
   el.innerHTML = `<div class="pm-box"><h2>⏸ ${t_('Пауза')}</h2><div class="mut small">${esc(G.dateStr())}</div>${B.map(([ic, n, f]) => `<button onclick="${f}">${ic} ${t_(n)}</button>`).join('')}<div class="mut small">${t_('Незбережений прогрес буде втрачено при виході')}</div></div>`;
   el.style.display = 'flex';
 }

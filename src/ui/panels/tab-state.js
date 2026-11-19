@@ -1,5 +1,5 @@
 // ВКЛАДКА «ДЕРЖАВА»: огляд, бюджет, політика, запаси. Підвкладки — щоб не перевантажувати.
-const TABS = [['state', '🏛 Держава'], ['econ', '📦 Економіка'], ['logi', '🚢 Логістика'], ['army', '🪖 Армія'], ['dipl', '🌐 Дипломатія'], ['build', '🏗 Будівництво'], ['tech', '🔬 Дослідження'], ['intel', '🛰 Розвідка й космос'], ['world', '📊 Світ']];
+const TABS = [['state', '🏛 Держава'], ['econ', '📦 Економіка'], ['logi', '🚢 Логістика'], ['army', '🎖 Армія'], ['dipl', '🌐 Дипломатія'], ['build', '🏗 Будівництво'], ['tech', '🔬 Дослідження'], ['intel', '🛰 Розвідка й космос'], ['world', '📊 Світ']];
 const ROLE_TABS = { general: ['army', 'world'], min_econ: ['state', 'econ', 'build', 'logi', 'tech', 'world'], min_def: ['army', 'state', 'build', 'world'], min_for: ['dipl', 'intel', 'world'], diplomat: ['intel', 'dipl', 'world'], spy: ['intel', 'world'] };
 function roleTabs(r) { const all = TABS.concat([['world', '📊 Світ']]); return ROLE_TABS[r].map(k => all.find(x => x[0] === k)).filter(Boolean); }
 const CO_RAIL = [['co', '🏢 Компанія'], ['coprod', '🏭 Виробництво'], ['cotrade', '📦 Ресурси'], ['cotend', '📑 Тендери'], ['cord', '🔬 R&D'], ['cobuild', '🏗 Будівництво'], ['codipl', '🤝 Дипломатія'], ['cofin', '🏦 Фінанси']];

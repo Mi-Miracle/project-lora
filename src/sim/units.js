@@ -7,7 +7,7 @@
 LORA.sim.register('units', 61, function (G) {
   const { N, ter, T } = G; const U = LORA.core, clamp = U.clamp;
   const TY = G.D.armyTypes = {
-    inf:  { n: 'Мотопіхота', ic: '🪖', col: '#8fb36a', d: 'Основа оборони: найкраща в містах, лісах і горах' },
+    inf:  { n: 'Мотопіхота', ic: '🎖', col: '#8fb36a', d: 'Основа оборони: найкраща в містах, лісах і горах' },
     spec: { n: 'Спецпризначенці / ДШВ', ic: '🎯', col: '#c08ad8', d: 'Штурм міст і лісів, прориви; найкращі бійці, але дорогі' },
     mbt:  { n: 'Танки', ic: '🛡', col: '#c9a24a', d: 'Головна ударна сила в степу й на рівнинах; слабкі в містах і горах; гальмують у бездоріжжя; потребують бронетехніки з арсеналу' },
     ifv:  { n: 'БМП / БТР', ic: '🚙', col: '#a8b07a', d: 'Мобільна піхота: добре і в наступі, і в обороні; теж залежить від бронетехніки' },
@@ -21,7 +21,7 @@ LORA.sim.register('units', 61, function (G) {
   const mk = o => { const c = {}; TK.forEach(k => c[k] = o[k] || 0); return c; };
   const TP = G.D.armyTemplates = {
     std:     { n: 'Загальновійськова', ic: '⚔', c: mk({ inf: 0.5, mbt: 0.1, ifv: 0.12, tube: 0.13, mlrs: 0.05, ad: 0.1 }) },
-    inf:     { n: 'Піхотна (оборона)', ic: '🪖', c: mk({ inf: 0.75, mbt: 0.03, ifv: 0.05, tube: 0.1, mlrs: 0.02, ad: 0.05 }) },
+    inf:     { n: 'Піхотна (оборона)', ic: '🎖', c: mk({ inf: 0.75, mbt: 0.03, ifv: 0.05, tube: 0.1, mlrs: 0.02, ad: 0.05 }) },
     tank:    { n: 'Танкова (прорив)', ic: '🛡', c: mk({ inf: 0.25, mbt: 0.35, ifv: 0.2, tube: 0.1, mlrs: 0.04, ad: 0.06 }) },
     assault: { n: 'Штурмова (ДШВ)', ic: '🎯', c: mk({ inf: 0.3, spec: 0.3, ifv: 0.2, tube: 0.1, mlrs: 0.03, ad: 0.07 }) },
     art:     { n: 'Артилерійська', ic: '💥', c: mk({ inf: 0.4, ifv: 0.05, tube: 0.3, mlrs: 0.15, ad: 0.1 }) },
@@ -220,7 +220,7 @@ LORA.sim.register('units', 61, function (G) {
       if (hot.has(a.t)) a.xp = Math.min(1, (a.xp || 0) + 0.0035);
       if (a.retrain && G.day >= a.retrain.until) {
         a.comp = Object.assign({}, a.retrain.c || TP[a.retrain.to].c); const nm = a.retrain.c ? 'власний склад' : TP[a.retrain.to].n; a.retrain = null;
-        if (a.n === G.player || (G.isHuman && G.isHuman(a.n))) G.say(`🪖 «${a.name}» переформовано: ${nm}`, 'good', [a.n]);
+        if (a.n === G.player || (G.isHuman && G.isHuman(a.n))) G.say(`🎖 «${a.name}» переформовано: ${nm}`, 'good', [a.n]);
       }
     }
     partisansDaily(); if (month) navalDrones();

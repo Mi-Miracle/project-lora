@@ -19,7 +19,7 @@ LORA.sim.register('life', 99.67, function (G) {
     mil:   { n: 'Військова справа', ic: '🎖', d: 'офіцерська карʼєра; у війну популярність вища' }
   };
   G.skill = (L, k) => (L && L.sk && L.sk[k]) || 0;
-  const studyCost = lv => 0.000004 * (lv + 1) * (lv + 1), studyDays = lv => 15 + lv * 12;
+  const stud = () => !!(G.leader && G.leader.type === 'student'); const studyCost = lv => 0.000004 * (lv + 1) * (lv + 1) * (stud() ? 0.5 : 1), studyDays = lv => Math.round((15 + lv * 12) / (stud() ? 2 : 1));
   G.lifeStudyCan = function (k) {
     const L = G.leader; if (!isChar(L)) return 'Лише для персонажа'; if (!G.SKILLS[k]) return '?'; const lv = G.skill(L, k);
     if (lv >= 5) return 'Максимальний рівень'; if (L.mv) return 'Персонаж у дорозі'; if (L.busy > G.day) return `Зайнятий ще ${L.busy - G.day} дн.`;
@@ -158,7 +158,7 @@ LORA.sim.register('life', 99.67, function (G) {
   G.INV = {
     bond:   { n: 'Держоблігації', ic: '🏛', d: 'гроші йдуть у бюджет країни; дохідність залежить від боргу й війни; можливий дефолт' },
     fund:   { n: 'Світовий індексний фонд', ic: '🌐', d: 'повторює світовий біржовий індекс' },
-    crypto: { n: 'Криптовалюта', ic: '🪙', d: 'висока волатильність; бульбашки й обвали впливають на світ' },
+    crypto: { n: 'Криптовалюта', ic: '💰', d: 'висока волатильність; бульбашки й обвали впливають на світ' },
     gold:   { n: 'Золото', ic: '🥇', d: 'дорожчає під час воєн і криз' },
     venture:{ n: 'Венчурний стартап', ic: '🚀', d: 'через 1–3 роки: більшість згорає, але кожен десятий — ×10 і більше' },
     direct: { n: 'Пряма інвестиція в регіон', ic: '🏗', d: 'ВВП регіону росте, ви отримуєте дивіденди й популярність у країні' }
@@ -259,7 +259,7 @@ LORA.sim.register('life', 99.67, function (G) {
     // ринки: золото росте з кількістю воєн, крипта — випадкове блукання з бульбашками
     const wars = G.wars ? G.wars.size : 0; M.gold *= 1 + (0.003 + wars * 0.002 + (G.rnd() - 0.5) * 0.03); M.gold = clamp(M.gold, 0.4, 6);
     const hype = M.cap > 2 ? 0.02 : 0; let dc = (G.rnd() - 0.48) * 0.22 + hype; if (M.crypto > 3 && G.rnd() < 0.08) dc = -0.45 - G.rnd() * 0.2;
-    M.crypto = clamp(M.crypto * (1 + dc), 0.05, 50); if (dc < -0.35) { M.crash++; if (M.cap > 0.05) G.say(`🪙 Обвал криптовалют: −${Math.round(-dc * 100)}%`, 'bad', []); if (M.cap > 1) G.worldMod = Object.assign(G.worldMod || {}, { growth: (G.worldMod && G.worldMod.until > G.day ? G.worldMod.growth : 0) - Math.min(0.006, M.cap * 0.001), until: G.day + 180 }); }
+    M.crypto = clamp(M.crypto * (1 + dc), 0.05, 50); if (dc < -0.35) { M.crash++; if (M.cap > 0.05) G.say(`💰 Обвал криптовалют: −${Math.round(-dc * 100)}%`, 'bad', []); if (M.cap > 1) G.worldMod = Object.assign(G.worldMod || {}, { growth: (G.worldMod && G.worldMod.until > G.day ? G.worldMod.growth : 0) - Math.min(0.006, M.cap * 0.001), until: G.day + 180 }); }
     M.cryptoH.push(+M.crypto.toFixed(3)); M.goldH.push(+M.gold.toFixed(3)); if (M.cryptoH.length > 60) { M.cryptoH.shift(); M.goldH.shift(); }
     N.forEach(n => { if (n.fdiG) n.fdiG *= 0.97; });
     Object.values(G.leaders || {}).forEach(L => {

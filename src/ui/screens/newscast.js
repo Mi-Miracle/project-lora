@@ -27,13 +27,13 @@ const NEWSCAST = (() => {
       en ? 'Meanwhile, around the world.' : 'Тим часом у світі.', ...world, ...(fun ? [(en ? 'And finally, something funny: ' : 'І наостанок — кумедне: ') + fun] : []), outro];
     show(lines, ticker, 'LORA NEWS');
   }
-  function show(lines, ticker, title) {
+  function show(lines, ticker, title, key) { key = key || 'newscast';
     const lang = LORA.lang === 'en' ? 'en' : 'uk';
     st = { lines, i: 0, ch: 0, talk: false, done: false };
     openModal(`<div class="nc"><div class="nc-top"><span class="nc-live">● ${lang === 'en' ? 'LIVE' : 'НАЖИВО'}</span><b>${esc(title)}</b><span>${G.dateStr()}</span></div>
       <div class="nc-studio"><canvas id="ncA" width="32" height="32"></canvas><div class="nc-desk">LORA</div><div class="nc-screen"><div id="ncTxt"></div></div></div>
       <div class="nc-ticker"><div>${ticker.map(x => esc(x)).join(' &nbsp;◆&nbsp; ')}</div></div>
-      <div class="btns" style="justify-content:space-between"><label class="small mut"><input type="checkbox" ${AUD.S.newscast ? 'checked' : ''} onchange="AUD.set('newscast',this.checked)"> ${t_('Показувати щомісяця')}</label>
+      <div class="btns" style="justify-content:space-between"><label class="small mut"><input type="checkbox" ${AUD.S[key] !== false ? 'checked' : ''} onchange="AUD.set('${key}',this.checked)"> ${t_(key === 'funcast' ? 'Показувати щотижня' : 'Показувати щомісяця')}</label>
       <div class="btns" style="margin:0"><button onclick="NEWSCAST.next()">⏭ ${t_('Далі')}</button><button class="pri" onclick="NEWSCAST.close()">${t_('Продовжити гру')}</button></div></div></div>`);
     $('#mbox').classList.add('ncbox'); AUD.sfx('news'); setTimeout(say, 900); anim();
   }
@@ -50,6 +50,17 @@ const NEWSCAST = (() => {
   function next() { if (!st) return; if (window.speechSynthesis) speechSynthesis.cancel(); st.i++; if (st.i >= st.lines.length) { st.done = true; st.talk = false; return; } say(); }
   function close() { st = null; if (window.speechSynthesis) speechSynthesis.cancel(); $('#mbox').classList.remove('ncbox'); closeModal(); }
   LORA.bus.on('day', day => { if (!G || G.gameOver || !AUD.S.newscast) return; const m = Math.floor(day / 30); if (day % 30 === 1 && m !== lastMonth && day > 20) { lastMonth = m; setTimeout(() => { if (!modalOpen) open(); }, 50); } });
+  // ЩОТИЖНЕВІ КУМЕДНІ НОВИНИ
+  let lastWeek = -1;
+  function openFun() {
+    const en = LORA.lang === 'en', lang = en ? 'en' : 'uk'; const seen = new Set();
+    const game = G.news.filter(n => n.d > G.day - 7 && /^(😄|🐐) /.test(n.text)).map(n => clean(n.text)).filter(x => !seen.has(x) && seen.add(x)).slice(0, 3);
+    const fun = LORA.FUN ? Array.from({ length: 5 - game.length }, () => LORA.FUN.next(lang)).filter(Boolean) : [];
+    const items = game.concat(fun); if (!items.length) return;
+    const lines = [en ? 'Hello! LORA Humour with the funniest news of the week.' : 'Привіт! З вами «LORA Гумор» — найкумедніше за тиждень.', ...items, en ? 'That was the funny news. See you next week!' : 'Це були кумедні новини. До зустрічі за тиждень!'];
+    show(lines, LORA.FUN ? Array.from({ length: 8 }, () => LORA.FUN.next(lang)) : [], en ? 'LORA HUMOUR · WEEK' : 'LORA ГУМОР · ТИЖДЕНЬ', 'funcast');
+  }
+  LORA.bus.on('day', day => { if (!G || G.gameOver || AUD.S.funcast === false || day < 5) return; const w = Math.floor(day / 7); if (day % 7 === 4 && day % 30 > 3 && w !== lastWeek) { lastWeek = w; setTimeout(() => { if (!modalOpen) openFun(); }, 80); } });
   // ПІДСУМКИ РОКУ
   let lastYear = -1;
   function openYear() {
@@ -67,5 +78,5 @@ const NEWSCAST = (() => {
     show(lines, LORA.FUN ? Array.from({ length: 10 }, () => LORA.FUN.next(en ? 'en' : 'uk')) : [], en ? `LORA NEWS · ${yr}` : `LORA NEWS · ${yr} РІК`);
   }
   LORA.bus.on('day', day => { if (!G || G.gameOver || !G.yearRep || G.yearRep.day === lastYear || day - G.yearRep.day > 20 || AUD.S.yearcast === false || modalOpen) return; lastYear = G.yearRep.day; setTimeout(() => { if (!modalOpen) openYear(); else lastYear = -1; }, 300); });
-  return { open, next, close, openYear };
+  return { open, next, close, openYear, openFun };
 })();

@@ -35,7 +35,7 @@
   FX.add('speech', { bg: ['#2a1a08', '#0a0602'], items: [['🎈', 'rise', 12, 34], ['✨', 'burst', 18, 20]], draw(cx, W, H, u, t) {
     const mx = W / 2; cx.fillStyle = '#7a1e1e'; cx.fillRect(mx - 70, H * 0.42, 140, 110); cx.fillStyle = '#ffd34d'; cx.fillRect(mx - 70, H * 0.42, 140, 8); cx.font = '64px serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText('🧑‍💼', mx, H * 0.36 + Math.sin(u * 6) * 3); cx.font = '30px serif'; cx.fillText('🎤', mx + 40, H * 0.42);
     ['🚩', '🏳', '🚩'].forEach((f, i) => { cx.font = '50px serif'; cx.fillText(f, mx - 220 + i * 220, H * 0.32 + Math.sin(u * 3 + i) * 6); });
-    cx.font = '38px serif'; for (let k = 0; k < 22; k++) { const x = (k / 22) * W + 20, y = H * 0.82 - Math.abs(Math.sin(u * 6 + k * 1.3)) * 18; cx.fillText(['🙌', '👏', '🙋', '🙌', '📣', '👏', '🪧'][k % 7], x, y); } } }, ['🎙 ВИСТУП', 'SPEECH']);
+    cx.font = '38px serif'; for (let k = 0; k < 22; k++) { const x = (k / 22) * W + 20, y = H * 0.82 - Math.abs(Math.sin(u * 6 + k * 1.3)) * 18; cx.fillText(['🙌', '👏', '🙋', '🙌', '📣', '👏', '📋'][k % 7], x, y); } } }, ['🎙 ВИСТУП', 'SPEECH']);
   // ---- телеефір
   FX.add('tvshow', { bg: ['#101030', '#04040c'], items: [['👏', 'float', 8, 30]], draw(cx, W, H, u, t) {
     const mx = W / 2, my = H * 0.52; cx.fillStyle = '#111'; cx.fillRect(mx - W * 0.28, my - H * 0.22, W * 0.56, H * 0.42); cx.fillStyle = '#28305a'; cx.fillRect(mx - W * 0.26, my - H * 0.2, W * 0.52, H * 0.38);
@@ -47,8 +47,8 @@
   FX.add('meeting', { bg: ['#0a1a2a', '#02060a'], items: [['💼', 'march', 6, 46], ['📈', 'zoom', 1, 140], ['🤝', 'float', 3, 50]] }, ['📑 ДІЛОВА ЗУСТРІЧ', 'BUSINESS MEETING']);
   FX.add('work', { bg: ['#141a22', '#050709'], items: [['💻', 'pulse', 1, 120], ['📎', 'rain', 20, 26], ['☕', 'float', 5, 40]] }, ['💼 РОБОЧИЙ ДЕНЬ', 'WORK DAY']);
   FX.add('charity', { bg: ['#2a0a1a', '#0a0206'], items: [['❤', 'burst', 40, 30], ['🎁', 'rain', 14, 40], ['🤗', 'pulse', 1, 120]] }, ['🎗 БЛАГОДІЙНІСТЬ', 'CHARITY']);
-  FX.add('protest', { bg: ['#2a0a0a', '#0a0202'], items: [['🪧', 'march', 14, 44], ['📣', 'marchL', 6, 40], ['🔥', 'float', 4, 30]] }, ['📢 ПРОТЕСТИ', 'PROTESTS']);
-  FX.add('police', { bg: ['#0a0a2a', '#02020a'], items: [['🚓', 'march', 5, 60], ['🛡', 'marchL', 8, 40], ['🪧', 'rain', 10, 30]], flash: 1 }, ['🚓 РОЗГІН', 'CRACKDOWN']);
+  FX.add('protest', { bg: ['#2a0a0a', '#0a0202'], items: [['📋', 'march', 14, 44], ['📣', 'marchL', 6, 40], ['🔥', 'float', 4, 30]] }, ['📢 ПРОТЕСТИ', 'PROTESTS']);
+  FX.add('police', { bg: ['#0a0a2a', '#02020a'], items: [['🚓', 'march', 5, 60], ['🛡', 'marchL', 8, 40], ['📋', 'rain', 10, 30]], flash: 1 }, ['🚓 РОЗГІН', 'CRACKDOWN']);
   FX.add('build', { bg: ['#2a2a0a', '#0a0a02'], items: [['🏗', 'pulse', 1, 140], ['🚧', 'march', 6, 40], ['🧱', 'rain', 20, 28]] }, ['🏗 ІНВЕСТИЦІЇ', 'INVESTMENT']);
   FX.add('busted', { bg: ['#300808', '#0a0202'], items: [['🚨', 'pulse', 1, 140], ['🕵', 'chase', 1, 70], ['🚔', 'dot', 1, 70], ['📰', 'rain', 20, 30]], flash: 1 }, ['🚨 ВИКРИТО!', 'BUSTED!']);
   FX.add('mole', { bg: ['#1a1a1a', '#050505'], items: [['🐀', 'dot', 1, 80], ['🕵', 'chase', 1, 80], ['🔦', 'float', 3, 40]] }, ['🐀 СПІЙМАНО КРОТА', 'MOLE CAUGHT']);
@@ -56,8 +56,8 @@
   FX.add('kessler', { bg: ['#02030a', '#000'], items: [['🛰', 'orbit', 10, 40], ['💥', 'burst', 50, 26], ['🌍', 'pulse', 1, 170]], shake: 1, flash: 1 }, ['☄ СИНДРОМ КЕССЛЕРА', 'KESSLER SYNDROME']);
   FX.add('cleanup', { bg: ['#06122a', '#020610'], items: [['🧹', 'orbit', 3, 60], ['🛰', 'orbit', 6, 34], ['🌍', 'pulse', 1, 150], ['✨', 'burst', 20, 20]] }, ['🧹 ПРИБИРАННЯ ОРБІТИ', 'ORBIT CLEANUP']);
   FX.add('paparazzi', { bg: ['#111', '#000'], items: [['📸', 'burst', 24, 40], ['😱', 'pulse', 1, 130]], flash: 1 }, ['📸 ПАПАРАЦЦІ!', 'PAPARAZZI!']);
-  FX.add('disco', { bg: ['#2a0a3a', '#05020a'], items: [['🪩', 'pulse', 1, 140], ['💃', 'march', 6, 50], ['🕺', 'marchL', 6, 50], ['✨', 'burst', 30, 20]], laser: 1 }, ['🪩 ВЕЧІРКА', 'PARTY NIGHT']);
-  FX.add('jackpot', { bg: ['#2a1a00', '#0a0600'], items: [['🎰', 'pulse', 1, 140], ['🪙', 'rain', 40, 30], ['💵', 'rain', 20, 34]] }, ['🎰 ДЖЕКПОТ!', 'JACKPOT!']);
+  FX.add('disco', { bg: ['#2a0a3a', '#05020a'], items: [['🕺', 'pulse', 1, 140], ['💃', 'march', 6, 50], ['🕺', 'marchL', 6, 50], ['✨', 'burst', 30, 20]], laser: 1 }, ['🕺 ВЕЧІРКА', 'PARTY NIGHT']);
+  FX.add('jackpot', { bg: ['#2a1a00', '#0a0600'], items: [['🎰', 'pulse', 1, 140], ['💰', 'rain', 40, 30], ['💵', 'rain', 20, 34]] }, ['🎰 ДЖЕКПОТ!', 'JACKPOT!']);
   FX.add('gym', { bg: ['#1a1a1a', '#050505'], items: [['🏋', 'stomp', 1, 160], ['💪', 'burst', 12, 34]] }, ['💪 ТРЕНУВАННЯ', 'WORKOUT']);
   FX.add('heart', { bg: ['#2a0a1a', '#0a0206'], items: [['🕯', 'float', 6, 34], ['❤', 'burst', 30, 28], ['🍷', 'pulse', 1, 110]] }, ['❤ РОМАНТИКА', 'ROMANCE']);
   FX.add('flooded', { bg: ['#06223a', '#020a12'], items: [['🌊', 'march', 8, 70], ['🏠', 'float', 5, 44], ['🛶', 'march', 2, 50]] }, ['🌊 ЗАТОПЛЕННЯ', 'FLOODING']);

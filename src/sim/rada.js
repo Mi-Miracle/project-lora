@@ -27,7 +27,7 @@ LORA.sim.register('rada', 93.7, function (G) {
     n => ({ what: 'Підвищити податки на 2% для оборони', ic: '🧾', apply: () => { setPol(n, 'tax', n.pol.tax + 0.02); setPol(n, 'mil', n.pol.mil + 0.01); } }),
     n => ({ what: 'Збільшити соціальні виплати на 2% ВВП', ic: '👵', apply: () => { setPol(n, 'soc', n.pol.soc + 0.02); n.stab = clamp(n.stab + 2, 0, 100); } }),
     n => ({ what: 'Збільшити оборонний бюджет на 1% ВВП', ic: '🛡', apply: () => setPol(n, 'mil', n.pol.mil + 0.01) }),
-    n => enemies(n).length ? { what: 'Розширити мобілізацію', ic: '🪖', apply: () => setPol(n, 'mob', Math.min(0.06, n.pol.mob + 0.003)) } : null,
+    n => enemies(n).length ? { what: 'Розширити мобілізацію', ic: '🎖', apply: () => setPol(n, 'mob', Math.min(0.06, n.pol.mob + 0.003)) } : null,
     n => enemies(n).length ? { what: 'Демобілізувати тих, хто служить понад 3 роки', ic: '🏠', apply: () => { setPol(n, 'mob', Math.max(0.001, n.pol.mob - 0.002)); n.stab = clamp(n.stab + 3, 0, 100); } } : null,
     n => { const h = hostile(n)[0]; return h ? { what: `Запровадити санкції проти ${h.name}`, ic: '🚫', apply: () => G.sanctions.add(n.id + '>' + h.id) } : null; },
     n => { const f = friends(n)[0]; return f ? { what: `Надати військову допомогу: ${f.name} ($1 млрд)`, ic: '📦', apply: () => { if (n.cash >= 1) { n.cash -= 1; f.cash += 1; G.rel[f.id][n.id] = G.rel[n.id][f.id] = clamp(G.rel[n.id][f.id] + 6, -100, 100); } } } : null; },

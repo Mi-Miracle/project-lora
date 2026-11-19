@@ -8,11 +8,12 @@ using System.IO.Compression;
 using System.Net;
 using System.Threading;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 [assembly: System.Reflection.AssemblyTitle("Project LORA — інсталятор")]
 [assembly: System.Reflection.AssemblyProduct("Project LORA")]
 [assembly: System.Reflection.AssemblyCompany("Mi-Miracle")]
-[assembly: System.Reflection.AssemblyVersion("1.0.0.0")]
+[assembly: System.Reflection.AssemblyVersion("1.1.0.0")]
 
 class LoraInstaller : Form
 {
@@ -22,7 +23,7 @@ class LoraInstaller : Form
     static readonly string[] GAME = { "index.html", "overlay.html", "src/", "data/", "assets/", "styles/", "lib/" };
 
     TextBox path = new TextBox();
-    Button browse = new Button(), install = new Button(), launch = new Button();
+    Button browse = new Button(), install = new Button(), launch = new Button(), remove = new Button();
     CheckBox desk = new CheckBox(), menu = new CheckBox();
     ProgressBar bar = new ProgressBar();
     Label status = new Label();
@@ -37,7 +38,39 @@ class LoraInstaller : Form
             try { f.quiet = true; f.Work(args[1], false, false); File.WriteAllText(log, "OK " + f.exePath); } catch (Exception e) { File.WriteAllText(log, "ERR " + e); }
             return;
         }
+        if (args.Length >= 1 && args[0] == "/uninstall")
+        {
+            string d = args.Length >= 2 ? args[1] : InstalledDir();
+            // деінсталятор лежить у папці гри — запускаємо копію з TEMP, щоб папку можна було видалити
+            string me = Application.ExecutablePath;
+            if (d != null && me.StartsWith(d, StringComparison.OrdinalIgnoreCase))
+            {
+                string tmp = Path.Combine(Path.GetTempPath(), "lora-uninstall.exe"); File.Copy(me, tmp, true);
+                Process.Start(tmp, "/uninstall \"" + d + "\""); return;
+            }
+            Application.EnableVisualStyles(); Uninstall(d, null); return;
+        }
         Application.EnableVisualStyles(); Application.Run(new LoraInstaller());
+    }
+    const string UKEY = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\ProjectLORA";
+    static string InstalledDir()
+    {
+        try { using (var k = Registry.CurrentUser.OpenSubKey(UKEY)) { var v = k == null ? null : k.GetValue("InstallLocation") as string; return v != null && File.Exists(Path.Combine(v, "Project LORA.exe")) ? v : null; } } catch { return null; }
+    }
+    static void Uninstall(string d, IWin32Window owner)
+    {
+        if (owner == null) { var top = new Form { TopMost = true, ShowInTaskbar = false, FormBorderStyle = FormBorderStyle.None, Size = new Size(1, 1), StartPosition = FormStartPosition.CenterScreen, Opacity = 0 }; top.Show(); top.Activate(); owner = top; }
+        if (d == null || !Directory.Exists(d)) { MessageBox.Show(owner, "Встановлену гру не знайдено.", "Project LORA", MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
+        if (MessageBox.Show(owner, "Видалити Project LORA з папки\n" + d + " ?", "Видалення Project LORA", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+        var saves = MessageBox.Show(owner, "Видалити також збереження, налаштування й завантажені оновлення гри?\n(Ні — вони залишаться, якщо встановите гру знову)", "Project LORA", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+        foreach (var p in Process.GetProcessesByName("Project LORA")) { try { if (p.MainModule.FileName.StartsWith(d, StringComparison.OrdinalIgnoreCase)) { p.Kill(); p.WaitForExit(5000); } } catch { } }
+        Thread.Sleep(500);
+        try { Directory.Delete(d, true); } catch (Exception e) { MessageBox.Show(owner, "Не вдалося видалити все: " + e.Message + "\nЗакрийте гру й спробуйте ще раз.", "Project LORA", MessageBoxButtons.OK, MessageBoxIcon.Warning); return; }
+        try { File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Project LORA.lnk")); } catch { }
+        try { Directory.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "Project LORA"), true); } catch { }
+        try { Registry.CurrentUser.DeleteSubKeyTree(UKEY, false); } catch { }
+        if (saves) { try { Directory.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Project LORA"), true); } catch { } }
+        MessageBox.Show(owner, "Project LORA видалено." + (saves ? "" : " Збереження залишились."), "Project LORA", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
     bool quiet;
 
@@ -59,7 +92,16 @@ class LoraInstaller : Form
         status.Text = "Оберіть папку й натисніть «Встановити».";
         install.Text = "Встановити"; install.Location = new Point(330, 254); install.Width = 100; install.Height = 32; install.BackColor = Color.FromArgb(255, 211, 77); install.ForeColor = Color.Black; install.FlatStyle = FlatStyle.Flat; install.Click += Install;
         launch.Text = "Грати ▶"; launch.Location = new Point(438, 254); launch.Width = 100; launch.Height = 32; launch.Enabled = false; launch.FlatStyle = FlatStyle.Flat; launch.Click += delegate { Process.Start(new ProcessStartInfo(exePath) { WorkingDirectory = Path.GetDirectoryName(exePath) }); Close(); };
-        Controls.AddRange(new Control[] { title, sub, lp, path, browse, desk, menu, bar, status, install, launch });
+        remove.Text = "Видалити гру"; remove.Location = new Point(22, 254); remove.Width = 120; remove.Height = 32; remove.FlatStyle = FlatStyle.Flat; remove.ForeColor = Color.FromArgb(255, 140, 140);
+        remove.Click += delegate { Uninstall(InstalledDir() ?? (File.Exists(Path.Combine(path.Text, "Project LORA.exe")) ? path.Text : null), this); Refresh2(); };
+        Controls.AddRange(new Control[] { title, sub, lp, path, browse, desk, menu, bar, status, install, launch, remove });
+        Refresh2();
+    }
+    void Refresh2()
+    {
+        string d = InstalledDir(); remove.Enabled = d != null;
+        if (d != null) { path.Text = d; exePath = Path.Combine(d, "Project LORA.exe"); launch.Enabled = true; install.Text = "Перевстановити"; status.Text = "Гру вже встановлено. Можна перевстановити (оновити), видалити або грати."; }
+        else { launch.Enabled = false; install.Text = "Встановити"; install.Enabled = browse.Enabled = path.Enabled = true; }
     }
 
     void Browse(object s, EventArgs e)
@@ -79,7 +121,7 @@ class LoraInstaller : Form
         install.Enabled = browse.Enabled = path.Enabled = false; bool dk = desk.Checked, mn = menu.Checked;
         var th = new Thread(delegate ()
         {
-            try { Work(dir, dk, mn); Ui(delegate { launch.Enabled = true; install.Text = "Готово"; }); }
+            try { Work(dir, dk, mn); Ui(delegate { launch.Enabled = true; remove.Enabled = true; install.Text = "Готово"; }); }
             catch (Exception ex) { Say("Помилка: " + ex.Message + "\nПеревірте інтернет і спробуйте ще раз.", -1); Ui(delegate { install.Enabled = browse.Enabled = path.Enabled = true; }); }
         });
         th.IsBackground = true; th.Start();
@@ -137,6 +179,17 @@ class LoraInstaller : Form
         Say("Створюю ярлики…", 97);
         if (dk) Shortcut(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Project LORA.lnk"), exePath, ico);
         if (mn) { string pm = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "Project LORA"); Directory.CreateDirectory(pm); Shortcut(Path.Combine(pm, "Project LORA.lnk"), exePath, ico); }
+        try { File.Copy(Application.ExecutablePath, Path.Combine(dir, "LORA-Installer.exe"), true); } catch { }
+        try
+        {
+            using (var k = Registry.CurrentUser.CreateSubKey(UKEY))
+            {
+                k.SetValue("DisplayName", "Project LORA — Lords Of Real Atlas"); k.SetValue("Publisher", "Mi-Miracle"); k.SetValue("DisplayIcon", File.Exists(ico) ? ico : exePath);
+                k.SetValue("InstallLocation", dir); k.SetValue("UninstallString", "\"" + Path.Combine(dir, "LORA-Installer.exe") + "\" /uninstall"); k.SetValue("NoModify", 1); k.SetValue("NoRepair", 1);
+                long sz = 0; foreach (var f in Directory.GetFiles(dir, "*", SearchOption.AllDirectories)) sz += new FileInfo(f).Length; k.SetValue("EstimatedSize", (int)(sz / 1024));
+            }
+        }
+        catch { }
         try { Directory.Delete(tmp, true); } catch { }
         Say("✔ Готово! Гру встановлено в " + dir + ". Натисніть «Грати».", 100);
     }

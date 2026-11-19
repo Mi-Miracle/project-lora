@@ -121,7 +121,7 @@ function citySide() {
 }
 function cityDo(k, a) { const r = G.act.cityDo(k, a); if (!r || r.ok === false) { hint('⚠ ' + t_((r && r.err) || 'Помилка'), 2500); return; }
   const P = G.CITY[k]; const d = r.d || {}; const good = (d.mood || 0) + (d.popu || 0) + (d.fame || 0) >= 0;
-  cityUI.fx.push({ x: P.x, y: P.y, t0: performance.now(), e: r.fx === 'jackpot' ? '🪙' : r.fx === 'paparazzi' ? '📸' : r.fx === 'heart' ? '❤' : r.fx === 'busted' ? '🚨' : r.fx === 'song' ? '🎵' : r.fx === 'football' ? '⚽' : r.fx === 'disco' ? '✨' : r.fx === 'pigeons' ? '🕊' : good ? '✨' : '💢' });
+  cityUI.fx.push({ x: P.x, y: P.y, t0: performance.now(), e: r.fx === 'jackpot' ? '💰' : r.fx === 'paparazzi' ? '📸' : r.fx === 'heart' ? '❤' : r.fx === 'busted' ? '🚨' : r.fx === 'song' ? '🎵' : r.fx === 'football' ? '⚽' : r.fx === 'disco' ? '✨' : r.fx === 'pigeons' ? '🕊' : good ? '✨' : '💢' });
   if (r.fx === 'jackpot' || r.fx === 'paparazzi' || r.fx === 'busted') LORA.bus.emit('fx', { kind: r.fx, sub: r.msg });
   AUD.sfx(good ? 'good' : 'bad'); hint((good ? '😊 ' : '😬 ') + t_(r.msg), 4500); cityTop(); citySide(); }
 function cityWait() { const r = G.act.cityWait(2); if (r && r.ok === false) { hint('⚠ ' + t_(r.err), 2000); return; } hint('⏳ ' + t_(r.msg), 2500); cityTop(); citySide(); }

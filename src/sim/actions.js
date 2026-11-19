@@ -14,7 +14,7 @@ LORA.sim.register('actions', 90, function (G) {
     if (tr + k > pool) return { ok: false, err: `Ліміт мобілізації: доступно ${Math.max(0, pool - tr).toFixed(0)} тис. Підвищте рівень мобілізації.` };
     const cost = k * 0.02 * (0.5 + n.pc / 20000) + k * 0.05; pay(n, cost);
     if (tpl && G.D.armyTemplates && G.D.armyTemplates[tpl]) G._tpl = tpl; const a = G.newArmy(n.id, ti, k); a.train = Math.round(45 + k / 10); a.org = 0.5; a.auto = false;
-    G.say(`🪖 Сформовано «${a.name}» (${k} тис., ${T[ti].n}). Підготовка ${a.train} днів. Вартість $${cost.toFixed(1)} млрд`, 'good', [n.id]);
+    G.say(`🎖 Сформовано «${a.name}» (${k} тис., ${T[ti].n}). Підготовка ${a.train} днів. Вартість $${cost.toFixed(1)} млрд`, 'good', [n.id]);
     return { ok: true };
   };
   P.buildFleet = s => {

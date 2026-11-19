@@ -64,7 +64,7 @@ LORA.sim.register('v31a', 99.992, function (G) {
 
   // ================= ДІМ =================
   G.HOUSE = [null,
-    { n: 'Хатинка', ic: '🛖', c: 35000, upk: 60 }, { n: 'Будинок', ic: '🏠', c: 120000, upk: 180 }, { n: 'Котедж', ic: '🏡', c: 420000, upk: 500 },
+    { n: 'Хатинка', ic: '🏚', c: 35000, upk: 60 }, { n: 'Будинок', ic: '🏠', c: 120000, upk: 180 }, { n: 'Котедж', ic: '🏡', c: 420000, upk: 500 },
     { n: 'Особняк', ic: '🏘', c: 1800000, upk: 2000 }, { n: 'Маєток', ic: '🏰', c: 12000000, upk: 12000 }];
   G.houseBuy = function (lv) { const L = G.leader, H = G.HOUSE[lv]; if (!can(L) || !H) return { ok: false, err: '?' }; const cur = L.house ? L.house.lvl : 0; if (lv <= cur) return { ok: false, err: 'У вас уже такий або кращий' };
     const credit = cur ? G.HOUSE[cur].c * 0.85 : 0; const cost = $(H.c - credit); if (L.money < cost) return { ok: false, err: `Потрібно ${f$(cost)} (старий дім іде в залік)` }; L.money -= cost; L.house = { lvl: lv, reg: L.at, d: G.day }; L.fame += lv >= 4 ? 1 : 0;
@@ -77,7 +77,7 @@ LORA.sim.register('v31a', 99.992, function (G) {
     dog: { n: 'Пес', ic: '🐕', c: 300, eat: 60, b: { mood: 2, hp: 1 }, d: 'настрій і здоровʼя, гарний охоронець' },
     parrot: { n: 'Папуга', ic: '🦜', c: 200, eat: 15, b: { fame: 0.1 }, d: 'повторює фрази. Іноді не ті' },
     hamster: { n: 'Хом’як', ic: '🐹', c: 10, eat: 5, b: { mood: 1 }, d: 'інвестує краще за брокерів (жарт)' },
-    capy: { n: 'Капібара', ic: '🦫', c: 3000, eat: 80, b: { mood: 3, popu: 0.3 }, d: 'найспокійніша тварина світу; люди в захваті', house: 2 },
+    capy: { n: 'Капібара', ic: '🦦', c: 3000, eat: 80, b: { mood: 3, popu: 0.3 }, d: 'найспокійніша тварина світу; люди в захваті', house: 2 },
     raccoon: { n: 'Єнот', ic: '🦝', c: 500, eat: 40, b: { mood: 2 }, d: 'краде печиво й серця' },
     fox: { n: 'Лис', ic: '🦊', c: 800, eat: 50, b: { fame: 0.1, mood: 1 }, d: 'хитрий, як ваш політтехнолог' },
     horse: { n: 'Кінь', ic: '🐴', c: 20000, eat: 600, b: { fame: 0.3, hp: 1 }, d: 'статус і прогулянки верхи', house: 4 },

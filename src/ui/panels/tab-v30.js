@@ -12,7 +12,7 @@ function drawBase29(c, lw, sh, lonL, lonR) {
 
 // ---------- профспілки у вкладці «Думка»
 { const b = TAB_FN.op; if (b) TAB_FN.op = function () { let h = b.apply(this, arguments); if (!G || G.player < 0 || !G.uniState) return h; const st = G.uniState(G.player), n = nat(G.player); const c = (n.agg ? n.agg.gdp : 100) * 0.0003;
-  h += `<div class="grp">🪧 ${t_('Профспілки')}</div><div class="mut small">${t_('Нижче 30% — ризик страйку. Зустріч підвищує задоволеність на 8.')}</div>` + Object.entries(G.UNIONS).map(([k, U]) => { const v = st.sat[k], s = st.strike[k] && st.strike[k].until > G.day;
+  h += `<div class="grp">📋 ${t_('Профспілки')}</div><div class="mut small">${t_('Нижче 30% — ризик страйку. Зустріч підвищує задоволеність на 8.')}</div>` + Object.entries(G.UNIONS).map(([k, U]) => { const v = st.sat[k], s = st.strike[k] && st.strike[k].until > G.day;
     return `<div class="row small"><span>${U.ic} ${esc(t_(U.n))}${s ? ` <b class="r">${t_('СТРАЙК')}</b>` : ''}</span><span><b class="${v > 55 ? 'g' : v < 30 ? 'r' : ''}">${v.toFixed(0)}%</b> <button class="small" onclick="v29Res(G.act.uniTalk('${k}'))">🤝 ${money(c)}</button></span></div>${bar29(v)}`; }).join(''); return h; }; }
 
 // ================= ЛОКАЦІЇ =================
@@ -26,7 +26,7 @@ function locLayout(loc, seed) {
   if (L.theme === 'city') { const cells = []; for (let i = 0; i < 10; i++) for (let j = 0; j < 7; j++) if (!((i === 4 || i === 5) && j <= 1)) cells.push([i, j]); for (let k = cells.length - 1; k > 0; k--) { const q = Math.floor(rnd() * (k + 1)); [cells[k], cells[q]] = [cells[q], cells[k]]; }
     let c = 0; keys.forEach(k => { if (k === 'park') pos[k] = { x: 0.5, y: 0.125 }; else { const [i, j] = cells[c++]; pos[k] = { x: (i + 0.5) / 10, y: (j + 0.5) / 8 }; } }); }
   else if (L.theme === 'rooms') { const n = keys.length, cols = Math.ceil(Math.sqrt(n * 1.6)), rows = Math.ceil(n / cols); keys.forEach((k, i) => { const cx = i % cols, cy = Math.floor(i / cols); pos[k] = { x: (cx + 0.5) / cols, y: (cy + 0.5) / rows, w: 1 / cols, h: 1 / rows, cx, cy }; }); }
-  else { const spots = [[0.2, 0.3], [0.5, 0.22], [0.8, 0.3], [0.25, 0.7], [0.55, 0.62], [0.82, 0.72], [0.12, 0.5], [0.4, 0.45]]; keys.forEach((k, i) => { const s = spots[i % spots.length]; pos[k] = { x: s[0], y: s[1] }; }); }
+  else { const spots = [[0.2, 0.3], [0.5, 0.22], [0.8, 0.3], [0.25, 0.7], [0.55, 0.62], [0.82, 0.72], [0.12, 0.5], [0.4, 0.45], [0.1, 0.86], [0.38, 0.88], [0.66, 0.88], [0.93, 0.16], [0.08, 0.14], [0.68, 0.42], [0.93, 0.48], [0.3, 0.12], [0.75, 0.1], [0.45, 0.68]]; keys.forEach((k, i) => { const s = spots[i % spots.length]; pos[k] = { x: s[0], y: s[1] }; }); }
   return pos;
 }
 function openCity() { openLoc('city'); }
@@ -73,7 +73,7 @@ function locEst(r) { hint((r && r.ok ? '✅ ' : '⚠ ') + t_(r && (r.msg || r.er
 const CITY_BIG_FX = ['jackpot', 'paparazzi', 'busted', 'court', 'spyop', 'council', 'tvshow', 'disco'];
 function cityDo(k, a) { const r = G.act.locDo(locUI.loc, k, a); if (!r || r.ok === false) { hint('⚠ ' + t_((r && r.err) || 'Помилка'), 2500); return; }
   const p = locUI.pos[k]; const d = r.d || {}; const good = (d.mood || 0) + (d.popu || 0) + (d.fame || 0) + (d.stab || 0) * 4 + (d.coRep || 0) >= 0;
-  const FE = { jackpot: '🪙', paparazzi: '📸', heart: '❤', busted: '🚨', song: '🎵', football: '⚽', disco: '✨', pigeons: '🕊', spyop: '🕶', court: '⚖', council: '📜', speech: '📣', tvshow: '📺', leaflets: '📄', handshake: '🤝', meeting: '📈', party: '🎉', build: '🌱', gym: '💪', exercise: '🚨' };
+  const FE = { jackpot: '💰', paparazzi: '📸', heart: '❤', busted: '🚨', song: '🎵', football: '⚽', disco: '✨', pigeons: '🕊', spyop: '🕶', court: '⚖', council: '📜', speech: '📣', tvshow: '📺', leaflets: '📄', handshake: '🤝', meeting: '📈', party: '🎉', build: '🌱', gym: '💪', exercise: '🚨' };
   locUI.fx.push({ x: p.x, y: p.y, t0: performance.now(), e: FE[r.fx] || (good ? '✨' : '💢') });
   if (CITY_BIG_FX.includes(r.fx)) LORA.bus.emit('fx', { kind: r.fx, sub: r.msg });
   AUD.sfx(good ? 'good' : 'bad'); hint((good ? '😊 ' : '😬 ') + t_(r.msg), 4500); cityTop(); citySide(); }
@@ -96,7 +96,7 @@ function cityLoop() {
   } else if (th === 'rooms') {
     cx.fillStyle = '#2a2420'; cx.fillRect(0, 0, W, H); const pal = locUI.loc === 'residence' ? ['#d9c9a3', '#c9b48a', '#e2d6b8', '#cdbb94'] : ['#cfd8dc', '#b8c6cc', '#dfe7ea', '#c3d0d6'];
     for (const [k, p] of Object.entries(locUI.pos)) { const x0 = (p.x - p.w / 2) * W, y0 = (p.y - p.h / 2) * H; cx.fillStyle = pal[(p.cx + p.cy) % pal.length]; cx.fillRect(x0 + 6, y0 + 6, p.w * W - 12, p.h * H - 12); cx.strokeStyle = '#3a2a1a'; cx.lineWidth = 6; cx.strokeRect(x0 + 6, y0 + 6, p.w * W - 12, p.h * H - 12); cx.fillStyle = '#2a2420'; cx.fillRect(x0 + p.w * W / 2 - 18, y0 + p.h * H - 9, 36, 6);
-      cx.font = '22px serif'; const deco = locUI.loc === 'residence' ? ['🪴', '🖼', '🛋', '📚', '🕰', '🏺'] : ['🪴', '🖥', '📠', '🗂', '☕', '📊']; for (let q = 0; q < 3; q++) cx.fillText(deco[(p.cx * 3 + p.cy + q) % deco.length], x0 + 30 + q * (p.w * W - 60) / 2, y0 + p.h * H - 32); }
+      cx.font = '22px serif'; const deco = locUI.loc === 'residence' ? ['🌿', '🖼', '🛋', '📚', '🕰', '🏺'] : ['🌿', '🖥', '📠', '🗂', '☕', '📊']; for (let q = 0; q < 3; q++) cx.fillText(deco[(p.cx * 3 + p.cy + q) % deco.length], x0 + 30 + q * (p.w * W - 60) / 2, y0 + p.h * H - 32); }
     if (night) { cx.fillStyle = 'rgba(10,10,40,0.25)'; cx.fillRect(0, 0, W, H); }
   } else {
     cx.fillStyle = night ? '#16261a' : '#8bc06a'; cx.fillRect(0, 0, W, H); for (let i = 0; i < 40; i++) { cx.fillStyle = night ? 'rgba(30,60,30,0.5)' : 'rgba(110,170,80,0.6)'; cx.beginPath(); cx.arc(rnd() * W, rnd() * H, 20 + rnd() * 40, 0, 7); cx.fill(); }

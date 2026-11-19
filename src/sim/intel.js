@@ -52,7 +52,7 @@ LORA.sim.register('intel', 93.5, function (G) {
     moon:    { n: 'Місячна місія', ic: '🌕', cost: 45, days: 1825, req: 'heavy_lift', d: 'історичний престиж: стабільність +8, відносини +8, технології' },
     mars:    { n: 'Пілотований політ на Марс', ic: '🔴', cost: 120, days: 3650, req: 'orbital_log', d: 'епохальне досягнення людства' },
     telescope: { n: 'Космічний телескоп нового покоління', ic: '🔭', cost: 8, days: 900, req: 'space_station', prest: 4, stab: 3, tb: 0.01, d: 'наука +1%, престиж' },
-    tourism:   { n: 'Космічний туризм', ic: '🧑‍🚀', cost: 6, days: 600, req: 'space_tour', prest: 3, stab: 2, inc: 0.05, d: 'прибуток ~$0.05 млрд/міс від туристів' },
+    tourism:   { n: 'Космічний туризм', ic: '👨‍🚀', cost: 6, days: 600, req: 'space_tour', prest: 3, stab: 2, inc: 0.05, d: 'прибуток ~$0.05 млрд/міс від туристів' },
     venus:     { n: 'Зонд до Венери', ic: '🟡', cost: 18, days: 1460, req: 'ion_drive', prest: 6, stab: 4, tb: 0.015, d: 'наука, престиж' },
     asteroid:  { n: 'Місія до астероїда (повернення зразків)', ic: '☄', cost: 25, days: 1460, req: 'asteroid_probe', prest: 8, stab: 4, tb: 0.02, inc: 0.08, d: 'рідкісні метали, ліцензії: ~$0.08 млрд/міс' },
     lunar_base:{ n: 'Постійна база на Місяці', ic: '🌕', cost: 60, days: 2190, req: 'moon_base', prest: 15, stab: 8, tb: 0.03, inc: 0.2, d: 'видобуток і туризм: ~$0.2 млрд/міс, великий престиж' },
