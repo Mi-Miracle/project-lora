@@ -16,4 +16,6 @@ if (typeof CITY_BIG_FX !== 'undefined') CITY_BIG_FX.push('launch', 'boom', 'cent
     if (Object.values(A).some(v => v > 0)) h += `<div class="grp">🐓 ${t_('Хлів і курник')}</div><div class="small">${Object.entries(A).filter(([, v]) => v > 0).map(([a, v]) => `${G.FARM_SHOP[a].ic} ${esc(t_(G.FARM_SHOP[a].n))} ×${v}`).join(' · ')}${(F.fed || -9) >= G.day - 3 ? ` · 😋 ${t_('нагодовані')}` : ` · <span class="y">${t_('голодні')}</span>`}</div>`; }
   if (locUI.loc === 'airport') { const A = L.air && L.air.d >= G.day - 1 ? L.air.s : 0; const ST = ['1. Реєстрація', '2. Паспортний контроль', '3. Огляд безпеки', '4. Посадка'];
     h += `<div class="grp">📋 ${t_('Порядок проходження')}</div><div class="small">${ST.map((x, i) => `<span class="${i < A ? 'g' : i === A ? 'y' : 'mut'}">${i < A ? '✅' : i === A ? '➡' : '▫'} ${t_(x)}</span>`).join('<br>')}</div><div class="mut small">${t_('Порушите порядок — штраф. Жарти про бомбу — дуже погана ідея.')}</div>`; }
-  if (h) el.insertAdjacentHTML('beforeend', h); }; }
+  if (h) el.insertAdjacentHTML('beforeend', h);
+  const aw = G.locAway && G.locAway(); if (aw) el.insertAdjacentHTML('afterbegin', `<div class="grp y">🧳 ${esc(t_(aw))}</div><div class="mut small">${t_('Час іде як звичайно — пришвидште гру кнопками швидкості, щоб повернутися раніше.')}</div>`);
+  else if (L.city && L.city.h >= 19) el.insertAdjacentHTML('afterbegin', `<div class="mut small">🌙 ${t_('Вечір: доступні нічні зміни й сон до ранку.')}</div>`); }; }
