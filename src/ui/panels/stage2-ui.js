@@ -99,6 +99,8 @@ function s2Routes(c) {
       <div class="row small"><span>${t_('Кількість')}</span><span><input type="number" min="1" max="${V.max}" value="${s2R.n}" style="width:60px" oninput="s2R.n=Math.max(1,Math.min(${V.max},+this.value||1))"> × ${money(V.cost)}</span></div>
       ${s2B('🚀 ' + t_('Відкрити маршрут') + ' · ' + money(V.cost * s2R.n), `s2Res(G.act.routeNew(${s2R.a},${s2R.b},'${s2R.m}',s2R.n))`, G.routeErr(c, s2R.a, s2R.b, s2R.m, s2R.n), 1)}`; } }
   h += `</div>`;
+  if (s2R.a >= 0 && s2R.b >= 0) { const e = G.coRailErr(c, s2R.a, s2R.b); const q = G.linkQuote('rail', s2R.a, s2R.b); h += `<div class="card small">🛤 <b>${t_('Власна залізниця')}</b> ${esc(regName(s2R.a))} — ${esc(regName(s2R.b))}<div class="mut">${t_('Будується за кошти компанії, працює для всіх (торгівля, армії, ваші потяги); ви щомісяця отримуєте плату за проїзд.')}</div><div class="row"><span>${Math.round(q.km)} ${t_('км')} · ${q.days} ${t_('дн.')}</span><b>${money(q.cost)}</b></div>${s2B('🛤 ' + t_('Прокласти залізницю'), `s2Res(G.act.coRail(${s2R.a},${s2R.b}))`, e, 1)}</div>`; }
+  const rails = G.links.filter(l => l.co === c.id); if (rails.length) h += `<div class="grp">🛤 ${t_('Ваші залізниці')} (${rails.length})</div>` + rails.map(l => `<div class="card small"><div class="row"><b>${esc(regName(l.a))} — ${esc(regName(l.b))}</b><span>${Math.round(l.km)} ${t_('км')}</span></div>${l.done > G.day ? `<div class="mut">🏗 ${t_('будується, ще')} ${l.done - G.day} ${t_('дн.')}</div>${s2bar(1 - (l.done - G.day) / Math.max(1, l.done - (l.d0 || l.done - 120)), '#c9a24a')}` : l.cut ? `<div class="r">✂ ${t_('рух перервано (війна)')}</div>` : `<div class="row"><span>${t_('Плата за проїзд')}</span><span>≈${money(G.railToll(l))}/${t_('міс.')}</span></div><div class="row"><span>${t_('Зароблено')}</span><b class="g">${money(l.earn || 0)}</b></div>`}</div>`).join('');
   const mine = S.routes.filter(r => r.co === c.id); h += `<div class="grp">🚚 ${t_('Ваші маршрути')} (${mine.length})</div>`;
   if (!mine.length) h += `<div class="small mut">${t_('Маршрутів ще немає.')}</div>`;
   mine.forEach(r => { const V = G.VEH[r.m]; const moving = r.u.filter(u => u >= 0).length;
@@ -116,7 +118,7 @@ function s2Routes(c) {
 // ---------------- МАПА: транспорт, шахти, розвідка ----------------
 function drawStage2(sh) {
   if (!G || !G.s2) return; const S = G.s2(); const myCo = G.pc; const zoom = view.s; const frac = typeof speedIdx !== 'undefined' && speedIdx ? (typeof tAcc !== 'undefined' ? tAcc : 0) : 0;
-  ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const L0 = G.leader; ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   S.routes.forEach(r => { const mine = r.co === myCo; if (!mine && zoom < 5) return; const X = G.routePts(r); const V = G.VEH[r.m];
     ctx.beginPath(); X.P.forEach((p, k) => { const [x, y] = toScreen(p[0] + sh, p[1]); if (k) ctx.lineTo(x, y); else ctx.moveTo(x, y); });
     ctx.strokeStyle = mine ? (r.st ? 'rgba(255,90,90,0.8)' : 'rgba(255,190,60,0.75)') : 'rgba(200,200,200,0.35)'; ctx.lineWidth = mine ? 2 : 1; ctx.setLineDash(r.m === 'ship' ? [6, 5] : r.m === 'rail' ? [2, 3] : []); ctx.stroke(); ctx.setLineDash([]);
@@ -126,7 +128,43 @@ function drawStage2(sh) {
   if (myCo >= 0 && zoom >= 2.5) { ctx.font = '14px system-ui';
     Object.entries(S.dep).forEach(([k, d]) => { if (d.lic !== myCo || d.till <= G.day) return; const i = +k.split(':')[0]; const c = D.regions[i].c; const [x, y] = toScreen(c[0] + sh, c[1]); ctx.globalAlpha = d.R > 0 ? 1 : 0.4; drawEmo('⛏', x - 14, y + 12 + Math.sin(animT * 5 + i) * 1.5, 15); ctx.globalAlpha = 1; });
     S.surv.forEach(v => { if (v.co !== myCo) return; const c = D.regions[v.t].c; const [x, y] = toScreen(c[0] + sh, c[1]); ctx.globalAlpha = 0.55 + 0.45 * Math.sin(animT * 4); drawEmo('🔍', x + 14, y + 12, 15); ctx.globalAlpha = 1; }); }
+  // поїздка у справах професії
+  if (L0 && L0.op && L0.op.tr && G.opPos) { const p = G.opPos(L0, frac); if (p) { const [x, y] = toScreen(p[0] + sh, p[1]); const B = D.regions[L0.op.t].c; const [bx, by] = toScreen(B[0] + sh, B[1]); const A = D.regions[L0.op.from].c; const [ax, ay] = toScreen(A[0] + sh, A[1]);
+    ctx.strokeStyle = 'rgba(255,211,77,0.7)'; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#000a'; ctx.beginPath(); ctx.arc(x, y, 11, 0, 7); ctx.fill(); drawEmo(L0.op.v || '✈', x, y, 17); } }
   // мітка «ви тут» для персонажа на фронті
   const L = G.leader; const fa = L && G.frontArmy && G.frontArmy(L); if (fa) { const c = D.regions[fa.t].c; const [x, y] = toScreen(c[0] + sh, c[1]); drawEmo('🪖', x - 26, y - 10 + Math.sin(animT * 3) * 2, 18); }
   ctx.restore();
+}
+
+// ---------------- СПРАВИ ПРОФЕСІЇ (v4.2) ----------------
+{ const base = window.curTabs; if (base) window.curTabs = function () { const r = base.apply(this, arguments); const L = G && G.leader;
+  if (L && L.role === 'char' && L.job && G.JOB_OPS && G.JOB_OPS[L.job.k] && !r.some(x => x[0] === 'ops')) { const i = r.findIndex(x => x[0] === 'career'); r.splice(i >= 0 ? i + 1 : r.length, 0, ['ops', '🗂 Справи']); }
+  return r; }; }
+let opsSel = {};
+function opTgName(op, t) { if (op.tg === 'build') { const c = G.constructions.find(x => x.id === +t); return c ? `${t_(G.D.buildings[c.type].n)} — ${regName(c.t)} (${c.done - G.day} ${t_('дн.')})` : '?'; } const n = G.ter[t].ctrl; return (op.tg === 'abroad' || op.tg === 'nation' || op.tg === 'enemy') ? `${G.N[n].name} — ${regName(t)}` : regName(t); }
+TAB_FN.ops = function () {
+  const L = G.leader; if (!L || !L.job) return ''; const list = G.JOB_OPS[L.job.k] || []; const j = G.JOBS[L.job.k];
+  let h = `<div class="card small">${t_('Великі справи вашої професії: кілька днів роботи з реальним впливом на країну й світ. Дні справи зараховуються як робочі, досвід — більший, ніж за щоденні обовʼязки. Поїздки видно на мапі.')}</div>`;
+  h += `<div class="kpi"><div><b>${esc(t_(G.jobTitle(L)))}</b><span>${esc(t_(j.n))}</span></div><div><b>${(L.job.xp || 0).toFixed(1)} / ${G.jobNeed(L)}</b><span>${t_('досвід до підвищення')}</span></div><div><b>${L.opsDone || 0}</b><span>${t_('справ виконано')}</span></div></div>`;
+  if (L.op) { const op = G.opFind(L, L.op.id) || { n: '?' }; const p = (G.day - L.op.d0) / Math.max(1, L.op.end - L.op.d0);
+    h += `<div class="card" style="border-color:#ffb000"><b>⏳ ${esc(t_(op.n))}</b>${L.op.tr ? ` <span class="mut">→ ${esc(regName(L.op.t))}</span>` : ''}${s2bar(p, '#ffb000')}<div class="small mut">${t_('Залишилось')} ${L.op.end - G.day} ${t_('дн.')}</div>${L.op.tr ? s2B('🗺 ' + t_('Показати на мапі'), `focusReg(${L.op.t})`, '') : ''}</div>`; }
+  list.forEach(op => { const e = G.opErr(L, op.id); const ts = op.tg !== 'home' && !L.op ? G.opTargets(L, op) : []; const cur = opsSel[op.id] != null && ts.includes(+opsSel[op.id]) ? +opsSel[op.id] : ts[0];
+    const days = op.tg === 'home' || op.tg === 'build' ? op.days : cur != null ? G.opDays(L, op, cur) : op.days;
+    h += `<div class="card small"><div class="row"><b>${op.v ? op.v + ' ' : ''}${esc(t_(op.n))}</b><span class="mut">${op.lvl > 1 ? '⭐' + op.lvl : ''} · ${days ? days + ' ' + t_('дн.') : t_('за відстанню')}</span></div><div class="mut">${esc(t_(op.d))}</div>
+      ${ts.length ? `<select style="width:100%;margin:4px 0" onchange="opsSel['${op.id}']=this.value;renderTab(true)">${ts.map(t => `<option value="${t}" ${t === cur ? 'selected' : ''}>${esc(opTgName(op, t))}</option>`).join('')}</select>` : ''}
+      ${s2B('▶ ' + t_('Розпочати'), `s2Res(G.act.opStart('${op.id}',${cur != null ? cur : 'null'}))`, e, 1)}</div>`; });
+  return h;
+};
+
+// ---------------- МІСТО: підсвітка місць з роботою ----------------
+// 'my' — ваше робоче місце, 'vac' — є вакансія, на яку ви підходите, 'gig' — підробітки на сьогодні
+let _pmC = { t: 0, m: {} };
+function placeMark(loc, k) {
+  const L = G && G.leader; if (!L || L.role !== 'char') return null; const now = performance.now(); if (now - _pmC.t > 700 || _pmC.loc !== loc) { _pmC = { t: now, loc, m: {} }; }
+  if (k in _pmC.m) return _pmC.m[k]; let r = null; const P = G.LOCS[loc] && G.LOCS[loc].places[k];
+  if (P) { const j = L.job && G.JOBS[L.job.k]; if (j && j.place === k && (j.loc || 'city') === loc) r = 'my';
+    else { for (const [a, A] of Object.entries(P.acts || {})) { if (!/^apply_/.test(a)) continue; try { if ((!A.hide || !A.hide(L)) && !(A.need && A.need(L))) { r = 'vac'; break; } } catch (e) { } }
+      if (!r && k === 'jobs' && loc === 'city' && (L.city ? (L.city.gigs || 0) : 0) < (L.job ? 1 : 2)) r = 'gig'; } }
+  _pmC.m[k] = r; return r;
 }

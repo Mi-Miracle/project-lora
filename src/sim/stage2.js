@@ -110,13 +110,13 @@ LORA.sim.register('stage2', 99.998, function (G) {
     L.mood = clamp((L.mood || 60) - 0.25, 0, 100);
     if (!atWarN(a.n)) return void G.frontBack(L, 'мир! вас демобілізували до столиці');
     const fight = (G.battles || []).includes(a.t);
-    if (fight && L.job) { L.job.xp += 0.12 * (1 + sk(L, 'mil') * 0.1); L.fightD = (L.fightD || 0) + 1;
+    if (fight && L.job) { L.job.xp += 0.06 * (1 + sk(L, 'mil') * 0.1); L.fightD = (L.fightD || 0) + 1;
       if (R() < (a.stance === 'attack' ? 0.03 : 0.018) * (1 - sk(L, 'fit') * 0.08)) { const w = 8 + Math.floor(R() * 18); L.hp = clamp((L.hp || 80) - w, 0, 100);
         if (L.hp < 20) { if (a.pcU) a.auto = !G.isHuman(a.n); return void G.frontBack(L, `тяжке поранення в боях за ${T[a.t].n} — евакуація до шпиталю`); }
         G.say(`🩸 ${L.name} поранений у бою (${T[a.t].n}): здоровʼя −${w}`, 'bad', [nid]); } }
     // звільнені/захоплені регіони
-    if (a._pt === a.t && a._pc !== a.n && ter[a.t].ctrl === a.n && L.job) { L.job.xp += 1.2; const bonus = G.jobPay(L) * 0.3; L.money += bonus; L.popu[nid] = clamp((L.popu[nid] || 0) + 2, 0, 100); L.fame = (L.fame || 0) + 1;
-      G.say(`🏳 ${L.name}${a.pcU ? ` і «${a.name}»` : ''}: регіон ${T[a.t].n} під контролем! Досвід +1.2, премія ${f$(bonus)}, популярність +2`, 'big', [nid]); }
+    if (a._pt === a.t && a._pc !== a.n && ter[a.t].ctrl === a.n && L.job) { L.job.xp += 0.8; const bonus = G.jobPay(L) * 0.3; L.money += bonus; L.popu[nid] = clamp((L.popu[nid] || 0) + 2, 0, 100); L.fame = (L.fame || 0) + 1;
+      G.say(`🏳 ${L.name}${a.pcU ? ` і «${a.name}»` : ''}: регіон ${T[a.t].n} під контролем! Досвід +0.8, премія ${f$(bonus)}, популярність +2`, 'big', [nid]); }
     a._pt = a.t; a._pc = ter[a.t].ctrl;
     // завдання штабу (лише командирам підрозділів)
     if (a.pcU && L.job) {
@@ -124,7 +124,7 @@ LORA.sim.register('stage2', 99.998, function (G) {
       const m = L.mis; if (m) {
         let done = m.ty === 'take' ? ter[m.t].ctrl === nid : m.ty === 'move' ? a.t === m.t : false;
         if (m.ty === 'hold') { if (a.t === m.t && ter[m.t].ctrl === nid) m.hd = (m.hd || 0) + 1; else if (ter[m.t].ctrl !== nid) m.hd = -99; done = m.hd >= 10; }
-        if (done) { const gx = 1 + L.job.lvl * 0.6, b = G.jobPay(L) * 0.5; L.job.xp += gx; L.money += b; L.popu[nid] = clamp((L.popu[nid] || 0) + 1.5, 0, 100); L.mis = null; L.misOk = (L.misOk || 0) + 1;
+        if (done) { const gx = 0.8 + L.job.lvl * 0.35, b = G.jobPay(L) * 0.5; L.job.xp += gx; L.money += b; L.popu[nid] = clamp((L.popu[nid] || 0) + 1.5, 0, 100); L.mis = null; L.misOk = (L.misOk || 0) + 1;
           G.say(`🎖 ${L.name}: завдання штабу виконано! Досвід +${gx.toFixed(1)}, премія ${f$(b)}${G.jobPromo ? G.jobPromo(L, true) : ''}`, 'good', [nid]); }
         else if (G.day > m.due || m.hd < 0) { L.job.xp = Math.max(0, L.job.xp - 1); L.mis = null; G.say(`📉 ${L.name}: завдання штабу провалено (${G.misText(m)}). Досвід −1`, 'bad', [nid]); }
       }
@@ -333,6 +333,17 @@ LORA.sim.register('stage2', 99.998, function (G) {
     r._pts = { P, cum, L: cum[cum.length - 1] || 1 }; r._pk = (r.path || r.sea || []).join(','); return r._pts; };
   G.routePos = function (r, u) { const X = G.routePts(r); let f = u < 0 ? (u > -0.5 ? 1 : 0) : u <= 1 ? u : 2 - u; f = clamp(f, 0, 1); const d = f * X.L; let k = 1; while (k < X.cum.length - 1 && X.cum[k] < d) k++;
     const a = X.P[k - 1], b = X.P[k] || a, seg = (X.cum[k] - X.cum[k - 1]) || 1, t = clamp((d - X.cum[k - 1]) / seg, 0, 1); return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, u > 1 ? -1 : 1]; };
+
+  // ---- приватна залізниця логістичної компанії: будується за кошти компанії, працює для всієї країни, компанія отримує плату за проїзд
+  G.coRailErr = function (c, a, b) { if (!c || c.sector !== 'logistics') return 'Залізниці прокладають компанії сектору «Логістика»'; if (a == null || b == null || a < 0 || b < 0) return 'Оберіть два регіони';
+    const na = ter[a].ctrl, nb = ter[b].ctrl; if (!G.coHasOffice(c, na) || !G.coHasOffice(c, nb)) return 'Потрібні офіси в країнах обох кінців';
+    const e = G.canLink(na, 'rail', a, b); if (e) return e; const q = G.linkQuote('rail', a, b); if (c.cash < q.cost) return `Будівництво коштує ${f$(q.cost)}`; return ''; };
+  G.coRail = function (a, b) { const c = G.myCo(); const e = G.coRailErr(c, a, b); if (e) return no(e); const na = ter[a].ctrl; const q = G.linkQuote('rail', a, b);
+    const n0 = N[na].cash; const r = G.startLink(na, 'rail', a, b, true); if (!r.ok) return r; N[na].cash = n0; c.cash -= q.cost; const l = G.links[G.links.length - 1]; l.co = c.id; l.d0 = G.day;
+    G.say(`🛤 «${c.name}» прокладає залізницю ${T[a].n} — ${T[b].n} (${Math.round(q.km)} км, ${q.days} дн., ${f$(q.cost)})`, 'good', [na]); return ok(`будівництво залізниці почалося: ${q.days} дн. Після запуску — плата за проїзд щомісяця`); };
+  G.railToll = l => { const gdp = (N[ter[l.a].ctrl].agg ? N[ter[l.a].ctrl].agg.gdp : 100) + (N[ter[l.b].ctrl].agg ? N[ter[l.b].ctrl].agg.gdp : 100); return l.cost * 0.009 * (0.7 + Math.min(0.8, gdp / 6000)); };
+  G.h29.m.push(() => { G.links.forEach(l => { if (l.co == null || !l.built || l.cut) return; const c = G.companies[l.co]; if (!c || !c.alive) return; const v = G.railToll(l); c.cash += v; l.earn = (l.earn || 0) + v; }); });
+  G.act.coRail = (a, b) => G.coRail(a, b);
 
   // =====================================================================================================
   // ДІЇ (через G.act — працюють і в мультиплеєрі)

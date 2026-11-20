@@ -7,6 +7,6 @@ LORA.config = {
   aiPolicyDays: 30,                   // як часто ШІ переглядає бюджет і дипломатію
   aiArmyDays: 2,                      // як часто ШІ віддає накази арміям
   autosaveDays: 30,
-  map: { relief: 'assets/map/relief.jpg', politicalAlpha: 0.42, maxZoom: 120 },
+  map: { relief: 'assets/map/relief.jpg', politicalAlpha: 0.42, maxZoom: 220 },
   stream: { enabled: false, websocketUrl: '' } // див. docs/STREAM.md
 };
