@@ -88,7 +88,7 @@ LORA.sim.register('v44', 100.25, function (G) {
   G.bizDevs = c => { const B = G.BIZT[c.bizType]; return B ? B.dev.concat(G.BIZDEV) : []; };
   // ---------------- КРОКИ ВІДКРИТТЯ (перевизначення v4.3) ----------------
   const FUND_MIN = 50000;
-  const typeOf = b => G.JOB_BIZT[b.job];
+  const typeOf = b => b.ty || G.JOB_BIZT[b.job];
   G.bizReady = b => !b ? ['Справу не розпочато'] : [b.fund < $(FUND_MIN) ? 'фонд ≥ $50 тис.' : '', !b.plan ? 'бізнес-план' : '', !b.office ? 'офіс' : '', !b.prod ? 'виробництво' : '', !b.reg ? 'реєстрація й ліцензія' : '', b.team < 1 ? 'команда' : ''].filter(Boolean);
   G.bizOfficeCost = $(15000); G.bizProd = b => { const B = G.BIZT[typeOf(b)]; return B ? B.prod : ['Обладнання', 30000]; };
   // допомогу не дають «просто так»: треба піти в місто й пройти випробування

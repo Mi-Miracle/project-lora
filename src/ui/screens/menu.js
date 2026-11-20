@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['Two-column menu: sections on the left, their tabs on the right', 'Small business research: 15 studies in 5 branches', 'Opportunities: orders, tenders, a manager, sponsorship, investors', 'City venues: work, side gigs and other split into tabs', '🛠 mod panel button in the top bar']
-  : ['Меню у дві колонки: зліва розділи, справа їхні вкладки', 'Дослідження для малого бізнесу: 15 у 5 гілках', 'Можливості: замовлення, тендери, керуючий, спонсорство, інвестори', 'У закладах міста: робота, підробітки й інше — окремими вкладками', 'Кнопка мод-панелі 🛠 на верхній панелі']
+  ? ['New menu: sections bar at the bottom, tabs on the side, search (/)', 'Choose your business type: trade, food & tourism; defense, plants & machinery; services; IT & media', 'Production lines for every business, a production plan for corporations', 'Company troops: raise units from your own equipment', 'Rating ★, staff, competitors, city events, your venue in the city, loans between players']
+  : ['Нове меню: розділи на нижній панелі, вкладки збоку, пошук (/)', 'Вибір типу справи: торгівля, їжа й туризм; ВПК, заводи й техніка; послуги; IT і медіа', 'Виробничі лінії для всіх справ, виробничий план корпорацій', 'Військо компанії: загони зі свого спорядження', 'Рейтинг ★, персонал, конкуренти, події міста, ваш заклад у місті, позики між гравцями']
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }

@@ -9341,3 +9341,273 @@ R&D: власні розробки компанії	R&D: the company's own devel
 ✨ Інше	✨ Other
 Меню	Menu
 шанс	chance
+Компанія може тримати власне військо: набір і навчання — гроші, спорядження (бронетехніка, снаряди, FPV-дрони) — зі складу компанії. Загоном командуєте на мапі (оберіть і ПКМ по регіону) або передаєте армії держави — тоді, поки країна воює, держава платить 140% утримання.	A company can keep its own troops: recruiting and training cost money, equipment (armored vehicles, shells, FPV drones) comes from the company warehouse. Command the unit on the map (select it and right-click a region) or hand it over to the state army — then, while the country is at war, the state pays 140% of upkeep.
+Унизу — панель розділів: 🧑 Персонаж, 💼 Робота, 🏢 Бізнес, 🏛 Держава, 🌐 Світ і пошук (клавіша /). Ліворуч — вкладки обраного розділу. Повторний клік по розділу ховає панель. 🛠 вгорі — мод-панель для тестування (F9).	At the bottom — the sections bar: 🧑 Character, 💼 Work, 🏢 Business, 🏛 State, 🌐 World and search (the / key). On the left — the tabs of the selected section. Clicking a section again hides the panel. 🛠 at the top — the testing mod panel (F9).
+Щомісяця заклади виробляють товар: собівартість списується одразу, товар продається автоматично (ціна залежить від рейтингу й подій міста) або йде на склад. Понаднормовий план (150%) — собівартість +25%.	Every month venues produce goods: the cost is charged at once, goods are sold automatically (the price depends on rating and city events) or go to the warehouse. Overtime plan (150%) — cost +25%.
+Коли справа виросте (8+ закладів або $250 тис./міс.), її можна перетворити на корпорацію сектору: будівництво заводів і станцій, державні тендери, R&D, біржа ресурсів. Заклади працюють і далі.	When the business grows (8+ venues or $250k/month), it can become a sector corporation: building plants and stations, state tenders, R&D, the resource exchange. Venues keep working.
+Оберіть, чим займатиметься справа. Профіль вашої професії позначено ⭐ — там легше з ліцензією. Далі кроки: фонд від $50 тис., план, допомога, офіс і виробництво, ліцензія, команда.	Choose what the business will do. Your profession's profile is marked ⭐ — the licence is easier there. Then the steps: a fund from $50k, a plan, help, an office and production, a licence, a team.
+Рейтинг росте від розробок, досліджень, сильного персоналу й ваших візитів у заклад (місто → «Ваш заклад»); падає від інцидентів і поганих відгуків.	The rating grows from developments, research, strong staff and your visits to the venue (city → «Your venue»); it falls from incidents and bad reviews.
+Платежі списуються щомісяця з особистих грошей, а якщо їх бракує — з компанії позичальника. Після 3 прострочок суд стягує борг із компанії.	Payments are charged monthly from personal money, and if that's short — from the borrower's company. After 3 missed payments a court collects the debt from the company.
+вітаємо: тепер вам доступні будівництво профільних активів, тендери, R&D і виробництво сектору; заклади працюють і далі	congratulations: you now have sector asset construction, tenders, R&D and sector production; venues keep working
+Унизу — розділи (Персонаж, Робота, Бізнес, Держава, Світ) і пошук, ліворуч — вкладки розділу. Відкрийте «Персонаж».	At the bottom — sections (Character, Work, Business, State, World) and search, on the left — the section's tabs. Open «Character».
+Економний — менше випуску, але дешевше; Максимум — понаднормово: +20% продукції, сировина й собівартість дорожчі.	Economy — less output but cheaper; Maximum — overtime: +20% output, raw materials and costs are higher.
+військовий товар іде на склад: продайте державі або озбройте власне військо (вкладка «Військо»)	military goods go to the warehouse: sell them to the state or arm your own troops (the «Troops» tab)
+загони передано під командування армії держави; поки йде війна, держава платить 140% утримання	units handed over to the state army's command; while the war lasts the state pays 140% of upkeep
+Власне військо компанії: набір загонів, спорядження зі складу, контракт із державою	The company's own troops: raising units, equipment from the warehouse, a contract with the state
+Професії за категоріями: держслужба, торгівля й туризм, виробництво й ВПК, інше	Professions by category: civil service, trade and tourism, industry and defense, other
+Платить держава; ведуть до державних посад (міністерства, суди, генштаб).	Paid by the state; they lead to state posts (ministries, courts, general staff).
+Передати загони армії держави (платить 140% утримання під час війни)	Hand units over to the state army (it pays 140% of upkeep during war)
+Рейтинг ★, персонал, конкуренти, події міста й сезонна пропозиція	Rating ★, staff, competitors, city events and the seasonal offer
+Можливості: замовлення, тендери, керуючий, спонсорство, інвестори	Opportunities: orders, tenders, a manager, sponsorship, investors
+У закладах міста: робота, підробітки й інше — окремими вкладками	City venues: work, side gigs and other in separate tabs
+Власне військо — лише для ВПК, ПВК чи охоронного бізнесу	Own troops are only for defense, PMC or security businesses
+Також можна брати контракти ПВК — у вкладці «Операції».	You can also take PMC contracts — in the «Operations» tab.
+Меню у дві колонки: зліва розділи, справа їхні вкладки	Two-column menu: sections on the left, their tabs on the right
+доходу ваших закладів у цьому місті (разом з іншими)	of your venues' income in this city (together with others)
+» розповіла пресі про переманювання — рейтинг −0.3	» told the press about the poaching — rating −0.3
+Конкуренти зʼявляться з першим щомісячним звітом.	Competitors will appear with the first monthly report.
+Командуйте ним на мапі: оберіть і ПКМ по регіону	Command it on the map: select it and right-click a region
+загін розпущено, повернуто 30% вартості набору	unit disbanded, 30% of the recruiting cost refunded
+менше штрафів і крадіжок; нечесний — сам краде	fewer fines and thefts; a dishonest one steals himself
+Дослідження для малого бізнесу: 15 у 5 гілках	Small business research: 15 in 5 branches
+Продаж і автопродаж — у вкладці «Ресурси».	Sales and auto-sales are in the «Resources» tab.
+75% успіху; інакше скандал і −0.3 рейтингу	75% success; otherwise a scandal and −0.3 rating
+Ваш тип справи не має виробничих ліній.	Your business type has no production lines.
+Кнопка мод-панелі 🛠 на верхній панелі	Mod panel button 🛠 in the top bar
+Немає експортної ліцензії в цю країну	No export licence for this country
+Бронетехніка (ремонт і модернізація)	Armored vehicles (repair and upgrades)
+загони знову під вашим командуванням	units are under your command again
+🍷 Провести дегустацію / презентацію	🍷 Hold a tasting / presentation
+Пройдіть кроки — і відкриєте справу	Complete the steps — and you'll open the business
+У цьому місті немає вашого закладу	You have no venue in this city
+Мінімальний загін — 1 тис. бійців	Minimum unit — 1k fighters
+і нове замовлення в «Можливостях»	and a new order in «Opportunities»
+3% доходу за рівень майстерності	3% income per skill level
+»: +6% доходу, поки триває сезон	»: +6% income while the season lasts
+🧑‍🍳 Самому відпрацювати зміну	🧑‍🍳 Work a shift yourself
+»: заводи, тендери, R&D, біржа	»: plants, tenders, R&D, exchange
+Зміна у власному закладі: каса	A shift at your own venue: till
+Кліпи й реклама на замовлення	Music videos and commissioned ads
+» втратила кращих працівників	» lost its best workers
+Реєстрація корпорації й аудит	Corporation registration and audit
+» стала корпорацією сектору «	» became a corporation of the sector «
+Гостям сподобалось! Рейтинг ★	The guests loved it! Rating ★
+Верстати й ліцензія на зброю	Machine tools and an arms licence
+товар продається автоматично	goods are sold automatically
+🔍 Перевірити роботу закладу	🔍 Inspect the venue
+«підкручує» звіти. Звільнено	is «tweaking» the books. Fired
+прострочив платіж за позикою	missed a loan payment to
+Інше: фінанси, медіа, спорт	Other: finance, media, sport
+Пакети юрпослуг для бізнесу	Legal service packages for business
+звільнено (вихідна допомога	fired (severance pay
+Презентація пройшла (оцінка	The presentation went fine (score
+Виробництво минулого місяця	Last month's production
+Виробництво, ВПК і техніка	Industry, defense and machinery
+Система бронювання й меблі	Booking system and furniture
+Сезонна пропозиція вже діє	The seasonal offer is already active
+Касирка шепнула: бухгалтер	The cashier whispered: the accountant
+позику погашено достроково	loan repaid early
+рейтинг ★ і менше поломок	rating ★ and fewer breakdowns
+Негода: люди сидять удома	Bad weather: people stay home
+У кредитора бракує грошей	The lender doesn't have enough money
+можна мати власне військо	you can have your own troops
+Разом за ринковими цінами	Total at market prices
+IT, наука, медіа й спорт	IT, science, media and sport
+Напівфабрикати для мереж	Semi-finished food for chains
+Електроніка й контролери	Electronics and controllers
+» куплено й ребрендовано	» bought and rebranded
+🤝 Поговорити з командою	🤝 Talk to the team
+Сторона угоди недоступна	A party to the deal is unavailable
+Немає такого конкурента	No such competitor
+Переманити кращих людей	Poach the best people
+Команда вдячна за увагу	The team is grateful for the attention
+Виробничі лінії сектору	Sector production lines
+Торгівля, їжа й туризм	Trade, food and tourism
+Експортна сертифікація	Export certification
+Корпоративні медогляди	Corporate medical checkups
+Мерч і спортхарчування	Merch and sports nutrition
+Ліміт війська компанії	Company troop limit
+тис. бійців, оснащення	k fighters, equipped
+Ставка 0–20% на місяць	Rate 0–20% per month
+вашу справу не зачіпає	does not affect your business
+Ремзавод бронетехніки	Armor repair plant
+Складання електроніки	Electronics assembly
+Завод сільгосптехніки	Farm machinery plant
+ВПК, заводи й техніка	Defense, plants and machinery
+Комплекти спорядження	Gear kits
+спорядження зі складу	equipment from the warehouse
+Оборонне виробництво	Defense manufacturing
+Майстерня FPV-дронів	FPV drone workshop
+Товари власної марки	Private-label goods
+Системи відеонагляду	CCTV systems
+розширено ваш заклад	your venue expanded
+сезонна пропозиція «	seasonal offer «
+Сума позики від $100	Loan amount from $100
+Запропонувати позику	Offer a loan
+Військове приймання	Military acceptance
+Автосервіс і тюнінг	Car service and tuning
+Транспорт і послуги	Transport and services
+Корпоративні виїзди	Corporate retreats
+Рекламні інтеграції	Ad integrations
+Немає такого загону	No such unit
+кандидати знайшлися	candidates found
+Промислова виставка	Industrial expo
+Погасити достроково	Repay early
+Курортний комплекс	Resort complex
+Цех ударних дронів	Strike drone workshop
+Контракти доставки	Delivery contracts
+Патенти й ліцензії	Patents and licences
+товар іде на склад	goods go to the warehouse
+» сформувала загін	» raised a unit
+закладів або дохід	venues or income
+Немає такої позики	No such loan
+👥 Команда й ринок	👥 Team and market
+Нічого не знайдено	Nothing found
+Сезонна пропозиція	Seasonal offer
+Онлайн-бронювання	Online booking
+Цех металообробки	Metalworking shop
+Головний фахівець	Lead specialist
+Міський фестиваль	City festival
+Туристичний сезон	Tourist season
+Ви вже корпорація	You are already a corporation
+Шукати кандидатів	Find candidates
+Стати корпорацією	Become a corporation
+Екскурсійне бюро	Sightseeing bureau
+Заводи й техніка	Plants and machinery
+Консерви й соуси	Canned food and sauces
+Аналітичні звіти	Analytical reports
+Набір і навчання	Recruiting and training
+загін сформовано	unit raised
+Сформувати загін	Raise a unit
+На 1 тис. бійців	Per 1k fighters
+до вашого доходу	to your income
+Переманити людей	Poach people
+Державна служба	Civil service
+Туризм і готелі	Tourism and hotels
+Цех боєприпасів	Ammunition workshop
+Імпортні партії	Import batches
+Металеві деталі	Metal parts
+Сільгосптехніка	Farm machinery
+виробничий план	production plan
+Святковий сезон	Holiday season
+Строк 1–36 міс.	Term 1–36 months
+Державні посади	State posts
+Продати державі	Sell to the state
+Виробничий план	Production plan
+держава платить	the state pays
+Захист від РЕБ	EW protection
+Цех і верстати	Workshop and machine tools
+Кейтеринг-сети	Catering sets
+Овочі й молоко	Vegetables and milk
+Склад порожній	Warehouse empty
+новий заклад «	new venue «
+Коштує $5 тис.	Costs $5k
+Ставка, %/міс.	Rate, %/mo.
+Блоки й бетон	Blocks and concrete
+не має грошей	has no money
+Адміністратор	Administrator
+Посада вільна	The post is vacant
+%), рейтинг ★	%), rating ★
+позику видано	loan issued
+⚖ Суд стягнув	⚖ The court collected
+Почати справу	Start the business
+Продати склад	Sell the stock
+інший гравець	the other player
+ЧПК-верстати	CNC machines
+Онлайн-курси	Online courses
+🌿 Економний	🌿 Economy
+Добрий Сусід	Good Neighbour
+»: бухгалтер	»: accountant
+крав із каси	stole from the till
+Великий матч	Big match
+Бізнес-форум	Business forum
+/міс. (зараз	/mo. (now
+%, рейтинг ★	%, rating ★
+з компанії «	from the company «
+» на користь	» in favour of
+вартість/рік	value/year
+майстерність	skill
+Авіавантажі	Air cargo
+Ліцензії ПЗ	Software licences
+🔥 Максимум	🔥 Maximum
+тис. (зараз	k (now
+% зі складу	% from the warehouse
+і закрилася	and closed down
+Перевірка «	Inspection «
+усі заклади	all venues
+Ваші загони	Your units
+Перетворити	Convert
+Ви позичили	You lent to
+Строк, міс.	Term, months
+Хто позичає	Who lends
+Турагенція	Travel agency
+⚖ Стандарт	⚖ Standard
+Магістраль	Mahistral
+скандал: «	scandal: «
+Ваш заклад	Your venue
+🪖 Військо	🪖 Troops
+Розпустити	Disband
+бездоганна	spotless
+Турпакети	Tour packages
+Едельвейс	Edelweiss
+Купівля «	Purchase of «
+Бухгалтер	Accountant
+»: оцінка	»: score
+Утримання	Upkeep
+Звільнити	Fire
+нормальна	normal
+доступів	accesses
+патентів	patents
+Левицька	Levytska
+попит на	demand for
+міс. під	months at
+Професія	Profession
+на склад	to warehouse
+сировина	raw materials
+Персонал	Staff
+вакансія	vacancy
+сумнівна	doubtful
+Зарплати	Salaries
+Ви винні	You owe
+посилок	parcels
+оглядів	checkups
+інтегр.	integr.
+роліків	videos
+Загін «	Unit «
+Перлина	Perlyna
+Яремчук	Yaremchuk
+позичив	lent
+позичає	lends
+забирає	takes
+Сума, $	Amount, $
+компл.	kits
+звітів	reports
+план «	plan «
+Каштан	Kashtan
+Орбіта	Orbita
+Причал	Prychal
+Гайдай	Haidai
+Савчин	Savchyn
+Острук	Ostruk
+Позика	Loan
+%/міс.	%/mo.
+Позики	Loans
+сетів	sets
+подій	events
+конт.	cont.
+Сонях	Soniakh
+Пульс	Puls
+Борей	Borei
+попит	demand
+міс.)	mo.)
+пак.	pkg.
+ліц.	lic.
+Бриз	Bryz
+Зоря	Zoria
+Ясен	Yasen
+Вежа	Vezha
+Явір	Yavir
+м³	m³
+ℹ Як отримати тут заклад	ℹ How to get a venue here
+Відкрийте заклад у цьому місті: «Бізнес» → вкладка закладів	Open a venue in this city: «Business» → the venues tab
+Спершу відкрийте свою справу: «Робота» → «Своя справа»	First open your own business: «Work» → «Own business»

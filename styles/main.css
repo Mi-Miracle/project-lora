@@ -549,3 +549,41 @@ body.lhide #tabs.one{width:200px}
 body.lhide:has(#tabs.one) #news{left:210px}
 @media (max-width:900px){#tabs.two,#tabs.one{width:150px}#tabs .rs{width:46px}#tabs .rs-b span{display:none}#tabs.two~#left,#tabs.one~#left{left:150px;width:min(380px,calc(100% - 150px))}#tabs .rt button span{display:inline}body.lhide #tabs.two{width:46px}}
 #funTk{left:580px}body.lhide:has(#tabs.one) #adv{left:212px}
+/* v4.6: нижня панель розділів + бічна колонка вкладок */
+#tabs.v46{width:168px;bottom:58px;flex-direction:column;gap:2px;padding:8px 6px;overflow-y:auto}
+#tabs.v46 .rt-h{font:600 11px var(--px);color:var(--acc2);letter-spacing:.06em;text-transform:uppercase;padding:2px 4px 7px;border-bottom:1px solid var(--line2);margin-bottom:4px;white-space:nowrap}
+#tabs.v46 button{flex-direction:row;justify-content:flex-start;gap:6px;padding:5px 6px;font:400 12px var(--px);text-align:left;width:100%;min-height:0}
+#tabs.v46 button span{max-width:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tabs.v46 button .pxi.x2{width:32px;height:32px;flex:none;zoom:.7}
+#tabs.v46~#left{left:168px;bottom:58px}
+body.lhide #tabs.v46{display:none}
+#right{max-height:calc(100% - 118px)}
+#dock{position:absolute;left:0;right:0;bottom:0;height:58px;z-index:8;display:flex;align-items:center;gap:10px;padding:0 12px;background:linear-gradient(#111a24f2,#0a1018fa);border-top:1px solid var(--line2);box-shadow:0 -6px 18px #0006}
+#dock::before{content:'';position:absolute;left:0;right:0;top:-1px;height:2px;background:linear-gradient(90deg,var(--acc),var(--acc2) 30%,transparent 70%);opacity:.7}
+.dk-secs{display:flex;gap:6px}
+.dk-b{display:flex;align-items:center;gap:8px;padding:7px 14px 7px 10px;border-radius:9px;cursor:pointer;font:600 13px var(--px);color:var(--mut);border:1px solid var(--line2);background:#0d151e;position:relative;transition:background .15s,color .15s}
+.dk-b b{font-size:21px;line-height:1;filter:grayscale(.5)}
+.dk-b i{font-style:normal;font-size:10px;color:var(--mut);background:#16212d;border-radius:8px;padding:1px 6px}
+.dk-b:hover{color:var(--tx);background:#16212d}
+.dk-b.on{color:#fff;background:linear-gradient(color-mix(in srgb,var(--acc) 55%,#0d151e),#0d151e);border-color:color-mix(in srgb,var(--acc) 70%,transparent)}
+.dk-b.on b{filter:none}
+.dk-b.on::after{content:'';position:absolute;left:18%;right:18%;top:-2px;height:3px;border-radius:2px;background:var(--acc2);box-shadow:0 0 8px var(--acc2)}
+.dk-s{margin-left:auto;position:relative}
+#dkIn{width:260px;padding:8px 12px;border-radius:9px;background:#0a1018;border:1px solid var(--line2);color:var(--tx);font:400 13px var(--px)}
+#dkIn:focus{outline:none;border-color:var(--acc2)}
+#dkRes{display:none;position:absolute;right:0;bottom:44px;width:360px;max-height:360px;overflow-y:auto;background:#0a1018f8;border:1px solid var(--line2);border-radius:9px;padding:4px;box-shadow:0 -8px 24px #000a}
+#dkRes>div{display:flex;justify-content:space-between;gap:8px;padding:7px 9px;border-radius:6px;cursor:pointer;font-size:13px}
+#dkRes>div:hover,#dkRes>div:first-child{background:#16212d}
+#dkRes i{font-style:normal;font-size:11px;color:var(--mut);white-space:nowrap}
+#news{left:562px;bottom:68px}#adv{left:564px;bottom:254px}#campCard{left:560px}
+body.lhide #news,#left.hide~#news{left:10px}
+body.lhide #adv,#left.hide~#adv{left:12px}
+body.lhide #campCard{left:10px}
+#funTk{left:552px}body.lhide #funTk,#left.hide~#funTk{left:0}
+#legend{bottom:68px}#togL{bottom:68px}#gChat{bottom:208px}
+body.stream #dock{display:none}
+.jc{margin:6px 0 4px;padding:6px 8px;border:1px solid var(--line2);border-radius:8px;background:#0b121a}
+.jc-h{font:600 12px var(--px);color:var(--acc2);margin-bottom:4px}
+@media (max-width:900px){#tabs.v46{width:132px}#tabs.v46~#left{left:132px;width:min(380px,calc(100% - 132px))}.dk-b span{display:none}.dk-b{padding:7px 9px}#dkIn{width:150px}#news{left:10px}}
+#tabs.v46 button>:first-child:not(.pxi){font-size:16px!important;width:22px!important;height:auto!important;text-align:center;flex:none;zoom:1}
+#funTk{bottom:58px}body.tk-on #news,body.tk-on #legend{bottom:92px}body.tk-on #togL{bottom:92px}
