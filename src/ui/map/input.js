@@ -29,6 +29,7 @@ addEventListener('keydown', e => {
   if (e.key === 'Escape') { sel = null; orderMode = null; hint(''); renderRight(); }
 });
 function onClick(e) {
+  if (window.s2Pick && window.s2PickClick) { const t = pickTerritory(e.clientX, e.clientY); if (t >= 0) s2PickClick(t); return; }
   if (orderMode === 'link') { const t = pickTerritory(e.clientX, e.clientY); if (t >= 0) finishLink(t); return; }
   if (orderMode && sel && (sel.type === 'a' || sel.type === 'f')) { onRightClick(e); return; }
   const u = pickUnit(e.clientX, e.clientY);
@@ -38,9 +39,9 @@ function onClick(e) {
 function onRightClick(e) {
   if (!sel) return;
   if (sel.type === 'a') {
-    const a = G.armies.find(x => x.id === sel.id); if (!a || a.n !== G.player) return;
+    const a = G.armies.find(x => x.id === sel.id); const mineU = a && a.n !== G.player && G.canCmd && G.canCmd(a); if (!a || (a.n !== G.player && !mineU)) return;
     const t = pickTerritory(e.clientX, e.clientY); if (t < 0) return;
-    const r = G.orderMove(a, t, e.shiftKey || orderMode === 'sea');
+    const r = mineU ? G.act.unitMove(a.id, t, e.shiftKey || orderMode === 'sea') : G.orderMove(a, t, e.shiftKey || orderMode === 'sea'); if (r && r.pending) { hint(`«${a.name}» → ${regName(t)}`, 2000); orderMode = null; return; }
     hint(r.ok ? `«${a.name}» → ${regName(t)}${r.days ? ` (≈${Math.ceil(r.days)} дн.)` : ''}` : '⚠ ' + r.err, 2500); orderMode = null; renderRight();
   } else if (sel.type === 'f') {
     const f = G.fleets.find(x => x.id === sel.id); if (!f || f.n !== G.player) return;

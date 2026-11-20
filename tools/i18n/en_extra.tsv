@@ -8063,3 +8063,250 @@ IT-хаб «Кремнієва балка»	"Silicon Gully" IT hub
 Мідл	Middle
 Матч	Match
 ГРВІ	A common cold
+Шлях до шахти: геологорозвідка (тижні) → аукціон за ліцензію проти інших компаній → будівництво → видобуток. Запаси скінченні; форсований режим дає більше, але виснажує родовище й частіше призводить до аварій. Там, де немає гравця, родовища розробляють ШІ-компанії.	The road to a mine: geological survey (weeks) → licence auction against other companies → construction → extraction. Reserves are finite; forced mode yields more but depletes the deposit and causes accidents more often. Where there is no player, AI companies develop deposits.
+Воюючі держави наймають приватні військові компанії. Ви набираєте й оснащуєте бійців за свій кошт, а замовник платить щомісяця й дає бонус за кожен звільнений регіон. Загоном можна командувати самому (мапа, ПКМ) або передати замовнику.	Countries at war hire private military companies. You recruit and equip fighters at your own expense; the client pays monthly plus a bonus for every region taken. Command the unit yourself (map, right-click) or hand it over to the client.
+Військова служба: на фронті ви рухаєтеся разом з армією, досвід і слава — з реальних боїв. З посади «Лейтенант» вам дають власний підрозділ: обирайте його на мапі й клацайте ПКМ по регіону, щоб віддати наказ.	Military service: at the front you move with the army; experience and glory come from real battles. From the rank of Lieutenant you get your own unit: select it on the map and right-click a region to give an order.
+Прокладіть маршрут між двома регіонами й купіть транспорт — машини, потяги чи судна поїдуть мапою. Дохід — з кожного рейсу; шлях обходить війни, а біля фронту транспорт можуть знищити.	Plan a route between two regions and buy vehicles: trucks, trains or ships travel across the map. Income comes from every run; the route avoids wars, but near the front vehicles can be destroyed.
+» у столиці замовника. Обирайте загін на мапі й віддавайте накази (ПКМ) — або передайте командування замовнику	» is in the client's capital. Select the unit on the map and give orders (right-click), or hand command to the client
+На фронті кожен день зараховується як робочий; є ризик поранення. Місто й перельоти — після повернення.	Every day at the front counts as a working day; there is a risk of injury. The city and flights wait until you return.
+Ви у складі армії: накази віддає командування. Власний підрозділ — з посади «Лейтенант».	You serve within an army: command gives the orders. Your own unit comes with the rank of Lieutenant.
+тис. бійців. Зберіть його на фронті й віддавайте накази на мапі (ПКМ по регіону)	thousand troops. Join it at the front and give orders on the map (right-click a region)
+Відкрийте офіси в країнах із корисними копалинами (вкладка «Компанія» → Офіси).	Open offices in countries with mineral resources (Company tab → Offices).
+форсований режим: +50% видобутку, але ризик аварій ×2 і швидке виснаження	forced mode: +50% output, but ×2 accident risk and fast depletion
+Потрібен хоча б один виробничий актив (завод, полігон, навчальний центр)	At least one production asset is required (factory, range, training centre)
+дорогі, але возять у 20 разів більше; потрібна розвинена інфраструктура	expensive, but carry 20 times more; developed infrastructure required
+Наказ руху: оберіть підрозділ на мапі → ПКМ по регіону (Shift — морем).	Move order: select the unit on the map → right-click a region (Shift: by sea).
+Зараз ніхто не наймає. Пропозиції зʼявляються щомісяця під час воєн.	Nobody is hiring right now. Offers appear monthly during wars.
+Спершу влаштуйтеся: Штаб і військкомат у місті (урядовий квартал).	First enlist: HQ and recruitment office in the city (government district).
+щадний режим: менше видобутку, менше аварій, запаси на довше	gentle mode: less output, fewer accidents, reserves last longer
+Ставка на аукціоні: що вища — то менше шансів у конкурентів	Auction bid: the higher it is, the lower the rivals' chances
+зараз не воює — фронту немає. Служіть у штабі й готуйтеся.	is not at war: there is no front. Serve at HQ and prepare.
+найбільший обсяг; лише між прибережними регіонами, морем	largest capacity; only between coastal regions, by sea
+дешево, будь-який суходіл; ризик на дорогах біля фронту	cheap, any land route; risky on roads near the front
+зараз не воює — фронту немає (можна служити в штабі)	is not at war: there is no front (you can serve at HQ)
+У країни немає вільних військ для нового підрозділу	The country has no free troops for a new unit
+Ви на фронті — спершу поверніться (вкладка «Фронт»)	You are at the front: return first (Front tab)
+відкрито. Транспорт уже в дорозі — дивіться на мапі	opened. Vehicles are already on the road: watch the map
+Потрібна ліцензія на родовище (розвідка → аукціон)	A deposit licence is required (survey → auction)
+Немає сухопутного шляху (море, війна або ембарго)	No land route (sea, war or embargo)
+Маршрути прокладають компанії сектору «Логістика»	Routes are run by Logistics companies
+Лише для військових (робота «Військова служба»)	Military only (Military service job)
+» — рухаєтеся разом з армією, досвід іде з боїв	»: you move with the army and gain experience from battles
+достроково відкликано (неустойка, відносини −8)	recalled early (penalty, relations −8)
+Лише для компаній «Видобуток» або «Нафта й газ»	Mining or Oil & Gas companies only
+підрозділ розбито, вас евакуювали з пораненням	your unit was destroyed; you were evacuated wounded
+Потрібен офіс хоча б в одній із країн маршруту	An office is required in at least one country on the route
+Спершу вирушайте на фронт до свого підрозділу	First go to the front and join your unit
+війна закінчилася — бійці повертаються додому	the war is over: the fighters are going home
+Нове завдання штаб надішле найближчими днями.	HQ will send a new mission in the coming days.
+без вас підрозділом керує командування країни	without you, national command leads the unit
+». Обирайте його на мапі й віддавайте накази	». Select it on the map and give orders
+Не можна воювати проти союзника країни штабу	You cannot fight an ally of your HQ country
+Лишається остання одиниця — закрийте маршрут	Only one vehicle left: close the route instead
+ПКМ по регіону на мапі — рух (Shift — морем)	Right-click a region on the map to move (Shift: by sea)
+Морем — лише між прибережними регіонами	By sea only between coastal regions
+Немає армії, до якої можна приєднатися	There is no army to join
+У вас уже є контракт із цим замовником	You already have a contract with this client
+Підрозділ уже під вашим командуванням	A unit is already under your command
+Замало здоровʼя — спершу підлікуйтеся	Not healthy enough: get treatment first
+командування передано штабу замовника	command handed over to the client's HQ
+маршрут закрито, транспорт продано за	route closed, vehicles sold for
+Підрозділ дають з посади «Лейтенант»	You get a unit from the rank of Lieutenant
+» передано під загальне командування	» handed over to general command
+ваш підрозділ розбито в боях без вас	your unit was destroyed in battle without you
+війна для вашої частини завершилася	the war is over for your unit
+Занадто близько — це вже не логістика	Too close: that isn't logistics any more
+ви повернулися з фронту до столиці	you have returned from the front to the capital
+мир! вас демобілізували до столиці	peace! you were demobilised to the capital
+під контролем! Досвід +1.2, премія	is under control! Experience +1.2, bonus
+тис. бійців ПВК вирушають на фронт	thousand PMC fighters head to the front
+» потрапив під обстріл на маршруті	» came under fire on the route
+Передати під загальне командування	Hand over to general command
+Ви на фронті — спершу поверніться	You are at the front: return first
+Прийняти командування підрозділом	Take command of a unit
+промислових покладів не знайдено	no commercial deposits found
+Немає безпечного морського шляху	No safe sea route
+завдання штабу виконано! Досвід	HQ mission accomplished! Experience
+Лише для компаній сектору «ВПК»	Defense companies only
+Тепер оберіть пункт призначення	Now choose the destination
+Країна штабу воює з замовником	Your HQ country is at war with the client
+виснажене — видобуток зупинено	is depleted: extraction stopped
+Поклади в країнах ваших офісів	Deposits in your office countries
+Підрозділ уже укомплектований	The unit is already at full strength
+Задалеко для вашої посади: до	Too far for your rank: up to
+Маршрутів конкурентів у світі	Competitor routes worldwide
+Поповнити підрозділ до штату	Bring the unit up to strength
+ви знову командуєте загоном	you command the unit again
+термін контракту вичерпано	the contract term has ended
+прорив дамби хвостосховища	tailings dam breach
+Забагато маршрутів (до 12)	Too many routes (up to 12)
+Активних контрактів немає.	No active contracts.
+Звільнити/захопити регіон	Liberate/capture region
+тяжке поранення в боях за	severely wounded in the battle for
+Контракт уже неактуальний	The contract is no longer available
+Ліцензія в іншої компанії	Another company holds the licence
+Оберіть два різні регіони	Choose two different regions
+Підрозділ укомплектований	The unit is at full strength
+завдання штабу провалено	HQ mission failed
+Слабка залізнична мережа	Weak rail network
+Неустойка й відносини −8	Penalty and relations −8
+під вашим командуванням	under your command
+буріння й аналіз проб ≈	drilling and sample analysis ≈
+р. роботи шахти, якість	years of mine operation, quality
+Бракує коштів на ставку	Not enough money for the bid
+25 років. Тепер будуйте	25 years. Now build
+Між цими країнами війна	These countries are at war
+Простій після аварії до	Down after an accident until
+У вас немає підрозділу	You have no unit
+Немає резервів поблизу	No reserves nearby
+Немає такого контракту	No such contract
+Спершу геологорозвідка	Survey first
+контракт підписано: «	contract signed: «
+⚖ Аукціон за ліцензію	⚖ Licence auction
+Конкуренти на фронтах	Competitors at the front
+прийняв командування	took command
+ви воюєте у складі «	you fight as part of «
+евакуація до шпиталю	evacuation to hospital
+» взяла під контроль	» took control of
+Розвідка тут уже йде	A survey is already under way here
+Регіон уже розвідано	The region has already been surveyed
+Немає такого обʼєкта	No such facility
+лишилося 15% запасів	15% of reserves left
+затоплення горизонту	a flooded mine level
+Повернутися з фронту	Return from the front
+»), організованість	»), organisation
+Лише для військових	Military only
+Це не ваш підрозділ	This is not your unit
+» уклала контракт з	» signed a contract with
+аукціон програно: «	auction lost: «
+ліцензію виграно за	licence won for
+Маршрутів ще немає.	No routes yet.
+ви з підрозділом «	you are with the unit «
+Висунутися в район	Advance to
+або відносини ≥ 20	or relations ≥ 20
+Тут немає покладів	There are no deposits here
+Родовище виснажене	The deposit is depleted
+пожежа на конвеєрі	a conveyor fire
+одиниць на маршрут	vehicles per route
+транспорт втрачено	vehicle lost
+Регіонів звільнено	Regions taken
+Командувати самому	Command it yourself
+Передати замовнику	Hand over to the client
+Підписати контракт	Sign the contract
+Прибуток з одиниці	Profit per vehicle
+Набір і оснащення	Recruitment and equipment
+загін ПВК знищено	the PMC unit was destroyed
+геологи виїхали в	geologists have set out for
+Ліцензія вже ваша	The licence is already yours
+Мінімальна ставка	Minimum bid
+Оберіть транспорт	Choose transport
+Вирушити на фронт	Go to the front
+під командуванням	under command
+Пропозиція діє до	Offer valid until
+Ви вже на фронті	You are already at the front
+вирушив на фронт	went to the front
+без конкурентів)	no rivals)
+нормальний режим	normal mode
+Транспорт коштує	Vehicles cost
+Немає підрозділу	No unit
+завдань виконано	missions completed
+Відкрити маршрут	Open route
+Ви не на фронті	You are not at the front
+поранений у бою	wounded in battle
+популярність +2	popularity +2
+Розвідка коштує	The survey costs
+Вантажні потяги	Freight trains
+⚔ Контракти ВПК	⚔ Defense contracts
+Бонус за регіон	Bonus per region
+Розвідка триває	Surveys in progress
+Остання одиниця	Last vehicle
+Не під час бою	Not during a battle
+наказ: оборона	order: defend
+» — контракт з	»: contract with
+ПВК відкликано	PMC recalled
+Загін втрачено	Unit lost
+Немає компанії	No company
+Немає маршруту	No route
+Завдання штабу	HQ mission
+Ваші контракти	Your contracts
+Обрати на мапі	Pick on the map
+дн. в один бік	days one way
+наказ: наступ	order: attack
+бракує коштів	not enough money
+»: родовище в	»: the deposit in
+обвал у забої	a rockfall at the face
+Показати ціль	Show the target
+Ваші промисли	Your mines
+Новий маршрут	New route
+Ваші маршрути	Your routes
+Ваш загін ПВК	Your PMC unit
+Ваш підрозділ	Your unit
+тис. бійців)	thousand troops)
+Ліцензія в «	Licence held by «
+» зі ставкою	» with a bid of
+вибух метану	a methane explosion
+за 50% ціни)	at 50% of the price)
+🚧 Маршрут «	🚧 Route «
+🚦 Маршрут «	🚦 Route «
+знову працює	is running again
+тис. на міс.	thousand per month
+не розвідано	not surveyed
+км за наказ	km per order
+», розвідка	», survey of
+перемогла «	won by «
+ваша ставка	your bid
+конкурент «	rival «
+дн., ремонт	days, repairs
+Суховантажі	Bulk carriers
+🚚 Маршрути	🚚 Routes
+тис. бійців	thousand troops
+поповнення	reinforcements
+здоровʼя −	health −
+Вантажівки	Trucks
+⛏ Родовища	⛏ Deposits
+Пропозиції	Offers
+Нормальний	Normal
+Форсований	Forced
+видобутку	output
+Батальйон	Battalion
+тис. (з «	thousand (from «
+📯 Штаб →	📯 HQ →
+Досвід −1	Experience −1
+Зароблено	Earned
+💥 Аварія	💥 Accident
+Надіслано	Sent
+На фронті	At the front
+Підрозділ	Unit
+Поповнити	Reinforce
+Транспорт	Vehicles
+командує	commands
+у складі	as part of
+Утримати	Hold
+🏳 ПВК «	🏳 PMC «
+запаси ≈	reserves ≈
+знайдено	found
+зупинено	stopped
+здоровʼя	health
+Іде бій!	Battle under way!
+ліцензія	licence
+Відстань	Distance
+в дорозі	on the road
+Бригада	Brigade
+Дивізія	Division
+10 днів	for 10 days
+терміну	the deadline
+Простій	Downtime
+маршрут	route
+одиниць	vehicles
+⚔ Фронт	⚔ Front
+Корпус	Corps
+посада	rank
+Оплата	Payment
+Щадний	Gentle
+Звідки	From
+Рейсів	Runs
+ПВК «	PMC «
+бонус	bonus
+Набір	Recruitment
+Куди	To
+рейс	run

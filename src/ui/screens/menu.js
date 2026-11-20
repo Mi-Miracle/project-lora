@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['New scenario: 1991, Ukraine becomes independent', 'Start as a Student or President; 1990s technologies', '18 professions with ranks, skill requirements and job minigames', 'Work in person: court, HQ, hospital, bank, logistics terminal…', 'The city is now split into districts']
-  : ['Новий сценарій: 1991 — Україна стала незалежною', 'Старт Студентом або Президентом; технології 90-х', '18 професій із посадами, вимогами до навичок і мініграми', 'Робота наживо: суд, штаб, лікарня, банк, логістичний термінал…', 'Місто поділено на квартали']
+  ? ['Front tab: go to war and command your own unit on the map', 'HQ missions, wounds and rewards for liberated regions', 'Defense companies take war contracts and send PMC units', 'Mining: surveys, licence auctions, reserves and accidents', 'Logistics: trucks, trains and ships moving on the world map']
+  : ['Вкладка «Фронт»: ідіть на війну й командуйте власним підрозділом на мапі', 'Завдання штабу, поранення й нагороди за звільнені регіони', 'ВПК бере військові контракти й відправляє загони ПВК', 'Видобуток: розвідка, аукціон ліцензій, запаси й аварії', 'Логістика: вантажівки, потяги й судна рухаються мапою світу']
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }

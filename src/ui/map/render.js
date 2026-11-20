@@ -93,7 +93,7 @@ function draw() {
   }
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   unitHit = [];
-  for (const sh of shifts) { drawCities(sh); drawLabels(sh); if (!(mode === 'trade' || mode === 'supply' || mode === 'res')) { drawBuildings(sh); drawCompanyLayer(sh); } drawUnits(sh); drawStrikes(sh); drawLeader(sh); if (window.drawAgents) drawAgents(sh); }
+  for (const sh of shifts) { drawCities(sh); drawLabels(sh); if (!(mode === 'trade' || mode === 'supply' || mode === 'res')) { drawBuildings(sh); drawCompanyLayer(sh); } if (window.drawStage2) drawStage2(sh); drawUnits(sh); drawStrikes(sh); drawLeader(sh); if (window.drawAgents) drawAgents(sh); }
 }
 
 // торгові потоки: суходолом — через регіони (суцільна коричнева лінія), морем — морськими шляхами (блакитний пунктир)
@@ -169,10 +169,10 @@ function groupByNation(list) { const m = {}; list.forEach(a => { if (!m[a.n]) m[
 function drawUnits(sh) {
   const P = G.pv(), zoomed = view.s >= 7, bset = new Set(G.battles || []);
   const fv = window.fogVis ? fogVis() : null;
-  const showA = a => (!fv || a.n === P || fv[a.t] || G.allied(P, a.n)) && (zoomed || a.n === P || G.atWar(P, a.n) || bset.has(a.t) || (G.allied(P, a.n) && G.enemiesOf(P).length) || (sel && sel.type === 't' && G.ter[sel.id].ctrl === a.n));
+  const MY = a => !!(G.myUnit && G.myUnit(a)); const showA = a => MY(a) || (!fv || a.n === P || fv[a.t] || G.allied(P, a.n)) && (zoomed || a.n === P || G.atWar(P, a.n) || bset.has(a.t) || (G.allied(P, a.n) && G.enemiesOf(P).length) || (sel && sel.type === 't' && G.ter[sel.id].ctrl === a.n));
   const byT = {}; G.armies.forEach(a => { if (!showA(a)) return; const k = a.mv && a.mv.sea ? 's' + a.id : a.t; (byT[k] = byT[k] || []).push(a); });
   Object.values(byT).forEach(list => {
-    const show = groupByNation(list.filter(a => a.n !== P)); list.filter(a => a.n === P).sort((a, b) => a.k - b.k).forEach(a => show.unshift({ n: a.n, k: a.k, arm: a }));
+    const show = groupByNation(list.filter(a => a.n !== P && !MY(a))); list.filter(a => a.n === P || MY(a)).sort((a, b) => a.k - b.k).forEach(a => show.unshift({ n: a.n, k: a.k, arm: a }));
     show.forEach((u, idx) => {
       const a = u.arm || u.first; const p = unitPos(a);
       let [x, y] = toScreen(p.lon + sh, p.lat); y += 4 + idx * 17 - (show.length - 1) * 8;
@@ -182,7 +182,7 @@ function drawUnits(sh) {
       ctx.font = '600 11px system-ui'; const w = ctx.measureText(txt).width + 18;
       if (u.arm && a.mv && p.to) { const [x2, y2] = toScreen(p.to[0] + sh, p.to[1]); ctx.strokeStyle = war ? '#ff3b3b' : u.n === P ? '#ffd34d' : '#ffffffaa'; ctx.fillStyle = ctx.strokeStyle; ctx.lineWidth = 2.2; ctx.setLineDash([5, 4]); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]); const ang = Math.atan2(y2 - y, x2 - x); ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - 9 * Math.cos(ang - 0.4), y2 - 9 * Math.sin(ang - 0.4)); ctx.lineTo(x2 - 9 * Math.cos(ang + 0.4), y2 - 9 * Math.sin(ang + 0.4)); ctx.fill(); }
       const isSel = sel && sel.type === 'a' && u.arm && sel.id === u.arm.id;
-      ctx.fillStyle = n.color; ctx.strokeStyle = isSel ? '#ffd34d' : war ? '#ff3b3b' : u.n === P ? '#fff' : '#000'; ctx.lineWidth = isSel ? 3 : 1.5;
+      ctx.fillStyle = n.color; ctx.strokeStyle = isSel ? '#ffd34d' : u.arm && MY(a) ? '#ffb000' : war ? '#ff3b3b' : u.n === P ? '#fff' : '#000'; ctx.lineWidth = isSel ? 3 : 1.5;
       roundRect(x - w / 2, y - 8, w, 16, 4); ctx.fill(); ctx.stroke();
       if (u.arm) { ctx.fillStyle = '#000a'; ctx.fillRect(x - w / 2 + 3, y - 5, 3, 10); ctx.fillStyle = a.sup > 0.6 ? '#4cd28a' : a.sup > 0.35 ? '#ffc04d' : '#ff5d5d'; ctx.fillRect(x - w / 2 + 3, y + 5 - 10 * a.sup, 3, 10 * a.sup); }
       ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 2.5; ctx.strokeStyle = '#000c'; ctx.strokeText(txt, x + 4, y + 0.5); ctx.fillText(txt, x + 4, y + 0.5);
