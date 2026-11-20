@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['Active career: tasks, courses and promotion assessments for all 21 professions', 'Budget tab: monthly income, expenses and history', 'Tougher economy: living costs, realistic business returns, gig limits', 'New character: Student, starting with $300', 'Weekly funny news broadcast']
-  : ['Активна карʼєра: завдання, курси й атестації для всіх 21 професії', 'Вкладка «Бюджет»: доходи, витрати й історія по місяцях', 'Складніша економіка: прожиткові витрати, реальна віддача бізнесу, ліміти підробітків', 'Новий персонаж: Студент — старт із $300', 'Щотижневий випуск кумедних новин']
+  ? ['New scenario: 1991, Ukraine becomes independent', 'Start as a Student or President; 1990s technologies', '18 professions with ranks, skill requirements and job minigames', 'Work in person: court, HQ, hospital, bank, logistics terminal…', 'The city is now split into districts']
+  : ['Новий сценарій: 1991 — Україна стала незалежною', 'Старт Студентом або Президентом; технології 90-х', '18 професій із посадами, вимогами до навичок і мініграми', 'Робота наживо: суд, штаб, лікарня, банк, логістичний термінал…', 'Місто поділено на квартали']
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }
@@ -22,9 +22,9 @@ function mmHide() { const el = document.getElementById('mm'); if (el) el.style.d
 function mmGo(k) {
   AUD.sfx && AUD.sfx('click');
   if (k === 'cont' || k === 'load') { if (loadGame()) mmHide(); return; }
-  if (k === 'single') { netMode = 'solo'; if (startMode === 'rada') startMode = 'nation'; startTab = 'game'; }
-  if (k === 'multi') { netMode = 'host'; if (startMode === 'rada') startMode = 'nation'; startTab = 'game'; }
-  if (k === 'rada') { netMode = 'solo'; startMode = 'rada'; startTab = 'game'; }
+  if (k === 'single') { netMode = 'solo'; radaOn = false; if (!/^(char|nation)$/.test(startMode)) startMode = 'nation'; startTab = 'game'; }
+  if (k === 'multi') { netMode = 'host'; radaOn = false; if (!/^(char|nation)$/.test(startMode)) startMode = 'nation'; startTab = 'game'; }
+  if (k === 'rada') { netMode = 'solo'; radaOn = true; if (!/^(char|nation)$/.test(startMode)) startMode = 'nation'; startTab = 'game'; }
   if (k === 'set') { settingsScreen(); return; } if (k === 'help') { help(); return; }
   if (k === 'credits') { credits(); return; }
   if (k === 'camp') { campaignStart(); return; }
@@ -34,8 +34,8 @@ function mmGo(k) {
   $('#start').classList.add('modern'); $('#start').style.display = 'flex'; startScreen();
 }
 function modHead() {
-  const solo = netMode === 'solo', rada = startMode === 'rada';
-  const T = rada ? ['🏛', 'Президент і Рада', 'Ви — президент, чат Twitch — Верховна Рада'] : solo ? ['🎮', 'Нова гра', 'Оберіть сценарій, складність, ким почати і країну'] : ['🌐', 'Мультиплеєр', 'Створіть кімнату або приєднайтеся до друзів'];
+  const solo = netMode === 'solo', rada = radaOn;
+  const T = rada ? ['🏛', 'Гра з чатом Twitch', 'Студент або президент; чат Twitch — Верховна Рада й голосування'] : solo ? ['🎮', 'Нова гра', 'Оберіть сценарій, складність, ким почати і країну'] : ['🌐', 'Мультиплеєр', 'Створіть кімнату або приєднайтеся до друзів'];
   const MULTI = [['host', '📡', 'Створити гру', 'ви — хост, роздаєте посилання'], ['guest', '🔗', 'Приєднатися', 'за кодом або посиланням'], ['watch', '👁', 'Дивитися', 'глядач без керування']];
   return `<div class="ns-head"><button id="st-back" class="ns-back" onclick="mainMenu()">← ${t_('Головне меню')}</button><div class="ns-t"><div class="mm-dev">Mi_Miracle · L.O.R.A.</div><h1>${T[0]} ${t_(T[1])}</h1><div class="mut">${t_(T[2])}</div></div><div class="ns-r">${typeof twBadge === 'function' ? twBadge() : ''}</div></div>
   ${solo ? '' : `<div class="ns-cards">${MULTI.map(([k, ic, n, d]) => `<button class="${netMode === k ? 'on' : ''}" onclick="netMode='${k}';startScreen()"><i>${ic}</i><b>${t_(n)}</b><small>${t_(d)}</small></button>`).join('')}</div>`}`;

@@ -40,11 +40,11 @@ TAB_FN.tech = function () {
     return h;
   }
   const b = cur0, B = D.techBranches[b], eraF = curSub('tera', 'all');
-  const eraBtn = e => { const L = Object.entries(TT).filter(([, t]) => t.br === b && (e === 'all' || t.era === +e)); return `<button class="small ${eraF === e ? 'on' : ''}" onclick="subtab.tera='${e}';renderTab(true)">${e === 'all' ? t_('Усі') : t_('Епоха') + ' ' + ['I', 'II', 'III', 'IV'][e - 1]} · ${L.filter(([id]) => R.done[id] != null).length}/${L.length}</button>`; };
-  h += `<div class="btns">${['all', '1', '2', '3', '4'].map(eraBtn).join('')}</div>`;
+  const eraBtn = e => { const L = Object.entries(TT).filter(([, t]) => t.br === b && (e === 'all' || t.era === +e)); return `<button class="small ${eraF === e ? 'on' : ''}" onclick="subtab.tera='${e}';renderTab(true)">${e === 'all' ? t_('Усі') : (e === '0' ? t_('90-ті') : t_('Епоха') + ' ' + ['I', 'II', 'III', 'IV'][e - 1])} · ${L.filter(([id]) => R.done[id] != null).length}/${L.length}</button>`; };
+  h += `<div class="btns">${['all', '0', '1', '2', '3', '4'].map(eraBtn).join('')}</div>`;
   h += resBranchCard(n, b, B);
   h += `<div class="mut small">${t_('Що більше країн уже має технологію, то дешевше її освоїти; союзники діляться знаннями; під час війни військові дослідження вдвічі дешевші.')}</div>`;
-  { let lastEra = 0;
+  { let lastEra = -1;
     const list = Object.entries(TT).filter(([, t]) => t.br === b && (eraF === 'all' || t.era === +eraF)).sort((x, y) => x[1].era - y[1].era || (R.done[x[0]] != null) - (R.done[y[0]] != null) || x[1].c - y[1].c);
     if (!list.length) h += `<div class="mut small">${t_('У цій епосі досліджень гілки немає')}</div>`;
     list.forEach(([id, t]) => {

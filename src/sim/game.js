@@ -101,7 +101,7 @@ LORA.sim.register('game', 100, function (G) {
 
   // ---------- збереження ----------
   G.save = function () {
-    return JSON.stringify({ v: 2, day: G.day, player: G.player, N: N.map(n => { const o = Object.assign({}, n); delete o.agg; return o; }),
+    return JSON.stringify({ v: 2, day: G.day, player: G.player, startDate: G.startDate, scen: G.scen || null, N: N.map(n => { const o = Object.assign({}, n); delete o.agg; return o; }),
       ter: ter.map(t => ({ owner: t.owner, ctrl: t.ctrl, gdp: t.gdp, pop: t.pop, dmg: t.dmg, integ: t.integ, occ: t.occ, prod: t.prod, fort: t.fort || 0, part: t.part || 0, bld: t.bld, base: t.base, pol: t.pol, rad: t.rad || 0, mine: t.mine || 0, rebuild: t.rebuild || 0, wasOcc: t.wasOcc || 0, dmz: t.dmz || 0, depl: t.depl || null })),
       rel: G.rel.map(r => Array.from(r, v => Math.round(v))), relBase: G.relBase.map(r => Array.from(r, v => Math.round(v))), wars: [...G.wars.values()], conflicts: G.conflicts,
       alliances: G.alliances.map(a => ({ name: a.name, m: [...a.m] })), sanctions: [...G.sanctions], access: [...G.access], treaties: [...G.treaties], contracts: G.contracts,
@@ -109,7 +109,7 @@ LORA.sim.register('game', 100, function (G) {
   };
   G.load = function (s) {
     const o = JSON.parse(s); if (o.v !== 2) throw new Error('Несумісне збереження');
-    G.day = o.day; G.player = o.player;
+    G.day = o.day; G.player = o.player; if (o.startDate) G.startDate = o.startDate; G.scen = o.scen || null;
     o.N.forEach((x, i) => Object.assign(N[i], x)); o.ter.forEach((x, i) => Object.assign(ter[i], x));
     o.rel.forEach((r, i) => r.forEach((v, j) => G.rel[i][j] = v)); o.relBase.forEach((r, i) => r.forEach((v, j) => G.relBase[i][j] = v));
     G.wars = new Map(o.wars.map(w => [G.warKey(w.a, w.b), w])); G.conflicts = o.conflicts; G.alliances = o.alliances.map(a => ({ name: a.name, m: new Set(a.m) }));

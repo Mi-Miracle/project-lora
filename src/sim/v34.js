@@ -37,7 +37,7 @@ LORA.sim.register('v34', 99.996, function (G) {
       if ((L.city.dn || {})['jobs.' + a]) return 'Сьогодні вже працювали на цьому підробітку — приходьте завтра';
       if (WEEKLY[a] && L.gigW && L.gigW[a] > G.day - 7) return `Таке замовлення буває раз на тиждень (ще ${L.gigW[a] + 7 - G.day} дн.)`;
       if ((L.city.gigs || 0) >= (L.job ? 1 : 2)) return L.job ? 'Ви ж працюєте: на день — лише один підробіток після роботи' : 'Сьогодні вже два підробітки — сили закінчились'; } }
-    if (loc === 'city' && k === 'work') { const A = C.work.acts[a]; if (A && A.daily && (L.city.dn || {})['work.' + a]) return 'Сьогодні вже було — завтра'; }
+    { const P = G.LOCS[loc] && G.LOCS[loc].places[k]; const A = P && P.acts[a]; if (A && A.daily && (L.city.dn || {})[k + '.' + a]) return 'Сьогодні вже було — завтра'; }
     return '';
   };
   G.locDo = function (loc, k, a) {
@@ -50,64 +50,7 @@ LORA.sim.register('v34', 99.996, function (G) {
   G.cityCan = (k, a) => G.locCan('city', k, a); G.cityDo = (k, a) => G.locDo('city', k, a);
   G.act.cityDo = (k, a) => G.locDo('city', k, a); G.act.locDo = (loc, k, a) => G.locDo(loc, k, a);
 
-  // ================= 4. АКТИВНІ ПІДВИЩЕННЯ ДЛЯ ВСІХ ПРОФЕСІЙ =================
-  // [навичка, складне завдання, спецдія професії, назва атестації]
-  const JF = {
-    lawyer: ['law', 'Підготувати позов на 80 сторінок', 'Захистити клієнта на засіданні', 'Кваліфікаційний іспит адвоката'],
-    journalist: ['media', 'Написати розслідування', 'Взяти інтервʼю в міністра', 'Атестація в редакції'],
-    officer: ['mil', 'Провести навчання підрозділу', 'Нічне чергування в частині', 'Іспит на чергове звання'],
-    manager: ['biz', 'Врятувати провальний проєкт', 'Переговори з великим клієнтом', 'Оцінка ради директорів'],
-    scientist: ['sci', 'Поставити складний експеримент', 'Виступ на конференції', 'Захист дисертації'],
-    doctor: ['sci', 'Складна операція', 'Нічне чергування в лікарні', 'Атестація на категорію'],
-    engineer: ['tech', 'Розрахувати міст, щоб не впав', 'Аварійний виклик на обʼєкт', 'Атестація інженера'],
-    programmer: ['tech', 'Закрити критичний баг у продакшені', 'Нічний реліз', 'Технічна співбесіда на сеньйора'],
-    banker: ['eco', 'Закрити велику угоду', 'Нічний звіт для регулятора', 'Оцінка ризик-комітету'],
-    economist: ['eco', 'Прогноз інфляції (який збудеться)', 'Коментар для телебачення', 'Атестація аналітика'],
-    diplomat: ['diplo', 'Узгодити текст ноти', 'Прийом у посольстві', 'Іспит на дипломатичний ранг'],
-    actor: ['media', 'Репетиція головної ролі', 'Вечірня вистава', 'Кастинг на головну роль'],
-    athlete: ['mil', 'Тренування до знемоги', 'Офіційні змагання', 'Відбір до збірної'],
-    teacher: ['orat', 'Відкритий урок для інспекції', 'Олімпіада з учнями', 'Атестація вчителя'],
-    farmer: ['biz', 'Посівна в рекордні строки', 'Ярмарок у районі', 'Конкурс «Фермер року»'],
-    pilot: ['tech', 'Посадка в сильний вітер', 'Нічний рейс', 'Іспит на командира екіпажу'],
-    architect: ['tech', 'Проєкт житлового кварталу', 'Захист проєкту в мерії', 'Конкурс архітекторів'],
-    blogger: ['media', 'Зняти вірусне відео', 'Прямий ефір на 3 години', 'Колаборація з топблогером'],
-    judge: ['law', 'Розглянути складну справу', 'Виїзне засідання', 'Кваліфікаційна комісія суддів'],
-    professor: ['sci', 'Написати монографію', 'Лекція для іноземних студентів', 'Вчена рада'],
-    entrepreneur: ['biz', 'Вийти на новий ринок', 'Нічна інвентаризація', 'Інвестиційний пітч']
-  };
-  const need = L => 6 * L.job.lvl;
-  const relSk = L => { const f = JF[L.job.k]; return f ? sk(L, f[0]) : 0; };
-  const addXp = (L, v) => { if (!L.job) return ''; L.job.xp = (L.job.xp || 0) + v; return promoChk(L); };
-  function promoChk(L) { const J = G.JOBS[L.job.k]; if (L.job.lvl < 5 && L.job.xp >= need(L)) { L.job.xp -= need(L); L.job.lvl++; const t = `📈 Підвищення: ${J.n}, рівень ${L.job.lvl}! Зарплата ≈ ${f$(J.pay * (1 + (L.job.lvl - 1) * 0.35))}/міс.`; G.say(`${L.name}: ${t}`, 'good', [L.job.nid]); return ' ' + t; } return ''; }
-  G.jobInfo = function () { const L = G.leader; if (!L || !L.job) return null; const J = G.JOBS[L.job.k], f = JF[L.job.k] || ['eco']; return { n: J.n, ic: J.ic, lvl: L.job.lvl, xp: L.job.xp || 0, need: need(L), pay: J.pay * (1 + (L.job.lvl - 1) * 0.35), sk: f[0], skN: G.SKILLS && G.SKILLS[f[0]] ? G.SKILLS[f[0]].n : f[0], examCd: Math.max(0, (L.job.exam || -99) + 30 - G.day), courseCd: Math.max(0, (L.job.course || -99) + 30 - G.day) }; };
-  const noJob = L => L.job ? '' : 'Спершу влаштуйтеся на роботу (вкладка «Карʼєра» / «Життя»)';
-  const hourly = L => G.JOBS[L.job.k].pay * (1 + (L.job.lvl - 1) * 0.35) / 170;
-  C.work = { n: 'Ваша робота', ic: '🏢', open: [7, 23], acts: {
-    task: { n: 'Складне завдання', h: 4, c: 0, daily: 1, need: noJob, r: L => { const f = JF[L.job.k] || ['eco', 'Складне завдання']; const ok = R() < 0.45 + relSk(L) * 0.1 + (L.mood || 60) / 600;
-      if (ok) return [`«${f[1]}»: впоралися блискуче. Керівник помітив (досвід +0,03).${addXp(L, 0.03)}`, { mood: 4 }]; return [`«${f[1]}»: не вийшло. ${pick(['Шеф зітхнув так, що чути на сусідньому поверсі', 'Колега забрав заслуги собі', 'Зате ви багато чого навчилися'])} (досвід +0,005)${addXp(L, 0.005)}`, { mood: -4 }]; } },
-    special: { n: 'Робота за профілем', h: 5, c: 0, daily: 1, need: noJob, r: L => { const f = JF[L.job.k] || ['eco', '', 'Позаурочна робота']; const p = hourly(L) * 5 * 1.5; L.money += p;
-      const war = L.job.k === 'officer' && G.enemiesOf(L.job.nid).length; return [`«${f[2]}»: ${f$(p)} понаднормових, досвід +${war ? '0,04 (воєнний час)' : '0,02'}.${addXp(L, war ? 0.04 : 0.02)}`, { hp: -3, mood: 1 }]; } },
-    course: { n: 'Курси підвищення кваліфікації', h: 8, c: 0, need: L => noJob(L) || ((L.job.course || -99) + 30 > G.day ? `Наступні курси — через ${(L.job.course || -99) + 30 - G.day} дн.` : L.money < $(150 * L.job.lvl) ? `Потрібно ${f$($(150 * L.job.lvl))}` : ''),
-      r: L => { L.money -= $(150 * L.job.lvl); L.job.course = G.day; return [`сертифікат отримано! ${pick(['Половину курсу розповідали про командний дух', 'Тест здали з першої спроби', 'Викладач сказав, що ви «перспективні»'])} (досвід +0,5)${addXp(L, 0.5)}`, { mood: 3 }]; } },
-    boss: { n: 'Кава з керівництвом', h: 1, c: $(15), daily: 1, need: noJob, r: L => [`${pick(['керівник розповів про свою дачу 40 хвилин. Ви слухали уважно', 'обговорили плани відділу. І погоду. Переважно погоду', 'ви вчасно засміялися з жарту шефа'])} (досвід +0,01)${addXp(L, 0.01)}`, { cont: 0.3 }] },
-    exam: { n: 'Атестація на підвищення', h: 3, c: 0, need: L => { if (noJob(L)) return noJob(L); if (L.job.lvl >= 5) return 'Ви вже на вершині професії'; if ((L.job.exam || -99) + 30 > G.day) return `Повторна атестація — через ${(L.job.exam || -99) + 30 - G.day} дн.`; if ((L.job.xp || 0) < need(L) * 0.75) return `Замало досвіду: ${(L.job.xp || 0).toFixed(1)} з ${(need(L) * 0.75).toFixed(1)} потрібних для атестації`; return ''; },
-      r: L => { const f = JF[L.job.k] || ['eco', '', '', 'Атестація']; L.job.exam = G.day; const ch = clamp(0.25 + relSk(L) * 0.12 + (L.job.xp / need(L)) * 0.35, 0.1, 0.92);
-        if (R() < ch) { L.job.xp = need(L); return [`«${f[3]}»: склали!${promoChk(L)}`, { mood: 12, fame: 0.3 }, 'jackpot']; }
-        L.job.xp = Math.max(0, L.job.xp - 1); return [`«${f[3]}»: не склали (шанс був ${Math.round(ch * 100)}%). Підтягніть навичку «${G.SKILLS && G.SKILLS[f[0]] ? G.SKILLS[f[0]].n : f[0]}» і спробуйте через місяць`, { mood: -8 }]; } }
-  } };
-  C.work.acts.special.night = false;
-  // назви дій під професію (міняються з роботою)
-  G.workActName = (a) => { const L = G.leader; const f = L && L.job && JF[L.job.k]; if (!f) return null; return { task: `Складне завдання: ${f[1]}`, special: `${f[2]} (понаднормово)`, exam: `${f[3]} (атестація)` }[a] || null; };
-  if (G.cityActName) { const b = G.cityActName; G.cityActName = (k, a) => (k === 'work' && G.workActName(a)) || b(k, a); }
-  // щомісячний досвід: 1 + навичка за профілем; офіцер у війну ×2; без роботи на місці — повільніше
-  { const b = G.careerMonthly; G.careerMonthly = function () { Object.values(G.leaders || {}).forEach(L => { if (L && L.role === 'char' && L.job) L._lvl0 = L.job.lvl; });
-      b.apply(this, arguments);
-      Object.values(G.leaders || {}).forEach(L => { if (!L || L.role !== 'char' || !L.job || !JF[L.job.k]) return; const f = JF[L.job.k];
-        // базовий +1 уже нараховано; додаємо бонус навички й війни
-        const war = L.job.k === 'officer' && G.enemiesOf(L.job.nid).length ? 1 : 0; L.job.xp += sk(L, f[0]) * 0.2 + war * 0.5; promoChk(L); }); }; }
-  // юрист/суддя: виграна справа в суді — досвід
-  if (G.courtTake) { const ct = G.courtTake; G.courtTake = function (role) { const r = ct(role); const L = G.leader; if (r && r.ok && L && L.job && (L.job.k === 'lawyer' || L.job.k === 'judge')) { r.msg += ` (досвід +0,3)${addXp(L, 0.3)}`; } return r; }; }
-
+  // (4. Активні підвищення перенесено в careers.js: справжні робочі місця й посади)
   // ================= 4б. ПРОЖИТКОВІ ВИТРАТИ: їжа, комуналка й житло (якщо свого нема) =================
   const ownHome = L => !!(L.house || (L.own || []).some(o => G.LUX[o.k] && G.LUX[o.k].c === 'home'));
   G.livingCost = L => { const lux = (L.own || []).length; return { food: $(320 + Math.min(lux, 10) * 40), rent: ownHome(L) ? 0 : $(280) }; };
@@ -124,7 +67,7 @@ LORA.sim.register('v34', 99.996, function (G) {
     if (G.day - B.d0 >= 30) { const net = L.money - B.m0; const act = Object.values(B.cur).reduce((s, v) => s + v, 0); B.hist.unshift({ d: G.day, net, cats: B.cur, passive: net - act }); B.hist.length = Math.min(B.hist.length, 12); B.cur = {}; B.m0 = L.money; B.d0 = G.day; } }); });
   G.budget = function (L0) {
     const L = L0 || G.leader; if (!L || L.role !== 'char') return null; const inc = [], exp = []; const add = (arr, ic, n, v) => { if (v > 1e-12) arr.push({ ic, n, v }); };
-    if (L.job && G.JOBS[L.job.k]) add(inc, G.JOBS[L.job.k].ic, `Зарплата: ${G.JOBS[L.job.k].n} (рівень ${L.job.lvl})`, G.JOBS[L.job.k].pay * (1 + (L.job.lvl - 1) * 0.35));
+    if (L.job && G.JOBS[L.job.k]) add(inc, G.JOBS[L.job.k].ic, `Зарплата: ${G.jobTitle ? G.jobTitle(L) : G.JOBS[L.job.k].n} (за 10+ робочих днів)`, G.jobPay ? G.jobPay(L) : G.JOBS[L.job.k].pay);
     if (L.mp != null) add(inc, '🏛', 'Зарплата депутата', 0.000004);
     if (L.agent) add(inc, '🕶', 'Оклад агента', 0.0000025 * (1 + L.agent.rank * 0.5));
     if (L.uLead) add(inc, '📋', 'Голова профспілки', 0.0000012);

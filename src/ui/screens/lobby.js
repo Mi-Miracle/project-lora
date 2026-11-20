@@ -9,7 +9,7 @@ function netStartBlock() {
     <div class="btns"><button class="pri" onclick="guestJoin()">🔗 ${t_('Підключитися як гравець')}</button><button onclick="if(!netCode){hint('⚠ '+t_('Введіть код кімнати'),2500)}else watchJoin(netCode,false)" data-tip="${t_('Лише дивитися: без держави й керування')}">👁 ${t_('Дивитися як глядач')}</button></div></div>`;
 }
 async function hostOpen() {
-  try { const code = await NET.host((netName || 'Streamer').trim()); NET.S.scen = scen; NET.S.diff = startDiff; NET.hostRole(/company|char/.test(startMode) ? startMode : startMode === 'party' || startMode === 'mp' ? 'char' : 'nation', coSector); NET.hostPick(startSel); renderLobby(); hint('🔑 ' + t_('Кімнату створено') + ': ' + code, 3000); }
+  try { const code = await NET.host((netName || 'Streamer').trim()); NET.S.scen = scen; NET.S.diff = startDiff; NET.hostRole(startMode === 'char' ? 'char' : 'nation', coSector); NET.hostPick(startSel); renderLobby(); hint('🔑 ' + t_('Кімнату створено') + ': ' + code, 3000); }
   catch (e) { hint('⚠ ' + t_('Не вдалося створити кімнату (потрібен інтернет)') + ': ' + (e.type || e.message || e), 6000); }
 }
 async function guestJoin() {

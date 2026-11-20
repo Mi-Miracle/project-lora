@@ -30,7 +30,7 @@ const NET = (() => {
     else if (m.t === 'cmd' && pl && S.started) execCmd(pl, m);
   }
   // ролі гравців: держава, компанія, персонаж — або посада в державі іншого гравця
-  const ROLES = { nation: '👑 Держава', company: '🏢 Компанія', char: '🧑 Персонаж', general: '🎖 Генерал', min_econ: '💰 Міністр економіки', min_def: '🛡 Міністр оборони', min_for: '🌐 Міністр закордонних справ', diplomat: '🎩 Дипломат', spy: '🕵 Шпигун' };
+  const ROLES = { nation: '👑 Президент', char: '🎒 Студент' };
   const STAFF = ['general', 'min_econ', 'min_def', 'min_for', 'diplomat', 'spy'];
   function pickErr(pl, a3, role) {
     if (role === 'nation' && S.players.some(p => p !== pl && p.a3 === a3 && (p.role || 'nation') === 'nation')) return t_('Цю державу вже обрано');
@@ -49,14 +49,14 @@ const NET = (() => {
     const opts = { difficulty: S.diff, humans: nationGuests.map(p => ({ nid: null, a3: p.a3, name: `${p.name} (${p.a3})` })), leaderName: S.name };
     opts.humans = []; // заповнимо після createGame (потрібні індекси)
     if (hr === 'company') G.init(null, S.scen, Object.assign(opts, { company: { name: S.name + ' Corp', sector: me.sector || 'tech', home: me.a3, cash: LORA.config.companyCash } }));
-    else if (hr === 'char') G.init(null, S.scen, Object.assign(opts, { char: { name: S.name, type: 'diplomat', home: me.a3 } }));
+    else if (hr === 'char') G.init(null, S.scen, Object.assign(opts, { char: { name: S.name, type: 'student', home: me.a3 } }));
     else G.init(me.a3, S.scen, opts);
     nationGuests.forEach(p => { p.nid = G.nIdx[p.a3]; G.humans.add(p.nid); G.initLeader && (() => { const pp = G.player; G.player = p.nid; G.initLeader({ name: `${p.name} (${p.a3})`, role: 'president', home: p.nid }); G.player = pp; })(); G.armies.forEach(a => { if (a.n === p.nid) a.auto = false; }); });
     G.online = true; if (AUD.S.chatRada && G.player >= 0) G.radaEnable(true);
     guests.forEach(p => {
       const r = role(p), nid = G.nIdx[p.a3];
       if (r === 'company') { const c = G.newCompany({ name: p.name + ' Corp', sector: p.sector || 'tech', home: nid, cash: LORA.config.companyCash, player: true }); c.infl[nid] = 3; p.pc = c.id; p.nid = null; p.lk = 'g' + p.id; G._lk = p.lk; G.initLeader({ name: 'CEO ' + c.name, role: 'ceo', home: nid, at: c.offices[0].t, ic: '💼' }); G._lk = undefined; }
-      else if (r === 'char') { p.lk = 'g' + p.id; p.nid = null; const pp = G.player; G._lk = p.lk; G.initLeader({ name: p.name, role: 'char', type: 'diplomat', home: nid }); G._lk = undefined; G.player = pp; }
+      else if (r === 'char') { p.lk = 'g' + p.id; p.nid = null; const pp = G.player; G._lk = p.lk; G.initLeader({ name: p.name, role: 'char', type: 'student', home: nid }); G._lk = undefined; G.player = pp; }
       else if (STAFF.includes(r)) { p.nid = nid; p.staff = r; }
     });
     S.started = true;

@@ -38,7 +38,7 @@ function openLoc(loc) {
     <div class="city-body"><canvas id="citycv"></canvas><div class="city-side" id="citySide"></div></div><div class="city-log" id="cityLog"></div>`;
   el.style.display = 'flex'; const S = G.cityState(); const nm = loc === 'city' ? S.name : loc + S.name; const seed = [...nm].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
   if (locUI) cancelAnimationFrame(locUI.raf);
-  locUI = cityUI = { loc, prev, place: null, me: { x: 0.5, y: 0.5 }, path: [], fx: [], seed, raf: 0, hov: null, pos: locLayout(loc, seed), npc: [], bub: [], ufo: 0 };
+  locUI = cityUI = { loc, prev, place: null, me: { x: 0.5, y: 0.5 }, path: [], fx: [], seed, raf: 0, hov: null, pos: window.locLayout(loc, seed), npc: [], bub: [], ufo: 0 };
   for (let i = 0; i < (loc === 'city' ? 14 : 6); i++) locUI.npc.push({ e: loc === 'city' ? LOC_NPC[i % LOC_NPC.length] : loc === 'dacha' ? ['🐓', '🐈', '🐝', '🦋', '🐕', '🧓'][i] : ['🧑‍💼', '👩‍💼', '👮', '🐈', '🧹', '🧑‍💻'][i], x: Math.random(), y: Math.random(), dx: 0, dy: 0, t: 0, say: null, st: 0 });
   $('#locSw').innerHTML = locAvail().map(([k, ic, n]) => `<button class="${k === loc ? 'on' : ''}" onclick="openLoc('${k}')">${ic} ${esc(n)}</button>`).join('');
   const cv = document.getElementById('citycv'); const hit = e => { const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height; let best = null, bd = 0.004; for (const [k, p] of Object.entries(locUI.pos)) { const d = (p.x - x) ** 2 + (p.y - y) ** 2; if (d < bd || (p.w && Math.abs(p.x - x) < p.w / 2 && Math.abs(p.y - y) < p.h / 2)) { bd = d; best = k; } } return best; };
@@ -60,7 +60,7 @@ function citySide() {
   const P = PL[k]; let h = `<h3>${P.ic} ${esc(t_(P.n))}</h3>` + (P.open ? `<div class="mut small">${t_('Працює')}: ${P.open[0]}:00–${P.open[1] % 24}:00 · ${locOpen(k, S.h) ? `<span class="g">${t_('відчинено')}</span>` : `<span class="r">${t_('зачинено')}</span>`}</div>` : '');
   if (k === 'court' && G.courtCases) { const cs = G.courtCases(); h += `<div class="small">${cs.length ? cs.map(c => `⚖ «${esc(t_(c.t))}» — ${esc(t_(c.k))}`).join('<br>') : t_('Резонансних справ немає')}</div>`; }
   if (k === 'sb' && L.agent) h += `<div class="small">🕵 ${esc(t_(G.AGENT_RANKS[L.agent.rank]))} · ${t_('досвід')} ${L.agent.xp}</div>`;
-  let AE = Object.entries(P.acts); const tabs = [...new Set(AE.map(([, A]) => A.tab).filter(Boolean))];
+  let AE = Object.entries(P.acts).filter(([, A]) => !A.hide || !A.hide(G.leader)); const tabs = [...new Set(AE.map(([, A]) => A.tab).filter(Boolean))];
   if (tabs.length > 1) { locUI.tabs = locUI.tabs || {}; const cur = tabs.includes(locUI.tabs[k]) ? locUI.tabs[k] : tabs[0]; const TN = Object.assign({}, G.LUX_TABS || {}, G.JOB_TABS || {});
     h += `<div class="btns city-tabs">${tabs.map(t => `<button class="small ${t === cur ? 'on' : ''}" onclick="locUI.tabs['${k}']='${t}';citySide()">${esc(t_(TN[t] || (G.LUX_CAT && G.LUX_CAT[t] ? G.LUX_CAT[t][1] : t)))}</button>`).join('')}</div>`;
     AE = AE.filter(([, A]) => (A.tab || tabs[0]) === cur); }
@@ -104,6 +104,7 @@ function cityLoop() {
     cx.font = '26px serif'; ['🌻', '🌳', '🍎', '🌲', '🌻', '🥕'].forEach((e, i) => cx.fillText(e, W * (0.08 + i * 0.17), H * 0.9)); cx.fillText('🏡', W * 0.5, H * 0.45 - 60);
     if (night) { cx.font = '30px serif'; cx.fillText('🌙', W * 0.9, H * 0.1); }
   }
+  if (th === 'city' && window.drawDistricts) drawDistricts(cx, W, H, night);
   // місця
   for (const [k, P] of Object.entries(locP())) { const p = locUI.pos[k]; const x = p.x * W, y = p.y * H, open = locOpen(k, S.h); const hov = locUI.hov === k || locUI.place === k; const own = locUI.loc === 'city' && G.leader.estate && G.leader.estate.some(e => e.reg === G.leader.at && ((e.k === 'bar' && k === 'bar') || (e.k === 'gym' && k === 'gym') || (e.k === 'club' && k === 'club')));
     cx.fillStyle = open ? (hov ? '#ffd34d' : '#f4f1e6') : '#6a6f78'; cx.strokeStyle = own ? '#ffd34d' : '#1b2633'; cx.lineWidth = own ? 4 : 2; cx.beginPath(); cx.arc(x, y, hov ? 30 : 26, 0, 7); cx.fill(); cx.stroke();

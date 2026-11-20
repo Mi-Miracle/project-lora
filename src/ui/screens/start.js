@@ -1,23 +1,25 @@
 // СТАРТОВИЙ ЕКРАН: сценарій, складність, режим (держава / компанія), вибір країни, налаштування компанії.
-let chName = '', chType = 'diplomat'; const CHAR_T = { student: { n: 'Студент', ic: '🎒', d: 'Старт: $300. Майже з нуля, зате навчання вдвічі швидше й дешевше' }, ordinary: { n: 'Звичайна людина', ic: '🧑', d: 'Старт: $8 тис. Скромні заощадження, але все попереду' }, diplomat: { n: 'Дипломат', ic: '🎩', d: 'Старт: $20 тис. Звʼязки з елітами ростуть удвічі швидше' }, tycoon: { n: 'Бізнесмен', ic: '💼', d: 'Старт: $300 тис. Більше грошей з консультацій і угод' }, star: { n: 'Медійна зірка', ic: '🎤', d: 'Старт: $40 тис. Популярність серед виборців росте вдвічі швидше' }, general: { n: 'Генерал у відставці', ic: '🎖', d: 'Старт: $15 тис. Повага у країнах, що воюють: звʼязки й популярність там ×2' } };
+let chName = '', chType = 'student'; const CHAR_T = { student: { n: 'Студент', ic: '🎒', d: 'Старт: $300. Майже з нуля, зате навчання вдвічі швидше й дешевше' }, ordinary: { n: 'Звичайна людина', ic: '🧑', d: 'Старт: $8 тис. Скромні заощадження, але все попереду' }, diplomat: { n: 'Дипломат', ic: '🎩', d: 'Старт: $20 тис. Звʼязки з елітами ростуть удвічі швидше' }, tycoon: { n: 'Бізнесмен', ic: '💼', d: 'Старт: $300 тис. Більше грошей з консультацій і угод' }, star: { n: 'Медійна зірка', ic: '🎤', d: 'Старт: $40 тис. Популярність серед виборців росте вдвічі швидше' }, general: { n: 'Генерал у відставці', ic: '🎖', d: 'Старт: $15 тис. Повага у країнах, що воюють: звʼязки й популярність там ×2' } };
 let startSel = 'UKR', scen = 'war2026', startDiff = 'normal', startMode = 'nation', coSector = 'tech', coName = '', coBudget = null;
 let startTab = 'game';
-const START_AS = [['char', '🧑', 'Персонаж', 'Почніть із нуля: робота, навчання, звʼязки, популярність. Далі — партія, депутатство, власна компанія і президентство.'], ['party', '🎗', 'Лідер партії', 'Ви очолюєте молоду партію: осередки, спонсори, мітинги, дебати, вибори до парламенту, коаліція і закони.'], ['mp', '🏛', 'Депутат', 'Ви вже депутат парламенту зі своєю партією: голосуйте, вносьте закони, набирайте вплив для президентських виборів.'], ['company', '🏢', 'Компанія (власник)', 'Ви — власник корпорації: виробництво, тендери, R&D, торгівля й вплив на уряди. Як персонаж можете балотуватися, виступати, вступати в партію.'], ['nation', '👑', 'Президент (держава)', 'Класична гра за державу: економіка, армія, дипломатія.']];
+const START_AS = [['char', '🎒', 'Студент', 'Почніть студентом майже без грошей: навчання, перша робота за навичками, карʼєра. Далі — власна компанія, політика й навіть президентство.'], ['nation', '👑', 'Президент (держава)', 'Ви керуєте державою: економіка, армія, дипломатія, закони.']];
+let radaOn = false;
 function startScreen() {
+  if (!/^(char|nation)$/.test(startMode)) startMode = 'nation';
   if (!window._themed) { window._themed = 1; setTimeout(() => applyTheme(startSel), 0); }
   if (!window._startList) { const tmp = LORA.createGame({ seed: 1 }); tmp.aggregate();
     window._startList = tmp.N.filter(n => n.alive && n.agg.gdpPot > 0.5).sort((a, b) => b.agg.gdpPot - a.agg.gdpPot).map(n => ({ a3: n.a3, col: n.color, name: n.name, gdp: n.agg.gdpPot, pop: n.agg.pop, tr: n.troopsBase, nk: n.nuke, nT: n.agg.nT })); }
   let hasSave = false; try { hasSave = !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { }
   const join = netMode === 'guest' || netMode === 'watch', host = netMode === 'host';
   if (join) startTab = 'game'; if (!host && startTab === 'online') startTab = 'game';
-  const MAIN = [['single', '🎮', 'Одиночна гра', 'персонаж, депутат, компанія чи президент проти ШІ'], ['multi', '🌐', 'Мультиплеєр', 'хост, гравець або глядач'], ['rada', '🏛', 'Президент і Рада', 'ви — президент, чат Twitch — парламент']];
-  const mainOn = k => k === 'rada' ? netMode === 'solo' && startMode === 'rada' : k === 'single' ? netMode === 'solo' && startMode !== 'rada' : netMode !== 'solo';
+  const MAIN = [['single', '🎮', 'Одиночна гра', 'студент або президент проти ШІ'], ['multi', '🌐', 'Мультиплеєр', 'хост, гравець або глядач'], ['rada', '🏛', 'Гра з чатом Twitch', 'як одиночна, але чат — парламент і голоси']];
+  const mainOn = k => k === 'rada' ? netMode === 'solo' && radaOn : k === 'single' ? netMode === 'solo' && !radaOn : netMode !== 'solo';
   const MULTI = [['host', '📡', 'Створити гру (хост)', 'роздати посилання гравцям'], ['guest', '🔗', 'Приєднатися гравцем', 'за кодом або посиланням'], ['watch', '👁', 'Дивитися гру', 'гість-глядач без керування']];
   const TABS = join ? [] : [['game', '🎮', 'Гра'], ['twitch', '🟣', 'Twitch'], ...(host ? [['online', '📡', 'Онлайн і посилання']] : []), ['stream', '📺', 'Стрім і звук']];
-  const MOD = $('#start').classList.contains('modern'); const TABS2 = MOD ? TABS.filter(x => x[0] === 'game' || x[0] === 'online' || (x[0] === 'twitch' && startMode === 'rada')) : TABS; if (MOD && !TABS2.some(x => x[0] === startTab)) startTab = 'game';
+  const MOD = $('#start').classList.contains('modern'); const TABS2 = MOD ? TABS.filter(x => x[0] === 'game' || x[0] === 'online' || (x[0] === 'twitch' && radaOn)) : TABS; if (MOD && !TABS2.some(x => x[0] === startTab)) startTab = 'game';
   $('#sbox').innerHTML = `${MOD ? modHead() : `<div class="st-head"><h1>${pxi('dipl', 1)} L.O.R.A. <small class="mut">v${LORA.version}</small></h1><div class="btns" style="margin:0">${twBadge()}${langSwitch()}</div></div>`}
   ${MOD ? '' : `<div class="feat"><div>${pxi('world', 1)}<span><b>${D.regions.length} ${t_('регіонів')}</b> · ${D.cities.length} ${t_('міст')}</span></div><div>${pxi('factory', 1)}<span><b>${Object.keys(D.buildings).length} ${t_('типів будівель')}</b> · ${Object.keys(D.techs).length} ${t_('технологій')}</span></div><div>${pxi('co', 1)}<span><b>${D.companies.length} ${t_('корпорацій')}</b> ${t_('зі своїми ШІ')}</span></div><div>${pxi('army', 1)}<span><b>${t_('ШІ-агенти')}</b> ${t_('для кожної держави + режисер світу')}</span></div></div>`}
-  ${MOD ? '' : `<div class="modeSel main3">${MAIN.map(([k, ic, n, d]) => `<button class="${mainOn(k) ? 'on' : ''}${k === 'rada' ? ' rada-m' : ''}" onclick="${k === 'rada' ? "netMode='solo';startMode='rada';startTab='game';" : k === 'single' ? "netMode='solo';if(startMode==='rada')startMode='nation';" : "if(netMode==='solo')netMode='host';if(startMode==='rada')startMode='nation';"}startScreen()">${ico(ic)} ${t_(n)}<span>${t_(d)}</span></button>`).join('')}</div>`}
+  ${MOD ? '' : `<div class="modeSel main3">${MAIN.map(([k, ic, n, d]) => `<button class="${mainOn(k) ? 'on' : ''}${k === 'rada' ? ' rada-m' : ''}" onclick="${k === 'rada' ? "netMode='solo';radaOn=true;startTab='game';" : k === 'single' ? "netMode='solo';radaOn=false;" : "if(netMode==='solo')netMode='host';if(startMode==='rada')startMode='nation';"}startScreen()">${ico(ic)} ${t_(n)}<span>${t_(d)}</span></button>`).join('')}</div>`}
   ${netMode !== 'solo' && !MOD ? `<div class="modeSel sub3">${MULTI.map(([k, ic, n, d]) => `<button class="${netMode === k ? 'on' : ''}" onclick="netMode='${k}';startScreen()">${ico(ic)} ${t_(n)}<span>${t_(d)}</span></button>`).join('')}</div>` : ''}
   ${TABS2.length > 1 ? `<div class="st-tabs">${TABS2.map(([k, ic, n]) => `<button class="${startTab === k ? 'on' : ''}" onclick="startTab='${k}';startScreen()">${ico(ic)} ${t_(n)}</button>`).join('')}</div>` : ''}
   <div class="st-body">${join ? joinBlock() : startTab === 'twitch' ? twitchBlock() : startTab === 'online' ? onlineBlock() : startTab === 'stream' ? streamBlock() : gameBlock()}</div>
@@ -31,15 +33,14 @@ function gameBlock() {
   <h3>${t_('Сценарій')}</h3><div class="btns">${Object.entries(D.scenarios).map(([k, v]) => `<button class="${scen === k ? 'on' : ''}" onclick="scen='${k}';startScreen()">${esc(t_(v.name))}</button>`).join('')}</div>
   <h3>${t_('Складність')}</h3><div class="btns">${Object.entries(DF).map(([k, v]) => `<button class="${startDiff === k ? 'on' : ''}" data-tip="${esc(t_(v.d))}" onclick="startDiff='${k}';coBudget=null;startScreen()">${esc(t_(v.n))}</button>`).join('')}</div><div class="small mut">${esc(t_(DF[startDiff].d))}</div>
   <label class="row"><span>🌫 ${t_('Туман війни')} <span class="small mut">${t_('(глядачі й вивід на стрім — без туману)')}</span></span><input type="checkbox" ${LORA.config.fog !== false ? 'checked' : ''} onchange="LORA.config.fog=this.checked;try{localStorage.setItem('lora_fog',this.checked?'1':'0')}catch(e){}"></label>
-  ${startMode === 'rada' ? '' : `<h3>${t_(host ? 'Ви (хост) граєте як' : 'Почати як')}</h3><div class="btns">${START_AS.map(([k, ic, n]) => `<button class="${startMode === k ? 'on' : ''}" onclick="startMode='${k}';startScreen()">${ico(ic)} ${t_(n)}</button>`).join('')}</div><div class="small mut">${t_((START_AS.find(x => x[0] === startMode) || START_AS[4])[3])}</div>`}
-  ${startMode === 'rada' && !host ? radaStartBlock() : ''}
+  ${`<h3>${t_(host ? 'Ви (хост) граєте як' : 'Почати як')}</h3><div class="btns">${START_AS.map(([k, ic, n]) => `<button class="${startMode === k ? 'on' : ''}" onclick="startMode='${k}';startScreen()">${ico(ic)} ${t_(n)}</button>`).join('')}</div><div class="small mut">${t_((START_AS.find(x => x[0] === startMode) || START_AS[1])[3])}</div>`}
+  ${radaOn && !host ? radaStartBlock() : ''}
   ${(startMode === 'company') ? `<div class="card"><div class="row"><span>${t_('Назва компанії')}</span><input type="text" id="coname" value="${esc(coName)}" placeholder="${t_('Моя компанія')}" oninput="coName=this.value" style="width:55%"></div>
     <div class="small mut" style="margin-top:6px">${t_('Галузь')}</div><div class="btns">${Object.entries(SEC).map(([k, v]) => `<button class="${coSector === k ? 'on' : ''}" data-tip="${esc(t_(v.d))}" onclick="coSector='${k}';startScreen()">${ico(v.ic)} ${esc(t_(v.n))}</button>`).join('')}</div>
     <div class="small mut">${esc(t_(SEC[coSector].d))}</div><div class="row"><span>${t_('Стартовий капітал')}</span><b>${money(LORA.config.companyCash)}</b></div>
     <div class="small mut">${t_('Штаб-офіс буде у столиці обраної країни. Мета — вирости, набрати вплив і перебрати владу в державі.')}</div></div>` : ''}
   ${(startMode === 'char' || startMode === 'mp' || startMode === 'party' || startMode === 'company') ? `<div class="card"><div class="row"><span>${t_('Імʼя персонажа')}</span><input type="text" value="${esc(chName)}" placeholder="${t_('Олена Коваль')}" oninput="chName=this.value" style="width:55%"></div>
-    <div class="small mut" style="margin-top:6px">${t_('Хто ви')}</div><div class="btns">${Object.entries(CHAR_T).map(([k, v]) => `<button class="${chType === k ? 'on' : ''}" onclick="chType='${k}';startScreen()">${ico(v.ic)} ${esc(t_(v.n))}</button>`).join('')}</div>
-    <div class="small mut">${esc(t_(CHAR_T[chType].d))}. ${t_('Ви не керуєте ні державою, ні компанією: подорожуйте, здобувайте звʼязки й популярність, заробляйте на посередництві — і виграйте вибори, щоб очолити країну.')}</div></div>` : ''}
+    <div class="small mut" style="margin-top:6px">🎒 ${esc(t_(CHAR_T.student.d))}. ${t_('Шлях: навчання → робота за навичками → карʼєра → власна компанія й політика → президентство.')}</div></div>` : ''}
   </div><div>
   <h3>${startMode === 'company' ? t_('Країна штаб-офісу') : /char|mp|party/.test(startMode) ? t_('Країна, де ви починаєте') : t_('Оберіть державу')}</h3><input type="text" id="csearch" placeholder="${t_('Пошук країни…')}" style="width:100%" oninput="renderClist(this.value)"><div id="clist"></div>
   </div></div>`;
@@ -97,14 +98,15 @@ function joinBlock() {
   <div><h3>🟣 Twitch</h3><div class="card">${TW.S.user ? `<span class="tw-u"><img src="${esc(TW.S.user.avatar)}" alt="">${esc(TW.S.user.name)}</span>` : `<button class="tw-b" onclick="TW.login()">🟣 ${t_('Увійти через Twitch')}</button><div class="small mut">${t_('Необовʼязково: нік і аватарка з Twitch.')}</div>`}</div></div></div>`;
 }
 function renderClist(q) {
-  q = (q || '').toLowerCase(); const L = window._startList.slice().sort((a, b) => (b.a3 === startSel) - (a.a3 === startSel));
+  const SC = D.scenarios[scen] || {}; const sf = c => { const e = (SC.econ || {})[c.a3]; return SC.year ? { gdp: c.gdp * (e ? e[0] : SC.defGdp), pop: c.pop * (e ? e[1] : SC.defPop), tr: e && e[2] != null ? e[2] : c.tr, nk: e && e[4] != null ? e[4] > 0 : c.nk } : c; };
+  q = (q || '').toLowerCase(); const L = window._startList.map(c => Object.assign({}, c, sf(c))).sort((a, b) => (b.a3 === startSel) - (a.a3 === startSel));
   $('#clist').innerHTML = L.filter(c => !q || c.name.toLowerCase().includes(q)).map(c => `<div class="c ${c.a3 === startSel ? 'sel' : ''}" style="--cc:${themeOf(c.a3, c.col).a}" onclick="startSel='${c.a3}';applyTheme('${c.a3}','${c.col}');renderClist(document.getElementById('csearch').value)"><b>${esc(c.name)}${c.nk ? ' ☢' : ''}</b><span>${t_('ВВП')} ${money(c.gdp)} · ${popM(c.pop)} · ${t_('армія')} ${people(c.tr)} · ${t_('регіонів')} ${c.nT}</span></div>`).join('');
 }
 function startGame() {
   G = LORA.createGame({ seed: (Date.now() % 1e9) | 0 });
-  if (/^(char|mp|party|company)$/.test(startMode)) G.init(null, scen, { difficulty: startDiff, char: { name: (chName || '').trim() || t_('Олена Коваль'), type: chType, home: startSel, stage: startMode === 'char' ? null : startMode === 'company' ? 'owner' : startMode, sector: coSector, coName: (coName || '').trim() || null, coCash: startMode === 'company' ? LORA.config.companyCash : 0 } });
+  if (startMode !== 'nation') G.init(null, scen, { difficulty: startDiff, char: { name: (chName || '').trim() || t_('Олена Коваль'), type: 'student', home: startSel } });
   else G.init(startSel, scen, { difficulty: startDiff });
-  if (startMode === 'rada' && G.player >= 0) G.radaEnable(true);
+  if (radaOn && G.player >= 0) G.radaEnable(true);
   $('#start').style.display = 'none'; startUI(); setTimeout(help, 300);
 }
 

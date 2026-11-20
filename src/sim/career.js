@@ -58,7 +58,7 @@ LORA.sim.register('career', 99.66, function (G) {
   G.careerMonthly = function () {
     Object.values(G.leaders || {}).forEach(L => {
       if (!L || L.role !== 'char') return;
-      if (L.job) { const J = G.JOBS[L.job.k]; L.money += J.pay * (1 + (L.job.lvl - 1) * 0.35); L.job.xp += 1; if (L.job.xp >= 6 * L.job.lvl && L.job.lvl < 5) { L.job.lvl++; L.job.xp = 0; if (G.leader === L) G.say(`📈 ${L.name}: підвищення — ${J.n}, рівень ${L.job.lvl}`, 'good'); } const nid = L.job.nid; if (J.k.cont) L.cont[nid] = clamp((L.cont[nid] || 0) + 0.4 * J.k.cont, 0, 100); if (J.k.pop) L.popu[nid] = clamp((L.popu[nid] || 0) + 0.3 * J.k.pop, 0, 100); if (J.k.fame) L.fame = clamp(L.fame + 0.2 * J.k.fame, 0, 100); }
+      if (L.job && G.jobMonthly) G.jobMonthly(L);
       if (L.mpBy && G.day >= L.mpBy && L.mpCand != null) { L.mpBy = null; const nid = L.mpCand; const save = L.mp; G.careerParlElection(nid); }
       if (L.party) { const P = L.party; P.r = clamp(P.r + ((L.popu[P.nid] || 0) * 0.15 - P.r) * 0.05, 0, 45); }
       if (L.mp != null) { L.money += 0.000004; L.mpInfl = clamp((L.mpInfl || 5) + 0.3, 0, 100); }
