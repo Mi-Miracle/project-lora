@@ -48,7 +48,7 @@ LORA.sim.register('future', 99.8, function (G) {
   function personaMonthly(key, L) {
     if (!L || L.money == null || L.role === 'char') return; const nid = L.home, n = N[nid];
     if (L.role === 'president' && n && n.alive) {
-      L.money += 0.0015; // зарплата й представницькі
+      L.money += 0.000025; // зарплата й представницькі
       L.popu[nid] = clamp((L.popu[nid] || 0) * 0.85 + n.stab * 0.15, 0, 100); L.cont[nid] = Math.max(L.cont[nid] || 0, 40);
       const sk = k => G.skill ? G.skill(L, k) : 0;
       if (sk('orat') || sk('media')) n.stab = clamp(n.stab + 0.04 * sk('orat') + 0.03 * sk('media'), 0, 100);
@@ -57,7 +57,7 @@ LORA.sim.register('future', 99.8, function (G) {
       if (sk('diplo')) G.N.forEach(x => { if (x.alive && x.id !== nid && !G.atWar(x.id, nid) && G.rel[x.id][nid] > 0) G.rel[x.id][nid] = clamp(G.rel[x.id][nid] + 0.08 * sk('diplo'), -100, 100); });
       if (sk('sci') && G.resBoost) G.resBoost(n, 0.006 * sk('sci'));
     }
-    if (L.role === 'ceo') { const c = G.companies && G.companies[G.pc]; L.money += 0.0012 + (c && c.profitY > 0 ? c.profitY * 0.0005 : 0); }
+    if (L.role === 'ceo') { const c = G.companies && G.companies[G.pc]; L.money += 0.00005 + (c && c.profitY > 0 ? c.profitY * 0.00005 : 0); }
   }
 
   // ---------- дії глави держави

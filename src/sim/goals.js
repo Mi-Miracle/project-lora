@@ -51,7 +51,7 @@ LORA.sim.register('goals', 97.5, function (G) {
       { id: 'fame50', n: 'Світова знаменитість', d: 'слава ≥ 50', r: { money: 0.0001 }, ok: L => L.fame >= 50 },
       { id: 'rich', n: 'Мільйонер', d: '$1 млн особистих коштів', r: { money: 0 }, ok: L => L.money >= 0.001 },
       { id: 'cand', n: 'У великій політиці', d: 'стати кандидатом на виборах', r: { money: 0.00002 }, ok: L => L.cand != null },
-      { id: 'pres', n: 'Президент', d: 'очолити державу', r: { money: 0.0005 }, ok: () => G.player >= 0 }
+      { id: 'pres', n: 'Президент', d: 'очолити державу', r: { money: 0.00005 }, ok: () => G.player >= 0 }
     ]
   };
   G.goalsMode = () => G.player >= 0 ? 'nation' : G.pc >= 0 && G.companies && G.companies[G.pc] ? 'company' : 'char';
