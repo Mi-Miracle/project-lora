@@ -165,7 +165,7 @@ LORA.sim.register('stage2', 99.998, function (G) {
     const h = c.home; if (G.atWar(h, o.buyer)) return 'Країна штабу воює з замовником';
     if (h !== o.buyer && !G.allied(h, o.buyer) && G.rel[h][o.buyer] < 20 && !G.coHasOffice(c, o.buyer)) return `Потрібен офіс у країні ${N[o.buyer].name} або відносини ≥ 20`;
     if (G.allied(h, o.enemy) || h === o.enemy) return 'Не можна воювати проти союзника країни штабу';
-    if (!c.assets.length) return 'Потрібен хоча б один виробничий актив (завод, полігон, навчальний центр)';
+    if (!c.assets.length && !(c.bunits || []).length) return 'Потрібен хоча б один виробничий актив (завод, полігон, навчальний центр)';
     if (S().pmc.some(p => p.co === c.id && p.buyer === o.buyer && !p.end)) return 'У вас уже є контракт із цим замовником';
     const cost = o.k * PMC_RAISE; if (c.cash < cost) return `Набір і оснащення: ${f$(cost)} — бракує коштів`;
     return '';

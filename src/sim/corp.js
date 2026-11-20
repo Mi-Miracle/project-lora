@@ -95,7 +95,7 @@ LORA.sim.register('corp', 99.6, function (G) {
       if (!c.alive) return; G.corpInit(c); const human = !c.ai;
       // R&D: бюджет = частка прибутку (мін. $5 млн/міс), очки: $1 млрд ≈ 1000 очок; лабораторії (університети, дата-центри) +20% кожна
       const labs = c.assets.filter(a => a.type === 'university' || a.type === 'datacenter' || a.type === 'ai_datacenter').reduce((s, a) => s + a.lvl, 0);
-      if (c.rd.budget < 0.05 || c.rd.budget > 3) c.rd.budget = 0.15; const spend = c.rd.budget / 12; c.rd.pts += 8 * (1 + labs * 0.2); if (c.cash > spend) { c.cash -= spend; c.rd.pts += spend * 3500 * (1 + labs * 0.2); }
+      if (c.rd.budget < 0.05 || c.rd.budget > 3) c.rd.budget = 0.15; const spend = c.small ? 0 : c.rd.budget / 12; c.rd.pts += 8 * (1 + labs * 0.2); if (c.cash > spend) { c.cash -= spend; c.rd.pts += spend * 3500 * (1 + labs * 0.2); }
       if (!c.rd.cur && !human) { const nx = G.corpTree(c).find(t => c.rd.done[t.id] == null && t.req.every(r => c.rd.done[r] != null) && G.corpStOk(c, t.st)); if (nx) c.rd.cur = nx.id; }
       const cur = c.rd.cur && G.corpTree(c).find(t => t.id === c.rd.cur);
       if (cur && c.rd.pts >= cur.cost) { c.rd.pts -= cur.cost; c.rd.done[cur.id] = G.day; c.rd.cur = null; if (human) G.say(`🔬 R&D «${c.name}»: розроблено «${cur.n}»`, 'good', [c.home]); }

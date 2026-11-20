@@ -30,7 +30,7 @@ LORA.sim.register('careers', 99.997, function (G) {
   const J = (o) => o;
   const JOBS = {
     cook: J({ n: 'Кухар', ic: '🍳', place: 'rest', d: 'ресторан: від помічника до шеф-ресторатора', k: { cont: 0.5 }, sk: 'biz',
-      ranks: [['Помічник кухаря', {}, 650], ['Кухар', {}, 1000], ['Су-шеф', { biz: 1 }, 1600], ['Шеф-кухар', { biz: 2 }, 2500], ['Шеф-ресторатор', { biz: 3 }, 4200]],
+      ranks: [['Помічник кухаря', {}, 900], ['Кухар', {}, 1400], ['Су-шеф', { biz: 1 }, 2200], ['Шеф-кухар', { biz: 2 }, 3400], ['Шеф-ресторатор', { biz: 3 }, 5500]],
       duties: [['chop', 'Нарізати овочі на зміну', 4, 1, 2, 'click', 0.06], ['cook', 'Готувати замовлення на кухні', 5, 2, 5, 'timing', 0.08], ['menu', 'Скласти нове меню', 3, 3, 5, 'quiz', 0.1], ['banq', 'Банкет на 200 гостей (до ночі)', 6, 2, 5, 'timing', 0.12, 1]] }),
     seller: J({ n: 'Торгівля', ic: '🛒', place: 'mall', d: 'ТРЦ: продавець → адміністратор → директор магазину → регіональний директор', k: { pop: 0.5 }, sk: 'biz',
       ranks: [['Продавець-консультант', {}, 600], ['Старший продавець', {}, 850], ['Адміністратор залу', { biz: 1 }, 1300], ['Директор магазину', { biz: 2 }, 2400], ['Регіональний директор', { biz: 3, eco: 1 }, 4500]],
@@ -151,13 +151,13 @@ LORA.sim.register('careers', 99.997, function (G) {
       P.acts[`j_${jk}_${id}`] = { n, h, c: 0, daily: 1, night: !!night, mg, job: jk, quiz: jk, hide: L => !(L.job && L.job.k === jk && L.job.lvl >= lo && L.job.lvl <= hi),
         need: L => !L.job || L.job.k !== jk ? `Лише для: ${j.n}` : L.job.lvl < lo ? `З посади «${j.ranks[lo - 1][0]}»` : '',
         r: (L) => { const s = L._mg != null ? clamp(L._mg, 0, 1) : autoScore(L, j); L._mg = null; const ok = s >= 0.45; L.job.dd = (L.job.dd || 0) + (L.job.ddD === G.day ? 0 : 1); L.job.ddD = G.day;
-          const gx = xp * (0.3 + s); L.job.xp = (L.job.xp || 0) + gx; const bonus = G.jobPay(L) / 170 * h * (night ? 0.6 : 0.3) * s; L.money += bonus;
+          const gx = xp * (0.3 + s); L.job.xp = (L.job.xp || 0) + gx; const bonus = G.jobPay(L) / 170 * h * (night ? 1.1 : 0.7) * (0.4 + s); L.money += bonus; const tp = G.jobTips ? G.jobTips(L, jk, id, s, h) : 0; if (tp) L.money += tp;
           let extra = '';
           if (id === 'defend') { const win = R() < 0.25 + s * 0.6; const fee = $(300 + L.job.lvl * 250) * (win ? 2 : 1); L.money += fee; extra = win ? ` Справу виграно! Гонорар ${f$(fee)}.` : ` Справу програно, але гонорар ${f$(fee)} ваш.`; L.popu[L.job.nid] = clamp((L.popu[L.job.nid] || 0) + (win ? 1 : -0.3), 0, 100); }
           if (id === 'judge') extra = ok ? ' Рішення залишилося в силі в апеляції.' : ' Апеляція скасувала ваше рішення.';
           if (id === 'op') extra = ok ? ' Пацієнт одужує.' : ' Ускладнення, але пацієнта врятували колеги.';
           if (id === 'task' && jk === 'military') extra = ok ? ' Завдання виконано, командування задоволене.' : ' Завдання виконано частково.';
-          const v = VERB[mg] || VERB.quiz; return [`${ok ? '✅' : '⚠'} ${v[ok ? 0 : 1]} (${Math.round(s * 100)}%) — ${pick(FUNNY[ok ? 'good' : 'bad'])}. Досвід +${gx.toFixed(2)}, премія ${f$(bonus)}.${extra}${promo(L, true)}`, { mood: ok ? 3 : -3, hp: night ? -4 : -1 }, ok && s > 0.85 ? 'jackpot' : null]; } };
+          const v = VERB[mg] || VERB.quiz; return [`${ok ? '✅' : '⚠'} ${v[ok ? 0 : 1]} (${Math.round(s * 100)}%) — ${pick(FUNNY[ok ? 'good' : 'bad'])}. Досвід +${gx.toFixed(2)}, премія ${f$(bonus)}${tp ? `, ${G.TIPS[jk][1]} ${f$(tp)}` : ''}.${extra}${promo(L, true)}`, { mood: ok ? 3 : -3, hp: night ? -4 : -1 }, ok && s > 0.85 ? 'jackpot' : null]; } };
     });
     P.acts['exam_' + jk] = { n: 'Атестація на підвищення', h: 3, c: 0, mg: 'quiz', quiz: jk, hide: L => !(L.job && L.job.k === jk), need: L => { if (!L.job || L.job.k !== jk) return 'Лише для працівників'; if (L.job.lvl >= 5) return 'Вершина карʼєри'; if ((L.job.exam || -99) + 30 > G.day) return `Повторно — через ${(L.job.exam || -99) + 30 - G.day} дн.`; if (L.job.xp < G.jobNeed(L) * 0.7) return `Замало досвіду: ${L.job.xp.toFixed(1)} з ${(G.jobNeed(L) * 0.7).toFixed(1)}`; return G.jobNextErr(L); },
       r: L => { const s = L._mg != null ? L._mg : autoScore(L, j); L._mg = null; L.job.exam = G.day; if (s >= 0.6) { L.job.xp = Math.max(L.job.xp, G.jobNeed(L)); return [`атестацію складено (${Math.round(s * 100)}%)!${promo(L, true)}`, { mood: 12 }, 'jackpot']; } L.job.xp = Math.max(0, L.job.xp - 1); return [`атестацію не складено (${Math.round(s * 100)}%). Спроба — через місяць`, { mood: -6 }]; } };

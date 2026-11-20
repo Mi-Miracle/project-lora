@@ -122,7 +122,7 @@ LORA.sim.register('companies', 57, function (G) {
       c.assets = c.assets.filter(a => { const t = ter[a.t]; const real = t.bld[a.type] || 0; if (real < a.lvl) a.lvl = real; return a.lvl > 0; });
       c.assets.forEach(a => { const p = G.assetProfit(c, a); const tx = p * taxRate(c, ter[a.t].owner); profit += p; tax += tx; N[ter[a.t].owner].cash += tx / 12; });
       N[c.home].cash += c.base * 0.085 * taxRate(c, c.home) / 12;
-      c.profitY = profit; c.taxY = tax; c.cash += (profit - tax) / 12 - c.offices.length * 0.004;
+      c.profitY = profit; c.taxY = tax; c.cash += (profit - tax) / 12 - c.offices.length * (c.small ? 0.000003 : 0.004);
       // вплив: згасання + пасивний від активів
       for (const k in c.infl) { const nid = +k; const pas = Math.min(40, G.coAssetsIn(c, nid) / Math.max(5, N[nid].agg.gdp) * 400) + (c.home === nid ? Math.min(25, c.base / Math.max(5, N[nid].agg.gdp) * 300) : 0);
         c.infl[k] += (pas - c.infl[k]) * 0.02; if (c.infl[k] > pas) c.infl[k] -= 0.3; c.infl[k] = clamp(c.infl[k], 0, 100); }

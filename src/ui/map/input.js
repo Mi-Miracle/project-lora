@@ -37,7 +37,8 @@ function onClick(e) {
   const t = pickTerritory(e.clientX, e.clientY); sel = t >= 0 ? { type: 't', id: t } : null; renderRight();
 }
 function onRightClick(e) {
-  if (!sel) return;
+  const ownA = sel && sel.type === 'a' && (a => a && (a.n === G.player || (G.canCmd && G.canCmd(a))))(G.armies.find(x => x.id === sel.id)); const ownF = sel && sel.type === 'f' && (f => f && f.n === G.player)(G.fleets.find(x => x.id === sel.id));
+  if (!ownA && !ownF) { if (window.mapCtx) mapCtx(e); return; }
   if (sel.type === 'a') {
     const a = G.armies.find(x => x.id === sel.id); const mineU = a && a.n !== G.player && G.canCmd && G.canCmd(a); if (!a || (a.n !== G.player && !mineU)) return;
     const t = pickTerritory(e.clientX, e.clientY); if (t < 0) return;
