@@ -64,7 +64,7 @@ function citySide() {
   if (tabs.length > 1) { locUI.tabs = locUI.tabs || {}; const cur = tabs.includes(locUI.tabs[k]) ? locUI.tabs[k] : tabs[0]; const TN = Object.assign({}, G.LUX_TABS || {}, G.JOB_TABS || {});
     h += `<div class="btns city-tabs">${tabs.map(t => `<button class="small ${t === cur ? 'on' : ''}" onclick="locUI.tabs['${k}']='${t}';citySide()">${esc(t_(TN[t] || (G.LUX_CAT && G.LUX_CAT[t] ? G.LUX_CAT[t][1] : t)))}</button>`).join('')}</div>`;
     AE = AE.filter(([, A]) => (A.tab || tabs[0]) === cur); }
-  h += AE.map(([a, A]) => { const e = G.locCan(locUI.loc, k, a); const nm = locUI.loc === 'city' ? G.cityActName(k, a) : A.n; return `<button class="city-act" ${e ? 'disabled' : ''} data-tip="${esc(e ? t_(e) : '')}" onclick="cityDo('${k}','${a}')"><b>${esc(t_(nm))}</b><span class="mut">${A.h} ${t_('год')} · ${A.c ? money(A.c) : t_('безкоштовно')}${e && A.need ? ' · ' + esc(t_(e)) : ''}</span></button>`; }).join('');
+  h += AE.map(([a, A]) => { const e = G.locCan(locUI.loc, k, a); const nm = locUI.loc === 'city' ? G.cityActName(k, a) : A.n; return `<button class="city-act" ${e ? 'disabled' : ''} data-tip="${esc(e ? t_(e) : '')}" onclick="cityDo('${k}','${a}')"><b>${esc(t_(nm))}</b><span class="mut">${A.h} ${t_('год')} · ${(G.actPrice ? G.actPrice(A) : A.c) ? money(G.actPrice ? G.actPrice(A) : A.c) : t_('безкоштовно')}${A.night ? ' · 🌙' : ''}${e && A.need ? ' · ' + esc(t_(e)) : ''}</span></button>`; }).join('');
   if (k === 'agency') h += estateBlock();
   h += `<div class="btns"><button class="small" onclick="locUI.place=null;citySide()">← ${t_('Усі місця')}</button></div>`; el.innerHTML = h;
 }

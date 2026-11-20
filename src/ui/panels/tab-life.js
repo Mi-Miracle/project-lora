@@ -34,7 +34,8 @@ function lspark(a) { if (a.length < 2) return ''; const w = 90, h = 18, mx = Mat
 TAB_FN.life = function () {
   const L = G.leader; if (!L || (L.role !== 'char' && L.money == null)) return ''; G.lifeInit(); const V = G.invValue(L), nid = G.leaderNation();
   let h = `<div class="kpi"><div><b>${money(G.lifeWealth(L))}</b><span>${t_('статки')}</span></div><div><b>${money(L.money)}</b><span>${t_('готівка')}</span></div><div><b>${money(V.tot)}</b><span>${t_('інвестиції')}</span></div><div><b>${(L.own || []).length}</b><span>${t_('майно')}</span></div></div>`;
-  h += subnav('life', [['lux', '💎 ' + t_('Розкіш')], ['own', '🗝 ' + t_('Моє майно')], ['inv', '📈 ' + t_('Інвестиції')], ['sec', '🛡 ' + t_('Охорона')]]); const sub = curSub('life', 'lux');
+  h += subnav('life', [['lux', '💎 ' + t_('Розкіш')], ['own', '🗝 ' + t_('Моє майно')], ['inv', '📈 ' + t_('Інвестиції')], ['sec', '🛡 ' + t_('Охорона')], ['bud', '💼 ' + t_('Бюджет')]]); const sub = curSub('life', 'lux');
+  if (sub === 'bud') return h + budBlock();
   if (sub === 'sec') return h + secBlock('L', L.home);
   if (sub === 'lux') {
     h += `<div class="card">${t_('Купівля майна тепер — у місті: автосалон, яхт-клуб і авіасалон, аукціонний дім, агенція нерухомості, спортивна агенція, медіахолдинг, турагенція. Тут — список того, що вже є, і продаж.')}<div class="btns"><button class="pri" onclick="openLoc('city')">🏙 ${t_('Вийти в місто')}</button><button onclick="subtab['life']='own';renderTab(true)">🗝 ${t_('Моє майно')}</button></div></div>`;
@@ -56,3 +57,19 @@ TAB_FN.life = function () {
   }
   return h;
 };
+
+// 💼 Бюджет персонажа: прогноз щомісячних доходів і витрат + фактичний облік
+function budBlock() {
+  const B = G.budget && G.budget(); if (!B) return `<div class="mut">${t_('Бюджет доступний персонажу')}</div>`;
+  const row = (x, sign) => `<tr><td>${ico(x.ic)} ${esc(t_(x.n))}</td><td class="${sign > 0 ? 'g' : 'r'}" style="text-align:right">${sign > 0 ? '+' : '−'}${money(x.v)}</td></tr>`;
+  let h = `<div class="grp">📅 ${t_('Щомісячний прогноз')}</div><table class="small" style="width:100%">`;
+  h += `<tr><th colspan="2" class="g">${t_('Доходи')}</th></tr>` + (B.inc.length ? B.inc.map(x => row(x, 1)).join('') : `<tr><td class="mut" colspan="2">${t_('Постійних доходів немає — влаштуйтеся на роботу або купіть бізнес')}</td></tr>`);
+  h += `<tr><th colspan="2" class="r">${t_('Витрати')}</th></tr>` + (B.exp.length ? B.exp.map(x => row(x, -1)).join('') : `<tr><td class="mut" colspan="2">${t_('Постійних витрат немає')}</td></tr>`);
+  h += `<tr><td><b>${t_('Разом за місяць')}</b></td><td style="text-align:right"><b class="${B.net >= 0 ? 'g' : 'r'}">${B.net >= 0 ? '+' : '−'}${money(Math.abs(B.net))}</b></td></tr></table>`;
+  h += `<div class="mut small">${t_('Прогноз без разових дій: підробітків, покупок, розваг, навчання. Дохід бізнесу коливається ±30%.')}</div>`;
+  const cats = Object.entries(B.cur).filter(([, v]) => Math.abs(v) > 1e-12);
+  h += `<div class="grp">🧾 ${t_('Цього місяця через дії')}</div>` + (cats.length ? `<table class="small" style="width:100%">${cats.map(([k, v]) => `<tr><td>${esc(t_(G.BUD_CAT[k] || k))}</td><td class="${v >= 0 ? 'g' : 'r'}" style="text-align:right">${v >= 0 ? '+' : '−'}${money(Math.abs(v))}</td></tr>`).join('')}</table>` : `<div class="mut small">${t_('Поки нічого')}</div>`);
+  if (B.hist.length) { h += `<div class="grp">📊 ${t_('Історія по місяцях')}</div><table class="small" style="width:100%"><tr><th>${t_('Місяць до')}</th><th>${t_('Пасивно')}</th><th>${t_('Дії')}</th><th>${t_('Разом')}</th></tr>`;
+    h += B.hist.map(m => { const act = m.net - m.passive; const c = v => `<span class="${v >= 0 ? 'g' : 'r'}">${v >= 0 ? '+' : '−'}${money(Math.abs(v))}</span>`; return `<tr><td>${esc(G.dateStr ? G.dateStr(m.d) : m.d)}</td><td>${c(m.passive)}</td><td>${c(act)}</td><td><b>${c(m.net)}</b></td></tr>`; }).join('') + '</table>'; }
+  return h;
+}

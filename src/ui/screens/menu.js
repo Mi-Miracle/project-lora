@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['New character: Student, starting with $300', 'Weekly funny news broadcast (toggle in Settings)', 'Stock exchange: all companies, pages and search', 'Installer can now uninstall the game', 'Fixed icons on Windows, the dacha well and the spaceport']
-  : ['Новий персонаж: Студент — старт із $300', 'Щотижневий випуск кумедних новин (вимикається в Налаштуваннях)', 'Біржа: усі компанії, сторінки й пошук', 'Інсталятор тепер уміє видаляти гру', 'Виправлено іконки у Windows, криницю на дачі й космодром']
+  ? ['Active career: tasks, courses and promotion assessments for all 21 professions', 'Budget tab: monthly income, expenses and history', 'Tougher economy: living costs, realistic business returns, gig limits', 'New character: Student, starting with $300', 'Weekly funny news broadcast']
+  : ['Активна карʼєра: завдання, курси й атестації для всіх 21 професії', 'Вкладка «Бюджет»: доходи, витрати й історія по місяцях', 'Складніша економіка: прожиткові витрати, реальна віддача бізнесу, ліміти підробітків', 'Новий персонаж: Студент — старт із $300', 'Щотижневий випуск кумедних новин']
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }

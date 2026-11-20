@@ -126,7 +126,7 @@ LORA.sim.register('v31a', 99.992, function (G) {
   });
   G.estateMgr = function (id) { const L = G.leader; const p = L && (L.estate || []).find(x => x.id === id); if (!p) return { ok: false, err: '?' }; if (p.mgr) return { ok: false, err: 'Керуючий уже є' }; const fee = G.ESTATE[p.k].inc * 2; if (L.money < fee) return { ok: false, err: 'Бракує грошей' };
     L.money -= fee; p.mgr = G.fakeName(); return { ok: true, msg: `керуючий ${p.mgr}: дохід +25%, менше проблем. ${pick(['Перший день — переставив усі стільці', 'Одразу запровадив дрес-код', 'Найняв свою тещу. Вона прекрасна'])}` }; };
-  G.h29.m.push(() => { const L = G.leader; if (!can(L) || !L.estate) return; L.estate.forEach(p => { if (p.mgr) L.money += G.ESTATE[p.k].inc * p.lvl * 0.25 - G.ESTATE[p.k].inc * 0.1; }); });
+  G.h29.m.push(() => { const L = G.leader; if (!can(L) || !L.estate) return; L.estate.forEach(p => { if (p.mgr) L.money += (G.estateInc ? G.estateInc(p) : G.ESTATE[p.k].inc * p.lvl) * 0.25 - G.ESTATE[p.k].inc * 0.1; }); });
 
   G.act.cropPlant = k => G.cropPlant(k); G.act.farmWater = () => G.farmWater(); G.act.farmSpray = () => G.farmSpray(); G.act.farmHarvest = () => G.farmHarvest(); G.act.farmSell = (m, w) => G.farmSell(m || 1, w || 'Ринок'); G.act.farmBuy = k => G.farmBuy(k);
   G.act.houseBuy = lv => G.houseBuy(lv); G.act.petBuy = k => G.petBuy(k); G.act.petPlay = () => G.petPlay(); G.act.inv2Do = (k, a) => G.inv2Do(k, a); G.act.inv2Sell = k => G.inv2Sell(k); G.act.estateMgr = id => G.estateMgr(id);

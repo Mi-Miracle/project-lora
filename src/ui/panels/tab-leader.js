@@ -81,7 +81,7 @@ TAB_FN.career = function () {
   const btn = (k, a, label) => { const e = G.careerCan(k, a); const A = G.CAREER[k]; return `<button class="${e ? '' : 'pri'}" ${e ? 'disabled' : ''} data-tip="${esc(t_(A.d))}${e ? ' — ' + esc(t_(e)) : ''}" onclick="carDo('${k}',${a == null ? 'null' : `'${a}'`})">${A.ic} ${esc(t_(label || A.n))}${A.cost ? ' · ' + money(A.cost) : ''}</button>`; };
   // робота
   h += `<div class="grp">🧳 ${t_('Робота')}</div>`;
-  if (L.job) { const J = G.JOBS[L.job.k]; h += `<div class="card small"><div class="row"><b>${J.ic} ${esc(t_(J.n))} · ${t_('рівень')} ${L.job.lvl}</b><span>${money(J.pay * (1 + (L.job.lvl - 1) * 0.6) * 12)}/${t_('рік')}</span></div><div class="mut">${esc(t_(J.d))} · ${esc(nat(L.job.nid).name)}</div></div>`; }
+  if (L.job) { const J = G.JOBS[L.job.k]; h += `<div class="card small"><div class="row"><b>${J.ic} ${esc(t_(J.n))} · ${t_('рівень')} ${L.job.lvl}</b><span>${money(J.pay * (1 + (L.job.lvl - 1) * 0.35) * 12)}/${t_('рік')}</span></div><div class="mut">${esc(t_(J.d))} · ${esc(nat(L.job.nid).name)}</div></div>`; }
   h += `<div class="btns">${Object.entries(G.JOBS).map(([k, J]) => { const e = G.careerCan('job', k); return `<button class="small" ${e ? 'disabled' : ''} data-tip="${esc(t_(J.d))}${e ? ' — ' + esc(t_(e)) : ''}" onclick="carDo('job','${k}')">${J.ic} ${esc(t_(J.n))}</button>`; }).join('')}</div>`;
   // партія
   h += `<div class="grp">🎗 ${t_('Партія')}</div>`;
