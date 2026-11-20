@@ -86,13 +86,13 @@ LORA.sim.register('trade', 40, function (G) {
     const doy = G.day % 365;
     const sig = [...G.wars.keys()].sort().join(',') + '|' + G.sanctions.size + '|' + [...G.sanctions].length + '|' + G.seaClosed.map(v => v > G.day ? 1 : 0).join('') + '|' + (doy >= 182 && doy <= 300) + '|' +
       G.fleets.filter(f => !f.mv && G.enemiesOf(f.n).length).map(f => f.n + ':' + f.node).sort().join(',') + '|' + Array.from(G.cellCtrl).join(',') + '|' + Math.round(G.day / 120) + '|' + (G.links ? G.links.filter(l => l.built && !l.cut).length : 0);
-    if (G._routeSig !== sig) { G._routeSig = sig; G._routeCache = { routes: {}, blk: {}, pairs: {} }; }
+    if (G._routeSig !== sig) { G._routeSig = sig; G._routeCache = { routes: {}, blk: {}, pairs: new Map() }; }
     const routeCache = G._routeCache.routes, blkCache = G._routeCache.blk;
     const blk = x => blkCache[x] || (blkCache[x] = G.seaBlockedFor(x));
     const R1 = (x, mode) => { const k = x + ':' + mode; return routeCache[k] || (routeCache[k] = dijkstra(G.nationCell(x), x, mode, blk(x))); };
     const pathOk = (path, X) => { const b = blk(X); for (let k = 1; k < path.length - 1; k++) { const u = path[k]; if (u < NC) { const c = G.cellCtrl[u]; if (c >= 0 && c !== X && (G.atWar(c, X) || G.rel[c][X] < -60)) return false; } else if (b[u - NC]) return false; } return true; };
-    const pairCache = G._routeCache.pairs;
-    const getRoute = (from, to, mode) => { const pk = from + '>' + to + ':' + mode; if (pk in pairCache) return pairCache[pk]; return (pairCache[pk] = getRoute0(from, to, mode)); };
+    if (!(G._routeCache.pairs instanceof Map)) G._routeCache.pairs = new Map(); const pairCache = G._routeCache.pairs; const MODE_I = {}; let modeN = 0;
+    const getRoute = (from, to, mode) => { const mi = MODE_I[mode] != null ? MODE_I[mode] : (MODE_I[mode] = modeN++); const pk = (from * 1024 + to) * 16 + mi; const v = pairCache.get(pk); if (v !== undefined) return v; const r = getRoute0(from, to, mode); pairCache.set(pk, r); return r; };
     const getRoute0 = (from, to, mode) => {
       const cf = G.nationCell(from), ct = G.nationCell(to);
       const A = R1(from, mode); const d = A.dist[ct];
@@ -104,7 +104,7 @@ LORA.sim.register('trade', 40, function (G) {
       const C = dijkstra(cf, from, mode, ub, to); const d3 = C.dist[ct];
       return isFinite(d3) ? { d: d3, path: pathFrom(C.prev, ct) } : null;
     };
-    const canTrade = (a, b) => a !== b && !G.atWar(a, b) && !G.sanctioned(a, b) && G.rel[a][b] > -70 && N[a].alive && N[b].alive;
+    const trMemo = new Map(); const tariffM = (i, j) => { const k = i * 1024 + j; let v = trMemo.get(k); if (v === undefined) { v = tariff(i, j) + (G.extraTariff ? G.extraTariff(i, j) : 0); trMemo.set(k, v); } return v; }; const ctMemo = new Map(); const canTrade = (a, b) => { const k = a * 1024 + b; let v = ctMemo.get(k); if (v === undefined) { v = a !== b && !G.atWar(a, b) && !G.sanctioned(a, b) && G.rel[a][b] > -70 && N[a].alive && N[b].alive; ctMemo.set(k, v); } return v; };
     // контракти гравця (пріоритет)
     G.contracts = G.contracts.filter(c => N[c.partner] && N[c.partner].alive);
     G.contracts.forEach(c => {
@@ -128,7 +128,7 @@ LORA.sim.register('trade', 40, function (G) {
         if (j === G.player && !N[j].autoTrade) return;
         const opts = [];
         exporters.forEach(i => { if (!canTrade(i, j) || (G.tradeBan && G.tradeBan(i, j, r))) return; if (i === G.player && !N[i].autoTrade) return; const R = getRoute(i, j, RI[r].mode); if (!R) return;
-          opts.push({ i, landed: 1 + RI[r].tc * R.d / 1000 + tariff(i, j) + (G.extraTariff ? G.extraTariff(i, j) : 0) - G.rel[i][j] / 2000, R }); });
+          opts.push({ i, landed: 1 + RI[r].tc * R.d / 1000 + tariffM(i, j) - G.rel[i][j] / 2000, R }); });
         opts.sort((a, b) => a.landed - b.landed); optsOf[j] = opts;
       });
       const fl = {};

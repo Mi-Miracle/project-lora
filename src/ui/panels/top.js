@@ -31,5 +31,5 @@ function renderLegend() {
     res: `${ico(RI[modeRes].ic)} ${RI[modeRes].n}: <span class="g">зелений</span> — регіон виробляє більше, ніж споживає; <span class="r">червоний</span> — дефіцит. Лінії — світові потоки.`,
     gdp: 'ВВП на душу в регіоні.', growth: 'Темп зростання ВВП держав.', stab: 'Внутрішня стабільність.', mil: 'Бойова сила армій.', op: 'Громадська думка у ваших регіонах: <span class="g">■</span> задоволені · <span class="r">■</span> незадоволені. 📢 — протести, 🦸 — місцеві герої.', flood: 'Море й клімат: <span style="color:#2a5cb0">■</span> затоплено · <span style="color:#ebbe50">■</span> ризик підтоплення. 🧱 — дамби.',
     supply: 'Фронти: <span style="color:#7a2323">■</span> ворог, <span style="color:#2e6aa6">■</span> ви, <span style="color:#2e5a6e">■</span> дружні. Пунктир — морські шляхи. Смужка біля армії — постачання; ➤ — наступ.' };
-  $('#legend').innerHTML = L[mode] + '<div class="mut small" style="margin-top:4px">ЛКМ — вибір · ПКМ — наказ · Shift+ПКМ — морем · колесо — масштаб · пробіл — пауза</div>';
+  $('#legend').innerHTML = L[mode] + '<div class="mut small" style="margin-top:4px">ЛКМ — вибір · ПКМ — меню дій (з обраною армією — наказ руху) · Shift+ПКМ — морем · колесо — масштаб · пробіл — пауза</div>';
 }

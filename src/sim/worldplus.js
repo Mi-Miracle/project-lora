@@ -59,8 +59,8 @@ LORA.sim.register('worldplus', 99.7, function (G) {
     if (on) { G.rel[a][b] = G.rel[b][a] = clamp(G.rel[a][b] - 6, -100, 100); G.say(`🚫 ${N[a].name} запроваджує ембарго на ${(G.RI && G.RI[r] ? G.RI[r].n : r).toLowerCase()} з ${N[b].name}`, 'info', [a, b]); }
     return { ok: true };
   };
-  G.tradeBan = (exp, imp, r) => { const L = G.embargo[imp + '>' + exp] || G.embargo[exp + '>' + imp]; return !!(L && (L.includes(r) || L.includes('all'))); };
-  G.extraTariff = (exp, imp) => G.tariffs[imp + '>' + exp] || 0;
+  G.tradeBan = (exp, imp, r) => { const E = G.embargo; let any = false; for (const _ in E) { any = true; break; } if (!any) return false; const L = E[imp + '>' + exp] || E[exp + '>' + imp]; return !!(L && (L.includes(r) || L.includes('all'))); };
+  G.extraTariff = (exp, imp) => { const T0 = G.tariffs; for (const _ in T0) return T0[imp + '>' + exp] || 0; return 0; };
   G.tariffMonthly = function () { (G.flows || []).forEach(f => { const r = G.tariffs[f.to + '>' + f.from]; if (r && f.val) { N[f.to].cash += f.val * r / 12; N[f.from].mods.push({ growth: -0.0004 * r, until: G.day + 31 }); } }); };
   // ---------- 8. подвійні агенти: спійманого ворожого шпигуна можна перевербувати
   G.doubleAgents = G.doubleAgents || [];

@@ -9180,3 +9180,164 @@ IT-бізнес	IT business
 Кіоск	Kiosk
 Дохід	Income
 Піти	Go
+Колесо — масштаб, ліва кнопка — вибір регіону, міста чи армії, права — меню дій для регіону (подорож, заклад, маршрут, будівництво), а з обраною армією — наказ рухатися (Shift+ПКМ — морем). Пробіл — стоп/старт, 1–4 — швидкість, Esc — пауза й меню. Туман війни ховає чужі війська поза розвідкою.	Wheel — zoom, left button — select a region, city or army, right — action menu for the region (travel, venue, route, construction), and with an army selected — move order (Shift+RMB — by sea). Space — stop/start, 1–4 — speed, Esc — pause and menu. Fog of war hides foreign troops outside intelligence range.
+Фонд від $50 тис., бізнес-план, допомогу здобувають у місті (банк, ЦНАП, IT-хаб, парк, ТБ), далі офіс, виробництво й команда. Після відкриття: заклади, розробки, 🔬 дослідження й 📋 можливості — замовлення, тендери, керуючий, спонсорство, інвестори.	A fund from $50k, a business plan, help is earned in the city (bank, admin center, IT hub, park, TV), then an office, production and a team. After opening: venues, developments, 🔬 research and 📋 opportunities — orders, tenders, a manager, sponsorship, investors.
+Персонаж (робота, навички, підробітки, розкіш, інвестиції) → партія і депутатство → власна компанія → президент. Почати можна з будь-якого етапу на екрані «Нова гра». Карʼєра — у вкладці «Карʼєра» розділу «Персонаж».	Character (job, skills, side gigs, luxury, investments) → party and parliament → own company → president. You can start from any stage on the «New game» screen. Career is in the «Career» tab of the «Character» section.
+Ліва панель у дві колонки: зліва розділи (🧑 Персонаж, 🏢 Компанія, 🏛 Держава, 🌐 Світ), справа — вкладки обраного розділу. Повторний клік ховає панель. 🛠 вгорі — мод-панель для тестування (F9).	The left panel has two columns: sections on the left (🧑 Character, 🏢 Company, 🏛 State, 🌐 World), the selected section's tabs on the right. Clicking again hides the panel. 🛠 at the top — the testing mod panel (F9).
+Ліва панель у дві колонки: зліва — розділи (Персонаж, Компанія, Держава, Світ), справа — вкладки розділу. Відкрийте «Персонаж».	The left panel has two columns: sections on the left (Character, Company, State, World), the section's tabs on the right. Open «Character».
+Нові пропозиції — щомісяця. Тендер — це конкурс: внесок 3%, шанс залежить від рівня закладів, досліджень і суперників.	New offers every month. A tender is a contest: 3% entry fee, the chance depends on your venues' level, research and rivals.
+Дослідження вашої справи: 5 гілок (продукт, маркетинг, процеси, масштаб, надійність). Працює паралельно з розробками.	Research for your business: 5 branches (product, marketing, processes, scale, reliability). Runs in parallel with developments.
+ЛКМ — вибір · ПКМ — меню дій (з обраною армією — наказ руху) · Shift+ПКМ — морем · колесо — масштаб · пробіл — пауза	LMB — select · RMB — action menu (with an army selected — move order) · Shift+RMB — by sea · wheel — zoom · space — pause
+Разові контракти від приватних клієнтів — щомісяця. Державні тендери — у вкладці «Тендери», кредит — у «Фінансах».	One-off contracts from private clients every month. State tenders are in the «Tenders» tab, loans in «Finance».
+Замовлення й тендери, керуючий, спонсорство, інвестори (для великої компанії — приватні контракти й спонсорство).	Orders and tenders, a manager, sponsorship, investors (for a large company — private contracts and sponsorship).
+Продайте 20% інвестору — отримаєте гроші зараз, але ця частка доходу закладів щомісяця йтиме йому. Максимум 60%.	Sell 20% to an investor — you get money now, but that share of venue income goes to them every month. Maximum 60%.
+Бере 10% доходу закладів; щомісяця сам розширює заклади, запускає розробки й дослідження, лишаючи запас коштів.	Takes 10% of venue income; every month expands venues, starts developments and research on their own, keeping a cash reserve.
+📦 — актив виробляє товар на склад; гроші приходять із продажу (вкладка «Виробництво» / «Ресурси»).	📦 — the asset produces goods into the warehouse; money comes from sales (the «Production» / «Resources» tab).
+Місцеві фестивалі, команди, благодійність: +4% доходу закладів на 90 днів і слава власника.	Local festivals, teams, charity: +4% venue income for 90 days and fame for the owner.
+Лабораторія вільна — оберіть дослідження. Розробки у вкладці закладів ідуть паралельно.	The lab is free — choose research. Developments in the venues tab run in parallel.
+спонсорство місцевих подій: +4% доходу закладів на 90 днів, слава власника +1	sponsoring local events: +4% venue income for 90 days, owner's fame +1
+керуючого найнято: 10% доходу закладів, розширює заклади й запускає розробки	manager hired: 10% of venue income, expands venues and starts developments
+Мод-панель для тестування (F9): гроші, навички, пропуск часу, миттєві будови	Testing mod panel (F9): money, skills, time skip, instant construction
+Активи вашої справи — заклади. Відкриття, розширення й розробки — у вкладці	Your business's assets are venues. Opening, expansion and developments are in the tab
+Операції компанії за її профілем: заклади, родовища, маршрути, контракти	Company operations by its profile: venues, deposits, routes, contracts
+Ваш персонаж: здоровʼя, настрій, гроші, звʼязки, популярність, вибори	Your character: health, mood, money, connections, popularity, elections
+Прогулянка містом: робота, підробітки, розваги, покупки, своя справа	A walk around the city: work, side gigs, fun, shopping, own business
+Справи за фахом: виїзні завдання на мапі, підробітки, сезонні бонуси	Professional tasks: field assignments on the map, side gigs, seasonal bonuses
+Угоди з іншими гравцями: перевезення, продаж, послуги — з торгом	Deals with other players: transport, sales, services — with haggling
+Своя справа: фонд, план, допомога, офіс, команда — і відкриття	Own business: fund, plan, help, office, team — and the opening
+Дослідження — для малого бізнесу. Велика компанія має R&D.	Research is for small businesses. A large company has R&D.
+Великі події й благодійні фонди: +5 впливу в країні штабу.	Major events and charity funds: +5 influence in the HQ country.
+Курси й навчання: навички для роботи, бізнесу й політики	Courses and study: skills for work, business and politics
+Громадська думка: настрої регіонів, протести, пропаганда	Public opinion: regional moods, protests, propaganda
+Виробництво: що виробляють ваші активи і куди йде товар	Production: what your assets produce and where the goods go
+спонсорство: вплив у країні штабу +5, імідж на 90 днів	sponsorship: influence in the HQ country +5, image for 90 days
+Служба на фронті: ваш підрозділ, накази штабу, тактика	Front service: your unit, HQ orders, tactics
+Пропозицій поки немає — заходьте наступного місяця.	No offers yet — come back next month.
+Професія: посада, зарплата, атестації й підвищення	Profession: position, salary, assessments and promotions
+Розвідка й космос: супутники, дані про інші країни	Intelligence and space: satellites, data on other countries
+Відносини компанії з урядами й іншими компаніями	The company's relations with governments and other companies
+Статки: гроші, нерухомість, інвестиції, покупки	Wealth: money, real estate, investments, purchases
+Поломка обладнання — заклад закрито на тиждень	Equipment breakdown — venue closed for a week
+Хвиля поганих відгуків: −12% доходу на місяць	A wave of bad reviews: −12% income for a month
+Фінанси: кредити, дивіденди, акції, звітність	Finance: loans, dividends, shares, reporting
+Інвесторам уже продано 60% — більше не можна	60% has already been sold to investors — no more allowed
+Порада: «Страхування закладів» зменшує ризик	Tip: «Venue insurance» reduces the risk
+Спецслужби: агенти, операції, контррозвідка	Secret services: agents, operations, counterintelligence
+Мод-панель для тестування (🛠 вгорі або F9)	Testing mod panel (🛠 at the top or F9)
+Державна посада: повноваження й рішення	State post: powers and decisions
+ООН: резолюції, голосування, миротворці	UN: resolutions, votes, peacekeepers
+дослідження скасовано, повернуто 50%	research cancelled, 50% refunded
+Бізнес ще надто малий для інвестора	The business is still too small for an investor
+претензії замовника, оплачено лише	client complaints, only paid
+Партія: членство, рейтинг, вибори	Party: membership, rating, elections
+Планета: клімат, море, катастрофи	Planet: climate, sea, disasters
+Міністри: призначення й доручення	Ministers: appointments and assignments
+більше — дослідження «Масштаб»)	more — «Scale» research)
+Родина: партнер, діти, стосунки	Family: partner, children, relationships
+R&D: власні розробки компанії	R&D: the company's own developments
+Персонал: помічники й радники	Staff: assistants and advisers
+заклади за кордоном без офісу	venues abroad without an office
+Державні тендери й контракти	State tenders and contracts
+Потрібно працюючих закладів	Working venues needed
+тендер програно (суперників	tender lost (rivals
+Санінспекція виписала штраф	The health inspection issued a fine
+Централізоване постачання	Centralized supply
+тепер інвестори отримують	investors now receive
+Будівництво нових активів	Building new assets
+Скасувати (повернуть 50%)	Cancel (50% refunded)
+Обслуговування фестивалю	Festival catering
+продано 20% інвестору за	sold 20% to an investor for
+Колонії й позаземні бази	Colonies and off-world bases
+Зароблено на замовленнях	Earned from orders
+Соцмережі й інфлюенсери	Social media and influencers
+Корпоративне замовлення	Corporate order
+Склад і продаж ресурсів	Warehouse and resource sales
+до замовлень і тендерів	to orders and tenders
+Лабораторія зайнята: «	Lab is busy: «
+Немає проданих часток	No shares sold
+прямий прибуток / рік	direct profit / year
+макс. рівень закладів	max venue level
+Страхування закладів	Venue insurance
+Термінове замовлення	Rush order
+Пропозицію вже знято	The offer has been withdrawn
+макс. рівень закладу	max venue level
+Замовлення й тендери	Orders and tenders
+Національна реклама	National advertising
+Масштабована модель	Scalable model
+Контракт із мережею	Contract with a chain
+Одночасно не більше	At most at once
+керуючого звільнено	manager dismissed
+запустив розробку «	started development «
+почав дослідження «	started research «
+Уже спонсоруєте (ще	Already sponsoring (
+Звільнити керуючого	Dismiss the manager
+Аналітика клієнтів	Customer analytics
+Стандарти операцій	Operating standards
+Регіональна мережа	Regional chain
+Міжнародний формат	International format
+Юридичний супровід	Legal support
+Державна закупівля	Public procurement
+Керувати закладами	Manage venues
+Приватні контракти	Private contracts
+Власна технологія	Own technology
+Немає дослідження	No research
+% доходу закладів	% of venue income
+ризику інцидентів	incident risk
+Частка інвесторів	Investors' share
+Стандарти якості	Quality standards
+Фірмовий продукт	Signature product
+Експортна партія	Export batch
+Потрібно активів	Assets needed
+викуплено 20% за	bought back 20% for
+»: досліджено «	»: researched «
+не повертається	is not refunded
+тендер виграно!	tender won!
+Крадіжка з каси	Theft from the till
+ціни розширення	expansion price
+Вже досліджено	Already researched
+часу відкриття	opening time
+Автоматизація	Automation
+Служба якості	Quality service
+дослідження «	research «
+📋 Можливості	📋 Opportunities
+дн. виконання	days to complete
+пропозиція ще	offer valid for
+💵 Підробітки	💵 Side gigs
+Спонсорувати	Sponsor
+Викупити 20%	Buy back 20%
+дн., оплата	days, payment
+Своя справа	Own business
+Спонсорство	Sponsorship
+Продати 20%	Sell 20%
+Надійність	Reliability
+досліджено	researched
+суперників	rivals
+Маркетинг	Marketing
+замовлень	orders
+виконання	completion
+Викуп 20%	Buyback of 20%
+до доходу	to income
+Одночасно	At once
+Інвестори	Investors
+Інциденти	Incidents
+💼 Робота	💼 Work
+виконано	completed
+розширив	expanded
+потрібно	needed
+Продукт	Product
+Процеси	Processes
+Масштаб	Scale
+до рів.	to lvl.
+активів	assets
+штрафів	fines
+Взятися	Take on
+останнє	latest
+тендер	tender
+внесок	fee
+рівнів	levels
+доходу	income
+Діє ще	Active for
+оплата	payment
+✨ Інше	✨ Other
+Меню	Menu
+шанс	chance

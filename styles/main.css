@@ -522,3 +522,30 @@ body.news-open #news { bottom: 30px; max-height: 46vh; z-index: 6; box-shadow: 0
 .mg-opts .city-act{display:block;width:100%;padding:10px 12px;background:#16212e;color:#e8f0f8;border:1px solid #2c3e54;border-radius:8px;cursor:pointer;text-align:left;font-size:14px}
 .mg-opts .city-act:hover{border-color:#ffd34d;background:#1d2b3b}
 #city .city-tabs{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}#city .city-tabs button.on{background:#ffd34d;color:#111;border-color:#ffd34d}
+/* v4.5: меню у дві колонки — розділи | вкладки розділу */
+#tabs.two,#tabs.one{width:200px;flex-direction:row;padding:0;gap:0}
+#tabs .rs{width:64px;flex:none;display:flex;flex-direction:column;gap:4px;padding:8px 5px;border-right:1px solid var(--line2);background:#0007}
+#tabs .rs-b{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 2px 7px;border-radius:8px;cursor:pointer;color:var(--mut);font:400 10px var(--px);text-align:center;border:1px solid transparent;position:relative}
+#tabs .rs-b b{font-size:22px;line-height:1;filter:grayscale(.6)}
+#tabs .rs-b:hover{background:#16212d;color:var(--tx)}
+#tabs .rs-b.on{color:#fff;background:linear-gradient(90deg,color-mix(in srgb,var(--acc) 45%,transparent),transparent);border-color:color-mix(in srgb,var(--acc) 50%,transparent)}
+#tabs .rs-b.on b{filter:none}
+#tabs .rs-b.on::after{content:'';position:absolute;right:-6px;top:20%;bottom:20%;width:3px;border-radius:2px;background:var(--acc2);box-shadow:0 0 8px var(--acc2)}
+#tabs .rt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding:8px 5px;overflow-y:auto}
+#tabs .rt-h{font:600 11px var(--px);color:var(--acc2);letter-spacing:.06em;text-transform:uppercase;padding:2px 4px 6px;border-bottom:1px solid var(--line2);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tabs .rt button{flex-direction:row;justify-content:flex-start;gap:6px;padding:4px 5px;font:400 11px var(--px);text-align:left;width:100%}
+#tabs .rt button span{max-width:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tabs .rt button .pxi.x2{width:32px;height:32px;flex:none;zoom:.7}
+#tabs .rt button.on::after{right:-5px}
+#tabs.two~#left,#tabs.one~#left{left:200px}
+body.lhide #tabs.two{width:64px}
+body.lhide #tabs.two .rt{display:none}
+#news{left:592px}#adv{left:594px}#campCard{left:590px}
+body.lhide #news,#left.hide~#news{left:74px}
+body.lhide #adv,#left.hide~#adv{left:76px}
+body.lhide #campCard{left:74px}
+body.lhide #funTk,#left.hide~#funTk{left:64px}
+body.lhide #tabs.one{width:200px}
+body.lhide:has(#tabs.one) #news{left:210px}
+@media (max-width:900px){#tabs.two,#tabs.one{width:150px}#tabs .rs{width:46px}#tabs .rs-b span{display:none}#tabs.two~#left,#tabs.one~#left{left:150px;width:min(380px,calc(100% - 150px))}#tabs .rt button span{display:inline}body.lhide #tabs.two{width:46px}}
+#funTk{left:580px}body.lhide:has(#tabs.one) #adv{left:212px}

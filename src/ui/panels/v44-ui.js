@@ -45,14 +45,23 @@ const RAIL_G = [['me', '🧑', 'Персонаж', ['char', 'lead', 'career', 'o
   ['st', '🏛', 'Держава', ['state', 'op', 'econ', 'logi', 'army', 'build', 'tech', 'colony', 'planet', 'intel', 'spy', 'mins', 'staff']],
   ['wd', '🌐', 'Світ', ['dipl', 'un', 'world', 'deals']]];
 const SMALL_HIDE = ['coprod', 'cotrade', 'cotend', 'cord', 'cobuild'];
-let railC = (() => { try { return new Set(JSON.parse(localStorage.getItem('lora_railc') || '[]')); } catch (e) { return new Set(); } })();
-function railToggle(g) { railC.has(g) ? railC.delete(g) : railC.add(g); try { localStorage.setItem('lora_railc', JSON.stringify([...railC])); } catch (e) { } renderTabs(); }
+// дві колонки: зліва розділи (Персонаж/Компанія/Держава/Світ), справа — вкладки обраного розділу
+let railSec = (() => { try { return localStorage.getItem('lora_rsec') || 'me'; } catch (e) { return 'me'; } })();
+const RSEC_LAST = {};
+function railList() { const c = G.pc >= 0 && G.myCo(); const seen = new Set(); return curTabs().filter(([k]) => { if (seen.has(k)) return false; seen.add(k); return !(c && c.bizType && SMALL_HIDE.includes(k)); }); }
+function railGOf(k) { return (RAIL_G.find(g => g[3].includes(k)) || RAIL_G[3])[0]; }
+function railSecClick(g) { const L = $('#left'); if (railSec === g && !L.classList.contains('hide')) { L.classList.add('hide'); renderTabs(); return; }
+  railSec = g; try { localStorage.setItem('lora_rsec', g); } catch (e) { } const l = railList().filter(([k]) => railGOf(k) === g); if (!l.length) return;
+  tab = (RSEC_LAST[g] && l.some(([k]) => k === RSEC_LAST[g])) ? RSEC_LAST[g] : l[0][0]; L.classList.remove('hide'); renderTabs(); renderTab(true); }
 { const base = window.renderTabs; window.renderTabs = function () { base.apply(this, arguments); const el = document.getElementById('tabs'); if (!el || !G) return;
-  const c = G.pc >= 0 && G.myCo(); const seen = new Set(); let list = curTabs().filter(([k]) => { if (seen.has(k)) return false; seen.add(k); return !(c && c.bizType && SMALL_HIDE.includes(k)); });
-  if (list.length < 7 || (G.mpRole && ROLE_TABS[G.mpRole])) { el.innerHTML = list.map(([k, v]) => `<button class="${tab === k ? 'on' : ''}" data-k="${k}" onclick="railClick('${k}')">${tabLabel(k, v)}</button>`).join(''); return; }
-  const gOf = k => (RAIL_G.find(g => g[3].includes(k)) || RAIL_G[3])[0]; const groups = RAIL_G.map(g => [g, list.filter(([k]) => gOf(k) === g[0])]).filter(([, l]) => l.length);
-  if (groups.length < 2) return;
-  el.innerHTML = groups.map(([g, l]) => { const open = !railC.has(g[0]) || l.some(([k]) => k === tab); return `<div class="rail-g ${open ? '' : 'shut'}" onclick="railToggle('${g[0]}')" data-tip="${esc(t_(open ? 'Згорнути блок' : 'Розгорнути блок'))}">${g[1]}<span>${esc(t_(g[2]))}</span>${open ? '' : `<i>${l.length}</i>`}</div>` + (open ? l.map(([k, v]) => `<button class="${tab === k ? 'on' : ''}" data-k="${k}" onclick="railClick('${k}')">${tabLabel(k, v)}</button>`).join('') : ''); }).join(''); }; }
+  const list = railList(); const btn = ([k, v]) => `<button class="${tab === k ? 'on' : ''}" data-k="${k}" onclick="railClick('${k}')">${tabLabel(k, v)}</button>`;
+  const groups = (G.mpRole && ROLE_TABS[G.mpRole]) ? [] : RAIL_G.map(g => [g, list.filter(([k]) => railGOf(k) === g[0])]).filter(([, l]) => l.length);
+  if (groups.length < 2) { el.className = 'one'; el.innerHTML = `<div class="rt">${list.map(btn).join('')}</div>`; return; }
+  if (list.some(([k]) => k === tab)) { railSec = railGOf(tab); RSEC_LAST[railSec] = tab; }
+  if (!groups.some(([g]) => g[0] === railSec)) railSec = groups[0][0][0];
+  const cur = groups.find(([g]) => g[0] === railSec); el.className = 'two';
+  el.innerHTML = `<div class="rs">${groups.map(([g, l]) => `<div class="rs-b ${g[0] === railSec ? 'on' : ''}" data-s="${g[0]}" onclick="railSecClick('${g[0]}')" data-tip="${esc(t_(g[2]))} · ${l.length}"><b>${g[1]}</b><span>${esc(t_(g[2]))}</span></div>`).join('')}</div>`
+    + `<div class="rt"><div class="rt-h">${cur[0][1]} ${esc(t_(cur[0][2]))}</div>${cur[1].map(btn).join('')}</div>`; }; }
 
 // ---------------- ПРАВИЙ КЛІК ПО МАПІ ----------------
 function mapCtxClose() { const m = document.getElementById('mctx'); if (m) m.remove(); }
@@ -82,7 +91,7 @@ document.addEventListener('mousedown', e => { const m = document.getElementById(
 document.addEventListener('keydown', e => { if (e.key === 'Escape') mapCtxClose(); });
 { const st = document.createElement('style'); st.textContent = `.mctx{position:fixed;z-index:950;min-width:220px;background:#141c27f5;border:1px solid #3a4a60;border-radius:10px;padding:6px;box-shadow:0 8px 24px #0008;display:flex;flex-direction:column;gap:2px}
 .mctx-h{font-weight:700;padding:4px 8px 6px;border-bottom:1px solid #2a3646;margin-bottom:4px}.mctx button{text-align:left;background:none;border:0;padding:6px 8px;border-radius:6px;color:inherit;cursor:pointer}.mctx button:hover:not([disabled]){background:#24324a}.mctx button[disabled]{opacity:.45;cursor:default}
-.rail-g{font-size:9px;text-transform:uppercase;letter-spacing:.04em;opacity:.7;padding:6px 2px 2px;text-align:center;cursor:pointer;border-top:1px solid #ffffff1a;display:flex;flex-direction:column;align-items:center;gap:1px;user-select:none}.rail-g:hover{opacity:1}.rail-g span{font-size:8px}.rail-g i{font-style:normal;font-size:9px;background:#ffffff22;border-radius:8px;padding:0 5px}.rail-g:first-child{border-top:0}`; document.head.appendChild(st); }
+`; document.head.appendChild(st); }
 // підробітки за фахом — у вкладці «Справи»
 { const base = TAB_FN.ops; TAB_FN.ops = function () { let h = base(); const L = G.leader; if (!L || !L.job || !G.SIDE[L.job.k]) return h; const j = G.JOBS[L.job.k];
   h += `<div class="grp">💵 ${t_('Підробітки за фахом')}</div><div class="small mut">${t_('Разові замовлення за професією — що вища посада, то дорожчі. Виконуються на робочому місці в місті.')}</div>`;
