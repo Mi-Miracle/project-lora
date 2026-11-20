@@ -122,6 +122,7 @@ function cityLoop() {
   cx.font = '34px serif'; cx.fillText(G.leader.ic && G.leader.ic !== '⭐' ? G.leader.ic : '🧍', me.x * W, me.y * H - 22 - (locUI.path.length ? Math.abs(Math.sin(now * 10)) * 5 : 0));
   locUI.fx = locUI.fx.filter(f => now * 1000 - f.t0 < 1600); locUI.fx.forEach(f => { const q = (now * 1000 - f.t0) / 1600; for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28; cx.globalAlpha = 1 - q; cx.font = '24px serif'; cx.fillText(f.e, f.x * W + Math.cos(a) * q * 90, f.y * H + Math.sin(a) * q * 90 - q * 30); } cx.globalAlpha = 1; });
   if (night && th === 'city') { cx.fillStyle = 'rgba(10,10,40,0.18)'; cx.fillRect(0, 0, W, H); }
+  if (window.cityWeather) cityWeather(cx, W, H, now, night);
   locUI.raf = requestAnimationFrame(cityLoop);
 }
 // вкладка «Місто»: усі локації, суди, нерухомість, служба

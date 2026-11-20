@@ -205,7 +205,8 @@ LORA.sim.register('stage2', 99.998, function (G) {
   // =====================================================================================================
   // 3. ВИДОБУТОК: РОДОВИЩА, РОЗВІДКА, ЛІЦЕНЗІЇ, РЕЖИМ, АВАРІЇ, ШІ
   // =====================================================================================================
-  const EXT = Object.keys(BD).filter(k => BD[k].req && BD[k].req.geo); const RES_T = {}; EXT.forEach(k => { RES_T[BD[k].req.geo] = k; });
+  const EXT = Object.keys(BD).filter(k => BD[k].req && BD[k].req.geo); const RES_T = {}; const SECA = [].concat(G.D.companySectors.mining.assets, G.D.companySectors.oil.assets);
+  EXT.forEach(k => { const r = BD[k].req.geo; if (!RES_T[r] || (SECA.includes(k) && !SECA.includes(RES_T[r]))) RES_T[r] = k; });
   G.EXT_TYPES = EXT; G.extOf = type => BD[type] && BD[type].req && BD[type].req.geo || null; G.typeOfRes = r => RES_T[r];
   G.secRes = sec => sec === 'mining' ? ['coal', 'metal', 'nonfer', 'rare', 'uranium'].filter(r => RES_T[r]) : sec === 'oil' ? ['oil', 'gas'].filter(r => RES_T[r]) : [];
   const hasGeo = (i, r) => { const t = ter[i]; if (!t || !RES_T[r]) return false; if ((t.prod[r] || 0) > (G.W_prod0[r] || 0) * 0.003) return true; const e = G.canBuild(t.owner, i, RES_T[r]); return !e || !/покладів/.test(e); };
@@ -273,6 +274,7 @@ LORA.sim.register('stage2', 99.998, function (G) {
   const VEH = G.VEH = {
     truck: { n: 'Вантажівки', ic: '🚚', cost: 0.00015, kmd: 650, rev: 2.4e-9, opx: 1.15e-9, risk: 0.03, max: 60, d: 'дешево, будь-який суходіл; ризик на дорогах біля фронту' },
     rail:  { n: 'Вантажні потяги', ic: '🚆', cost: 0.004, kmd: 900, rev: 46e-9, opx: 19e-9, risk: 0.02, max: 20, d: 'дорогі, але возять у 20 разів більше; потрібна розвинена інфраструктура', infra: 0.45 },
+    air:   { n: 'Пасажирські літаки', ic: '✈', cost: 0.08, kmd: 9000, rev: 80e-9, opx: 39e-9, risk: 0.004, max: 10, d: 'пасажирські рейси між великими містами; швидко, потрібні аеропорти', air: 1 },
     ship:  { n: 'Суховантажі', ic: '🚢', cost: 0.03, kmd: 560, rev: 165e-9, opx: 64e-9, risk: 0.01, max: 12, d: 'найбільший обсяг; лише між прибережними регіонами, морем' }
   };
   // шлях вантажу: обходить країни, що воюють з відправником чи отримувачем, і регіони з боями
@@ -286,10 +288,12 @@ LORA.sim.register('stage2', 99.998, function (G) {
     const V = VEH[m]; if (!V) return no('Оберіть транспорт'); if (a === b || a == null || b == null || a < 0 || b < 0) return no('Оберіть два різні регіони');
     const na = ter[a].ctrl, nb = ter[b].ctrl; if (G.atWar(na, nb)) return no('Між цими країнами війна');
     let P;
-    if (m === 'ship') { if (!T[a].p.length || !T[b].p.length) return no('Морем — лише між прибережними регіонами'); const sp = G.seaPath(na, a, b); if (!sp) return no('Немає безпечного морського шляху'); P = { sea: sp.nodes, km: sp.km };
+    if (m === 'air') { const big = i => ter[i].gdp > 25 || N[ter[i].ctrl].home === i; if (!big(a) || !big(b)) return no('Потрібні великі міста з аеропортами'); if ((G.tradeBan && G.tradeBan(na, nb, 'all')) || (G.sanctions && G.sanctions.has && (G.sanctions.has(na + '>' + nb) || G.sanctions.has(nb + '>' + na)))) return no('Авіасполучення заборонене (санкції)'); P = { path: [a, b], km: km(a, b) };
+    } else if (m === 'ship') { if (!T[a].p.length || !T[b].p.length) return no('Морем — лише між прибережними регіонами'); const sp = G.seaPath(na, a, b); if (!sp) return no('Немає безпечного морського шляху'); P = { sea: sp.nodes, km: sp.km };
     } else { P = cargoPath(a, b, na, nb); if (!P) return no('Немає сухопутного шляху (море, війна або ембарго)');
       if (m === 'rail') { const low = P.path.find(i => (N[ter[i].ctrl].infraLvl || 0) < V.infra); if (low != null) return no(`Слабка залізнична мережа: ${N[ter[low].ctrl].name}`); } }
     if (P.km < 60) return no('Занадто близько — це вже не логістика'); const days = Math.max(1, P.km / V.kmd);
+    if (m === 'air' && P.km < 300) return no('Занадто близько для авіарейсу');
     const gdp = (N[na].agg ? N[na].agg.gdp : 100) + (N[nb].agg ? N[nb].agg.gdp : 100); const dem = clamp(0.7 + gdp / 9000, 0.7, 1.5) * (na !== nb ? 1.2 : 1);
     const rev = P.km * V.rev * dem * 1.4, cost = P.km * 2 * V.opx; const per = rev - cost; const tripD = days * 2 + 1;
     return { ok: true, m, a, b, path: P.path || null, sea: P.sea || null, km: Math.round(P.km), days: +days.toFixed(1), dem: +dem.toFixed(2), profitTrip: per, monthly: per * 30 / tripD, vcost: V.cost };
@@ -313,6 +317,7 @@ LORA.sim.register('stage2', 99.998, function (G) {
       const step = 1 / Math.max(1, r.days), seas = r.path && G.seasonSpeed ? G.seasonSpeed(r.path[0]) : 1;
       for (let k = r.u.length - 1; k >= 0; k--) { const was = r.u[k]; if (was < 0) { r.u[k] = Math.min(0, was + 1); continue; } // < 0 — розвантаження/навантаження (днів)
         let v = was + step * seas;
+        if (r.fc && was < 1 && v >= 1) { r.trips++; v = 1.0001; r.u[k] = v; continue; } if (r.fc && v >= 2) { r.u[k] = -1; continue; }
         if (was < 1 && v >= 1) { const rev = r.km * V.rev * r.dem; c.cash += rev - r.km * V.opx; r.earn += rev - r.km * V.opx; r.trips++; v = 1.0001; r.u[k] = v; continue; }
         if (v >= 2) { const rev = r.km * V.rev * r.dem * 0.4; c.cash += rev - r.km * V.opx; r.earn += rev - r.km * V.opx; v = -1; }
         r.u[k] = v;
@@ -323,7 +328,7 @@ LORA.sim.register('stage2', 99.998, function (G) {
     G.companies.forEach(c => { if (!c.alive || !c.ai || c.sector !== 'logistics' || s.routes.filter(r => r.co === c.id).length >= 3 || R() > 0.35) return;
       const offs = c.offices.map(o => o.t).filter(t => t != null); if (!offs.length) return; const a = offs[Math.floor(R() * offs.length)];
       const cand = ter.filter(t => t.ctrl === t.owner && N[t.owner].alive && t.i !== a && !G.atWar(ter[a].ctrl, t.ctrl) && km(a, t.i) > 400 && km(a, t.i) < 3500 && t.gdp > 20); if (!cand.length) return;
-      const b = cand[Math.floor(R() * cand.length)].i; const m = T[a].p.length && T[b].p.length && R() < 0.3 ? 'ship' : R() < 0.4 ? 'rail' : 'truck'; const q = G.routeQuote(a, b, m); if (!q.ok || q.profitTrip <= 0) return;
+      const b = cand[Math.floor(R() * cand.length)].i; const m = R() < 0.25 ? 'air' : T[a].p.length && T[b].p.length && R() < 0.3 ? 'ship' : R() < 0.4 ? 'rail' : 'truck'; const q = G.routeQuote(a, b, m); if (!q.ok || q.profitTrip <= 0) return;
       const n = Math.min(VEH[m].max, Math.max(1, Math.floor(c.cash * 0.02 / VEH[m].cost))); if (n * VEH[m].cost > c.cash * 0.05) return; mkRoute(c, q, n); }); }
   // положення транспорту для мапи: [lon, lat]
   G.routePts = function (r) { if (r._pts && r._pk === (r.path || r.sea || []).join(',')) return r._pts; const P = [];

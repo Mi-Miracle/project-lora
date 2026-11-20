@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['Assignments tab: big real-world tasks for all 18 professions', 'Trips and convoys move on the map', 'City: workplaces and vacancies are highlighted', 'Detailed map: roads, deeper zoom, buildings with levels', 'Logistics companies build private railways']
-  : ['Вкладка «Справи»: великі завдання для всіх 18 професій', 'Поїздки й конвої рухаються мапою', 'Місто: робочі місця й вакансії підсвічено', 'Детальна мапа: дороги, глибше наближення, будівлі з рівнями', 'Логістичні компанії прокладають власні залізниці']
+  ? ['Mod panel for testing (F9)', 'Battle tactics and ministerial posts from your career', 'Open your own business step by step, cheaply', 'Ore sales and hired carriers; deals between players', 'Character dilemmas, seasons and airlines']
+  : ['Мод-панель для тестування (F9)', 'Тактика в бою й посади міністрів із карʼєри', 'Своя справа поетапно й дешево', 'Збут руди, наймані перевізники, угоди між гравцями', 'Ситуації-вибори, сезони й авіалінії']
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }
@@ -82,6 +82,7 @@ function settingsScreen() {
     + chk('sfx', 'Звукові ефекти') + rng('vol', 'Гучність ефектів') + chk('toasts', 'Спливаючі сповіщення') + chk('advisors', 'Радники з порадами') + chk('newscast', 'Щомісячний випуск новин') + chk('yearcast', 'Підсумки року (щорічний випуск)', true) + chk('funcast', 'Щотижневі кумедні новини', true);
   else if (setTab === 'voice') body = chk('tts', 'Озвучка увімкнена') + `<div id="voiceBox">${voiceSettings()}</div>`;
   else if (setTab === 'game') body = `<label class="row"><span>🌫 ${t_('Туман війни')}</span><input type="checkbox" ${LORA.config.fog !== false ? 'checked' : ''} onchange="LORA.config.fog=this.checked;try{localStorage.setItem('lora_fog',this.checked?'1':'0')}catch(e){};if(window.mapDirty!==undefined)mapDirty=true"></label>
+    ${chk('roads', 'Дороги на мапі (з наближення ×14)', true)}${chk('blds', 'Будівлі на мапі (з наближення ×18)', true)}${chk('dev', 'Мод-панель для тестування (клавіша F9)')}
     <label class="row"><span>${t_('Заставка при запуску')}</span><input type="checkbox" ${localStorage.getItem('lora_intro') === 'off' ? '' : 'checked'} onchange="localStorage.setItem('lora_intro',this.checked?'on':'off')"></label>
     <label class="row"><span>${t_('Гумористичні новини й події')}</span><input type="checkbox" ${S.humor !== false ? 'checked' : ''} onchange="AUD.set('humor',this.checked);LORA.tickerRefresh&&LORA.tickerRefresh()"></label>
     <label class="row"><span>${t_('Анімації світових подій (прибульці, катаклізми)')}</span><input type="checkbox" ${S.fx !== false ? 'checked' : ''} onchange="AUD.set('fx',this.checked)"></label>

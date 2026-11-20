@@ -112,14 +112,14 @@ function s2Routes(c) {
 }
 
 // ---------------- ПАНЕЛЬ АРМІЇ: власний підрозділ / ПВК ----------------
-{ const base = window.armyPanel; if (base) window.armyPanel = function () { const h = base.apply(this, arguments); const a = G.armies.find(x => x.id === sel.id); if (!a || !G.canCmd || !G.canCmd(a) || a.n === G.player) return h;
-  return h + `<div class="card small" style="border-color:#ffb000"><b>🎖 ${a.pmc != null ? t_('Ваш загін ПВК') : t_('Ваш підрозділ')}</b><div class="small mut">${t_('ПКМ по регіону на мапі — рух (Shift — морем)')}</div><div class="btns">${s2B('➤ ' + t_('Наступ'), `s2Res(G.act.unitStance(${a.id},'attack'))`, a.stance === 'attack' ? 'вже' : '')}${s2B('🛡 ' + t_('Оборона'), `s2Res(G.act.unitStance(${a.id},'hold'))`, a.stance !== 'attack' ? 'вже' : '')}</div></div>`; }; }
+document.addEventListener('DOMContentLoaded', () => { const base = window.armyPanel; if (base) window.armyPanel = function () { const h = base.apply(this, arguments); const a = G.armies.find(x => x.id === sel.id); if (!a || !G.canCmd || !G.canCmd(a) || a.n === G.player) return h;
+  return h + `<div class="card small" style="border-color:#ffb000"><b>🎖 ${a.pmc != null ? t_('Ваш загін ПВК') : t_('Ваш підрозділ')}</b><div class="small mut">${t_('ПКМ по регіону на мапі — рух (Shift — морем)')}</div><div class="btns">${s2B('➤ ' + t_('Наступ'), `s2Res(G.act.unitStance(${a.id},'attack'))`, a.stance === 'attack' ? 'вже' : '')}${s2B('🛡 ' + t_('Оборона'), `s2Res(G.act.unitStance(${a.id},'hold'))`, a.stance !== 'attack' ? 'вже' : '')}</div></div>`; }; });
 
 // ---------------- МАПА: транспорт, шахти, розвідка ----------------
 function drawStage2(sh) {
   if (!G || !G.s2) return; const S = G.s2(); const myCo = G.pc; const zoom = view.s; const frac = typeof speedIdx !== 'undefined' && speedIdx ? (typeof tAcc !== 'undefined' ? tAcc : 0) : 0;
   const L0 = G.leader; ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  S.routes.forEach(r => { const mine = r.co === myCo; if (!mine && zoom < 5) return; const X = G.routePts(r); const V = G.VEH[r.m];
+  S.routes.forEach(r => { const mine = r.co === myCo; if (!mine && zoom < (r.m === 'air' ? 2.5 : 5)) return; const X = G.routePts(r); const V = G.VEH[r.m];
     ctx.beginPath(); X.P.forEach((p, k) => { const [x, y] = toScreen(p[0] + sh, p[1]); if (k) ctx.lineTo(x, y); else ctx.moveTo(x, y); });
     ctx.strokeStyle = mine ? (r.st ? 'rgba(255,90,90,0.8)' : 'rgba(255,190,60,0.75)') : 'rgba(200,200,200,0.35)'; ctx.lineWidth = mine ? 2 : 1; ctx.setLineDash(r.m === 'ship' ? [6, 5] : r.m === 'rail' ? [2, 3] : []); ctx.stroke(); ctx.setLineDash([]);
     ctx.font = (mine ? 15 : 11) + 'px system-ui'; const step = 1 / Math.max(1, r.days);
@@ -142,7 +142,7 @@ function drawStage2(sh) {
   if (L && L.role === 'char' && L.job && G.JOB_OPS && G.JOB_OPS[L.job.k] && !r.some(x => x[0] === 'ops')) { const i = r.findIndex(x => x[0] === 'career'); r.splice(i >= 0 ? i + 1 : r.length, 0, ['ops', '🗂 Справи']); }
   return r; }; }
 let opsSel = {};
-function opTgName(op, t) { if (op.tg === 'build') { const c = G.constructions.find(x => x.id === +t); return c ? `${t_(G.D.buildings[c.type].n)} — ${regName(c.t)} (${c.done - G.day} ${t_('дн.')})` : '?'; } const n = G.ter[t].ctrl; return (op.tg === 'abroad' || op.tg === 'nation' || op.tg === 'enemy') ? `${G.N[n].name} — ${regName(t)}` : regName(t); }
+function opTgName(op, t) { if (op.tg === 'build') { const c = G.constructions.find(x => x.id === +t); return c ? `${t_(G.D.buildings[c.type].n)} — ${regName(c.t)} (${c.done - G.day} ${t_('дн.')})` : '?'; } const n = G.ter[t].ctrl; if (op.id === 'flight' && G.airSchedule && G.leader) { const f = G.airSchedule(G.N[G.leader.home].home).find(x => x.to === +t); if (f) return `✈ ${G.companies[f.co].name}: ${G.N[n].name} — ${regName(t)}`; } return (op.tg === 'abroad' || op.tg === 'nation' || op.tg === 'enemy') ? `${G.N[n].name} — ${regName(t)}` : regName(t); }
 TAB_FN.ops = function () {
   const L = G.leader; if (!L || !L.job) return ''; const list = G.JOB_OPS[L.job.k] || []; const j = G.JOBS[L.job.k];
   let h = `<div class="card small">${t_('Великі справи вашої професії: кілька днів роботи з реальним впливом на країну й світ. Дні справи зараховуються як робочі, досвід — більший, ніж за щоденні обовʼязки. Поїздки видно на мапі.')}</div>`;

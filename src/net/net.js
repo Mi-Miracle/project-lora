@@ -93,8 +93,8 @@ const NET = (() => {
       if (m.fn === 'uiArmy' || m.fn === 'uiFleet') { const list = m.fn === 'uiArmy' ? G.armies : G.fleets; const u = list.find(x => x.id === m.args[0]); if (!u || u.n !== pl.nid) return; const ps = sel; sel = { type: m.fn === 'uiArmy' ? 'a' : 'f', id: u.id }; try { (m.fn === 'uiArmy' ? window._armyAct : window._fleetAct)(m.args[1]); } finally { sel = ps; } return; }
       const fn = m.fn.startsWith('act.') ? G.act[m.fn.slice(4)] : G[m.fn]; if (typeof fn === 'function') r = fn(...args);
       if (m.fn === 'act.armySet' && args[0]) { const a = G.armies.find(x => x.id === args[0] && x.n === pl.nid); if (a) Object.assign(a, args[1]); }
-    } catch (e) { r = { ok: false, err: String(e) }; } finally { G.player = prev; G.pc = prevPc; G._lk = prevLk; }
-    const c = S.conns.find(x => cid(x) === pl.id); if (c && m.rid) send(c, { t: 'res', rid: m.rid, r: r && typeof r === 'object' ? { ok: r.ok, err: r.err, days: r.days } : r });
+    } catch (e) { r = { ok: false, err: String(e) }; } finally { if (G.pc >= 0 && G.pc !== (pl.pc != null ? pl.pc : -1) && pl.nid == null) pl.pc = G.pc; G.player = prev; G.pc = prevPc; G._lk = prevLk; }
+    const c = S.conns.find(x => cid(x) === pl.id); if (c && m.rid) send(c, { t: 'res', rid: m.rid, r: r && typeof r === 'object' ? { ok: r.ok, err: r.err, days: r.days, msg: r.msg } : r });
   }
   // знімок стану для гостя (повні дані — лише його держави)
   const LIGHT = ['alive', 'stab', 'cash', 'debt', 'tech', 'q', 'navQ', 'warExh', 'growth', 'press', 'milStock', 'casualties', 'nuke', 'infraLvl', 'troopsBase', 'nw', 'nk'];
@@ -110,7 +110,7 @@ const NET = (() => {
   async function unpack(m) { if (m.t === 'snapj') return JSON.parse(m.js); const st = new Blob([m.z]).stream().pipeThrough(new DecompressionStream('gzip')); return JSON.parse(await new Response(st).text()); }
   function hostTick(now) {
     if (S.role !== 'host' || !S.started || !G || S.busy) return; if (now - S.snapT < 1500) return; S.snapT = now; S.busy = true;
-    Promise.all(S.conns.map(async c => { const p = S.players.find(x => x.id === cid(c)); if (p && (p.nid != null || p.spect)) send(c, await pack(Object.assign(snapFor(p.spect ? -1 : p.nid), { players: onlineList() }, p.spect && window.outState ? { sv: outState() } : {}))); })).finally(() => S.busy = false);
+    Promise.all(S.conns.map(async c => { const p = S.players.find(x => x.id === cid(c)); if (p && (p.nid != null || p.spect || p.lk)) send(c, await pack(Object.assign(snapFor(p.spect ? -1 : p.nid != null ? p.nid : (G.leaders[p.lk] ? G.leaders[p.lk].home : -1)), { players: onlineList(), v29: G.v29, mePc: p.pc != null ? p.pc : -1 }, p.spect && window.outState ? { sv: outState() } : {}))); })).finally(() => S.busy = false);
   }
   function onlineList() { return S.players.filter(p => p.a3).map(p => ({ name: p.name, a3: p.a3, host: !!p.host, nid: p.host ? G.player : p.nid })); }
   // ---------- ГІСТЬ
@@ -131,7 +131,7 @@ const NET = (() => {
     else if (m.t === 'chat') addChat(m.who, m.text);
     else if (m.t === 'start') { G = LORA.createGame({ seed: 1 }); G.load(m.save); G.player = m.nid >= 0 ? m.nid : (m.pc >= 0 || m.lk ? -1 : m.view); G.pc = m.pc != null ? m.pc : -1; G._lk = m.lk || undefined; G.mpRole = m.role || 'nation'; S.myNid = m.nid; S.started = true; installProxies(); $('#start').style.display = 'none'; closeModal(); startUI(); try { const T0 = curTabs(); if (T0.length && !T0.some(x => x[0] === tab)) { tab = T0[0][0]; renderTabs(); renderTab(true); } } catch (e) { } document.body.classList.add('guest'); if (S.spectator) { document.body.classList.add('spect'); } else chatUI(true); if (S.spectator && window._follow) setStreamView('ticker'); else if (S.spectator && window._autoView) setStreamView(window._autoView); }
     else if ((m.t === 'snapz' || m.t === 'snapj') && G) unpack(m).then(o => { S.lag = S.lastSnap ? Math.round(performance.now() - S.lastSnap) : 0; S.lastSnap = performance.now(); S.online = o.players; applySnap(o); if (S.spectator && window.followOut) followOut(o.sv); });
-    else if (m.t === 'res') { const w = waiting[m.rid]; if (w) { delete waiting[m.rid]; if (m.r && m.r.ok === false) { hint('⚠ ' + t_(m.r.err || ''), 3500); AUD.sfx('bad'); } } }
+    else if (m.t === 'res') { const w = waiting[m.rid]; if (w) { delete waiting[m.rid]; if (m.r && m.r.ok === false) { hint('⚠ ' + t_(m.r.err || ''), 3500); AUD.sfx('bad'); } else if (m.r && m.r.msg) hint('✅ ' + t_(m.r.msg), 3500); } }
   }
   function applySnap(m) {
     const prevNews = G.news[0]; G.day = m.day; speedIdx = m.speed;
@@ -140,6 +140,7 @@ const NET = (() => {
     G.armies = m.armies; G.fleets = m.fleets; G.wars = new Map(m.wars.map(w => [G.warKey(w.a, w.b), w])); G.alliances = m.alliances.map(a => ({ name: a.name, m: new Set(a.m) }));
     G.sanctions = new Set(m.sanctions); G.access = new Set(m.access); G.treaties = new Set(m.treaties);
     G.news.length = 0; m.news.forEach(x => G.news.push(x)); G.strikes = m.strikes; G.pendingPeace = m.pending; G.constructions = m.constructions; G.links = m.links;
+    if (m.v29) G.v29 = m.v29; if (m.mePc != null && m.mePc >= 0) G.pc = m.mePc;
     G.decisions = m.decisions || []; G.leaders = m.leaders; G.agents = m.agents || []; G.generals = m.generals || []; G.blocs = m.blocs; G.prices = m.prices; G.battles = m.battles; G.battleHot = m.battleHot; if (m.gameOver) G.gameOver = m.gameOver;
     // нові новини → сповіщення й радники, як у одиночній грі
     const fresh = []; for (const n of G.news) { if (prevNews && n.text === prevNews.text && n.d === prevNews.d) break; fresh.push(n); } fresh.reverse().forEach(n => LORA.bus.emit('news', n));
