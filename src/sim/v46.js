@@ -100,7 +100,7 @@ LORA.sim.register('v46', 100.4, function (G) {
   G.coArmyErr = function (c, k) { if (!c) return 'Немає компанії'; if (!['military'].includes(c.sector) && !['vpk', 'pmc', 'sec'].includes(c.bizType)) return 'Власне військо — лише для ВПК, ПВК чи охоронного бізнесу';
     if (!(k >= 1)) return 'Мінімальний загін — 1 тис. бійців'; const cap = c.bizType ? 2 + (c.bunits || []).length : 10 + (c.assets || []).length * 2; const have = G.coArmies(c).reduce((s, a) => s + a.k, 0); if (have + k > cap) return `Ліміт війська компанії: ${cap} тис. (зараз ${have.toFixed(1)})`;
     const q = G.coArmyQuote(c, k); if (c.cash < q.total) return `Набір і навчання: ${f$(q.total)}`; return ''; };
-  G.coArmyRaise = function (k) { const c = G.myCo(); k = +k; const e = G.coArmyErr(c, k); if (e) return no(e); const q = G.coArmyQuote(c, k); c.cash -= q.total;
+  G.coArmyRaise = function (k) { const c = G.myCo(); k = +k; const e = G.coArmyErr(c, k); if (e) return no(e); const q = G.coArmyQuote(c, k); c.cash -= q.total; c.inv = c.inv || {};
     for (const [g, per] of Object.entries(G.ARMY_KIT)) c.inv[g] = Math.max(0, ((c.inv || {})[g] || 0) - per * k);
     c.inv = c.inv || {}; const t = (c.bunits && c.bunits[0] && c.bunits[0].t) ?? (c.offices[0] || {}).t; const n = G.coArmies(c).length + 1;
     const a = G.newArmy(c.home, t, k, LORA.lang === 'en' ? `${c.en || c.name} Guard ${n}` : `Загін «${c.name}» №${n}`); a.pmc = c.id; a.coArmy = c.id; a.auto = false; a.org = 0.45 + 0.5 * q.eq; a.xp = 0.1 + (c.bizType === 'pmc' ? 0.15 : 0);

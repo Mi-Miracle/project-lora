@@ -1,0 +1,112 @@
+/* v4.7 «Сучасний інтерфейс» (body.ui2): плаваючі скляні панелі над мапою, чистий шрифт із табличними цифрами,
+   заокруглення, мʼякі тіні, монохромні іконки неактивних вкладок, плаваючий док. Вимикається в Налаштуваннях → Гра. */
+body.ui2{
+  --px:'Inter','Segoe UI Variable Text','Segoe UI',system-ui,-apple-system,Roboto,sans-serif;--ui:var(--px);
+  --r:10px;--tx:#eaf0f6;--mut:#8e9db0;--line:#ffffff10;--line2:#ffffff1c;
+  --glass:rgba(12,17,25,.80);--glass2:rgba(255,255,255,.045);--glass3:rgba(255,255,255,.08);
+  --sh:0 10px 32px rgba(0,0,0,.45),0 2px 6px rgba(0,0,0,.3);
+  font-feature-settings:'tnum' 1,'cv11' 1;letter-spacing:.005em
+}
+body.ui2 ::-webkit-scrollbar{width:8px}body.ui2 ::-webkit-scrollbar-track{background:transparent}
+body.ui2 ::-webkit-scrollbar-thumb{background:#ffffff1f;border:2px solid transparent;background-clip:padding-box;border-radius:8px}
+body.ui2 ::-webkit-scrollbar-thumb:hover{background:#ffffff38;background-clip:padding-box}
+
+/* --- скляні панелі --- */
+body.ui2 #top,body.ui2 #tabs.v46,body.ui2 #left,body.ui2 #right,body.ui2 #dock,body.ui2 #news,body.ui2 #legend,body.ui2 #funTk{
+  background:var(--glass);backdrop-filter:blur(18px) saturate(1.35);-webkit-backdrop-filter:blur(18px) saturate(1.35);border:1px solid var(--line2);box-shadow:var(--sh)}
+
+/* --- верхній HUD --- */
+body.ui2 #top{top:8px;left:8px;right:8px;height:50px;border-radius:14px;padding-left:10px;gap:6px}
+body.ui2 #top::before,body.ui2 #top::after{display:none}
+body.ui2 #top .st{background:transparent;border:0;border-radius:10px;padding:4px 10px;min-width:0;transition:background .15s}
+body.ui2 #top .st:hover{background:var(--glass3)}
+body.ui2 #top .st:first-of-type{background:linear-gradient(90deg,color-mix(in srgb,var(--acc) 30%,transparent),transparent);border:0}
+body.ui2 #top .st b{font:650 14px var(--px)}
+body.ui2 #top .st span{font-size:9.5px;letter-spacing:.09em;opacity:.85}
+body.ui2 #top select{border-radius:9px;background:var(--glass2);border:1px solid var(--line2)}
+body.ui2 #top button{background:transparent;border-color:transparent;box-shadow:none}
+body.ui2 #top button:hover{background:var(--glass3)}
+body.ui2 #top button.on{background:color-mix(in srgb,var(--acc) 45%,transparent)}
+
+/* --- бічна колонка вкладок --- */
+body.ui2 #tabs.v46{left:8px;top:66px;bottom:78px;width:184px;border-radius:14px;padding:10px 8px;gap:2px}
+body.ui2 #tabs.v46::before{display:none}
+body.ui2 #tabs.v46 .rt-h{font:700 10.5px var(--px);letter-spacing:.12em;color:var(--mut);border-bottom:0;padding:2px 8px 8px}
+body.ui2 #tabs.v46 button{border:0;background:transparent;border-radius:9px;padding:7px 8px;font:500 13px var(--px);color:var(--mut);box-shadow:none;transition:background .15s,color .15s}
+body.ui2 #tabs.v46 button:hover{background:var(--glass3);color:var(--tx)}
+body.ui2 #tabs.v46 button.on{background:color-mix(in srgb,var(--acc) 30%,transparent);color:#fff}
+body.ui2 #tabs.v46 button.on::after{right:auto;left:-8px;top:22%;bottom:22%;width:3px;border-radius:2px;background:var(--acc2)}
+body.ui2 #tabs.v46 button .pxi,body.ui2 #tabs.v46 button .pxe{filter:grayscale(1) brightness(1.25) opacity(.75);transition:filter .15s}
+body.ui2 #tabs.v46 button:hover .pxi,body.ui2 #tabs.v46 button.on .pxi,body.ui2 #tabs.v46 button:hover .pxe,body.ui2 #tabs.v46 button.on .pxe{filter:none}
+
+/* --- основна панель --- */
+body.ui2 #tabs.v46~#left{left:200px;top:66px;bottom:78px;width:392px;border-radius:14px;overflow:hidden}
+body.ui2 #left.hide{transform:translateX(-24px) scale(.98);opacity:0}
+body.ui2 #ptitle{background:transparent;border-bottom:1px solid var(--line)}
+body.ui2 #tabc{padding:10px 14px 40px}
+body.ui2 #right{top:66px;right:8px;bottom:auto;max-height:calc(100% - 146px);border-radius:14px;padding:12px 14px}
+
+/* --- типографіка --- */
+body.ui2 h3{font:650 15px var(--px);letter-spacing:.01em}
+body.ui2 .grp{font:700 10.5px var(--px);color:var(--mut);letter-spacing:.12em;margin:16px 0 6px}
+body.ui2 .grp::after{background:var(--line)}
+body.ui2 .kpi b{font:650 18px var(--px)}
+body.ui2 .kpi span{letter-spacing:.08em;font-size:9.5px}
+body.ui2 .mut{color:var(--mut)}
+body.ui2 b.g,body.ui2 .g{color:#6fe3a0}body.ui2 b.r,body.ui2 .r{color:#ff8a7a}
+
+/* --- кнопки, поля, картки --- */
+body.ui2 button{background:var(--glass2);border:1px solid var(--line2);border-radius:9px;box-shadow:none;padding:6px 12px;transition:background .15s,border-color .15s,transform .08s}
+body.ui2 button:hover:not(:disabled){background:var(--glass3);border-color:#ffffff2e}
+body.ui2 button:active:not(:disabled){transform:scale(.97)}
+body.ui2 button:disabled{opacity:.42}
+body.ui2 button.pri{background:color-mix(in srgb,var(--acc) 70%,#1d6fe0 30%);border-color:transparent;text-shadow:none;color:#fff}
+body.ui2 button.pri:hover:not(:disabled){background:color-mix(in srgb,var(--acc) 85%,#3d8bff 15%)}
+body.ui2 button.on{background:color-mix(in srgb,var(--acc) 35%,transparent);border-color:color-mix(in srgb,var(--acc) 60%,transparent);color:#fff}
+body.ui2 input,body.ui2 select,body.ui2 textarea{border-radius:9px;background:#00000040;border:1px solid var(--line2);color:var(--tx)}
+body.ui2 input:focus,body.ui2 select:focus,body.ui2 textarea:focus{outline:none;border-color:var(--acc2);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc2) 22%,transparent)}
+body.ui2 .card{background:var(--glass2);border:1px solid var(--line);border-left:1px solid var(--line);border-radius:12px;padding:10px 12px;box-shadow:none;margin:8px 0}
+body.ui2 .card:hover{border-color:var(--line2);transform:none}
+body.ui2 .kpi div{background:var(--glass2);border:1px solid var(--line);border-radius:12px;padding:8px 11px}
+body.ui2 .kpi div::before{display:none}
+body.ui2 .jc{background:var(--glass2);border-color:var(--line);border-radius:12px}
+body.ui2 .row{padding:3px 0}
+body.ui2 .sub,body.ui2 .subnav{background:#00000030;border-radius:11px;padding:3px;gap:2px}
+body.ui2 .sub button,body.ui2 .subnav button{border-radius:8px;font:500 12.5px var(--px)}
+body.ui2 .sub button.on,body.ui2 .subnav button.on{background:color-mix(in srgb,var(--acc) 55%,#22324a);color:#fff}
+body.ui2 table th{color:var(--mut);font-weight:600;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase}
+body.ui2 .bar{border-radius:6px;overflow:hidden;background:#ffffff12}
+
+/* --- док (плаваючий, по центру) --- */
+body.ui2 #dock{left:50%;right:auto;transform:translateX(-50%);bottom:10px;height:58px;border-radius:18px;padding:0 8px;gap:8px}
+body.ui2 #dock::before{display:none}
+body.ui2 .dk-b{border:0;background:transparent;border-radius:12px;padding:8px 14px 8px 10px;font:600 13px var(--px)}
+body.ui2 .dk-b:hover{background:var(--glass3)}
+body.ui2 .dk-b.on{background:color-mix(in srgb,var(--acc) 38%,transparent)}
+body.ui2 .dk-b.on::after{top:auto;bottom:3px;left:30%;right:30%;height:3px}
+body.ui2 .dk-b i{background:#ffffff14}
+body.ui2 .dk-s{margin-left:6px;padding-left:8px;border-left:1px solid var(--line2)}
+body.ui2 #dkIn{width:220px;border-radius:11px;background:#00000038}
+body.ui2 #dkRes{background:var(--glass);backdrop-filter:blur(18px);border-radius:14px;bottom:52px}
+
+/* --- новини, легенда, біжучий рядок --- */
+body.ui2 #news{left:604px;bottom:80px;border-radius:14px;padding:8px 12px}
+body.ui2.lhide #news,body.ui2 #left.hide~#news{left:8px}
+body.ui2 #news div{border-bottom-color:var(--line)}
+body.ui2 #legend{right:8px;bottom:80px;border-radius:14px;padding:8px 12px}
+body.ui2 #funTk{left:50%!important;right:auto;transform:translateX(-50%);bottom:76px;width:min(860px,56vw);border-radius:10px;overflow:hidden;height:26px}
+body.ui2.tk-on #news,body.ui2.tk-on #legend{bottom:110px}
+body.ui2 #adv{left:604px;bottom:270px}
+body.ui2.lhide #adv,body.ui2 #left.hide~#adv{left:8px}
+body.ui2 #campCard{left:604px}
+
+/* --- модальні вікна й підказки --- */
+body.ui2 .modal,body.ui2 #modal>div{border-radius:16px}
+body.ui2 #tip,body.ui2 .tip{border-radius:10px;background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--line2)}
+
+/* --- анімації --- */
+body.ui2 #left{transition:transform .22s cubic-bezier(.2,.8,.2,1),opacity .18s}
+body.ui2 #right{animation:ui2In .2s cubic-bezier(.2,.8,.2,1)}
+@keyframes ui2In{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){body.ui2 #left,body.ui2 #right,body.ui2 button{transition:none;animation:none}}
+@media (max-width:900px){body.ui2 #tabs.v46{width:136px}body.ui2 #tabs.v46~#left{left:150px;width:min(392px,calc(100% - 158px))}body.ui2 #dkIn{width:130px}body.ui2 #news{left:8px}}

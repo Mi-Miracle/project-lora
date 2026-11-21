@@ -585,5 +585,5 @@ body.stream #dock{display:none}
 .jc{margin:6px 0 4px;padding:6px 8px;border:1px solid var(--line2);border-radius:8px;background:#0b121a}
 .jc-h{font:600 12px var(--px);color:var(--acc2);margin-bottom:4px}
 @media (max-width:900px){#tabs.v46{width:132px}#tabs.v46~#left{left:132px;width:min(380px,calc(100% - 132px))}.dk-b span{display:none}.dk-b{padding:7px 9px}#dkIn{width:150px}#news{left:10px}}
-#tabs.v46 button>:first-child:not(.pxi){font-size:16px!important;width:22px!important;height:auto!important;text-align:center;flex:none;zoom:1}
+#tabs.v46 button .pxe.x2{width:32px;height:32px;flex:none;zoom:.7}
 #funTk{bottom:58px}body.tk-on #news,body.tk-on #legend{bottom:92px}body.tk-on #togL{bottom:92px}

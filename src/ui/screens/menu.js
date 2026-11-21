@@ -1,8 +1,8 @@
 // ГОЛОВНЕ МЕНЮ (як у сучасних іграх), ЕКРАН НАЛАШТУВАНЬ і МЕНЮ ПАУЗИ (Esc).
 let _mmRaf = 0, _paused = false, _pauseSpeed = 1;
 const MM_NEWS = () => LORA.lang === 'en'
-  ? ['New menu: sections bar at the bottom, tabs on the side, search (/)', 'Choose your business type: trade, food & tourism; defense, plants & machinery; services; IT & media', 'Production lines for every business, a production plan for corporations', 'Company troops: raise units from your own equipment', 'Rating ★, staff, competitors, city events, your venue in the city, loans between players']
-  : ['Нове меню: розділи на нижній панелі, вкладки збоку, пошук (/)', 'Вибір типу справи: торгівля, їжа й туризм; ВПК, заводи й техніка; послуги; IT і медіа', 'Виробничі лінії для всіх справ, виробничий план корпорацій', 'Військо компанії: загони зі свого спорядження', 'Рейтинг ★, персонал, конкуренти, події міста, ваш заклад у місті, позики між гравцями']
+  ? ['Modern interface: floating glass panels, clean font (can be switched off in Settings)', 'Supply chains between businesses: cooperative or a player supplier, wholesale', 'General staff orders for company troops', 'Small business taxes: honest, optimization, schemes; inspections and audits', 'Share exchange: stakes in player companies and corporations, dividends; «Your business market» map mode']
+  : ['Сучасний інтерфейс: плаваючі скляні панелі, чистий шрифт (вимикається в Налаштуваннях)', 'Ланцюжки постачання між справами: кооператив або постачальник-гравець, опт', 'Накази генштабу для війська компаній', 'Податки малої справи: чесно, оптимізація, схеми; перевірки й аудит', 'Біржа часток: компанії гравців і корпорації, дивіденди; режим мапи «Ринок вашої справи»']
 function hasSaveGame() { try { return !!(localStorage.getItem('lora_save') || localStorage.getItem('lora_auto')); } catch (e) { return false; } }
 function mainMenu() {
   let el = document.getElementById('mm'); if (!el) { el = document.createElement('div'); el.id = 'mm'; document.body.appendChild(el); }
@@ -82,7 +82,7 @@ function settingsScreen() {
     + chk('sfx', 'Звукові ефекти') + rng('vol', 'Гучність ефектів') + chk('toasts', 'Спливаючі сповіщення') + chk('advisors', 'Радники з порадами') + chk('newscast', 'Щомісячний випуск новин') + chk('yearcast', 'Підсумки року (щорічний випуск)', true) + chk('funcast', 'Щотижневі кумедні новини', true);
   else if (setTab === 'voice') body = chk('tts', 'Озвучка увімкнена') + `<div id="voiceBox">${voiceSettings()}</div>`;
   else if (setTab === 'game') body = `<label class="row"><span>🌫 ${t_('Туман війни')}</span><input type="checkbox" ${LORA.config.fog !== false ? 'checked' : ''} onchange="LORA.config.fog=this.checked;try{localStorage.setItem('lora_fog',this.checked?'1':'0')}catch(e){};if(window.mapDirty!==undefined)mapDirty=true"></label>
-    ${chk('roads', 'Дороги на мапі (лише при сильному наближенні)', true)}${chk('blds', 'Будівлі на мапі (лише при сильному наближенні)', true)}${chk('dev', 'Мод-панель для тестування (🛠 вгорі або F9)')}
+    ${chk('ui2', 'Сучасний інтерфейс (новий вигляд панелей)', true)}${chk('roads', 'Дороги на мапі (лише при сильному наближенні)', true)}${chk('blds', 'Будівлі на мапі (лише при сильному наближенні)', true)}${chk('dev', 'Мод-панель для тестування (🛠 вгорі або F9)')}
     <label class="row"><span>${t_('Заставка при запуску')}</span><input type="checkbox" ${localStorage.getItem('lora_intro') === 'off' ? '' : 'checked'} onchange="localStorage.setItem('lora_intro',this.checked?'on':'off')"></label>
     <label class="row"><span>${t_('Гумористичні новини й події')}</span><input type="checkbox" ${S.humor !== false ? 'checked' : ''} onchange="AUD.set('humor',this.checked);LORA.tickerRefresh&&LORA.tickerRefresh()"></label>
     <label class="row"><span>${t_('Анімації світових подій (прибульці, катаклізми)')}</span><input type="checkbox" ${S.fx !== false ? 'checked' : ''} onchange="AUD.set('fx',this.checked)"></label>
